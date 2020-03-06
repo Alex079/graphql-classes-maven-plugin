@@ -1,0 +1,46 @@
+
+<#macro type t>
+<#switch t.class.simpleName>
+<#case 'TypeName'>${t.name}<#break>
+<#case 'NonNullType'><@type t.type/>!<#break>
+<#case 'ListType'>[<@type t.type/>]<#break>
+</#switch>
+</#macro>
+
+<#macro value v>
+<#switch v.class.simpleName>
+<#case 'ArrayValue'>[<#list v.values as c><@value c/><#sep> </#list>]<#break>
+<#case 'EnumValue'>${v.name}<#break>
+<#case 'NullValue'>null<#break>
+<#case 'ObjectValue'>{<#list v.objectFields as c>${c.name}: <@value c.value/><#sep> </#list>}<#break>
+<#case 'VariableReference'>$${v.name}<#break>
+<#case 'BooleanValue'>${v.value?c}<#break>
+<#case 'FloatValue'>${v.value?c}<#break>
+<#case 'IntValue'>${v.value?c}<#break>
+<#case 'StringValue'>"""${v.value}"""<#break>
+<#default>${v}
+</#switch>
+</#macro>
+
+<#macro var v><#list v>(<#items as i>$${i.name}: <@type i.type/><#if i.defaultValue??> = <@value i.defaultValue/></#if><#sep> </#items>)</#list></#macro>
+
+<#macro arg v><#list v>(<#items as i>${i.name}: <@value i.value/><#sep> </#items>)</#list></#macro>
+
+<#macro dir v><#list v> <#items as i>@${i.name}<@arg i.arguments/><#sep> </#items></#list></#macro>
+
+<#macro selection sel>
+<#switch sel.class.simpleName>
+<#case 'Field'><#if sel.alias??>${sel.alias}: </#if>${sel.name}<@arg sel.arguments/><@dir sel.directives/><#if sel.selectionSet??><@selection_set sel.selectionSet/></#if><#break>
+<#case 'InlineFragment'>...on ${sel.typeCondition.name}<@dir sel.directives/><@selection_set sel.selectionSet/><#break>
+<#case 'FragmentSpread'>...${sel.name}<@dir sel.directives/><#break>
+</#switch>
+</#macro>
+
+<#macro selection_set sel><#if 0 < sel.selections?size> {<#list sel.selections as s><@selection s/><#sep> </#list>}</#if></#macro>
+
+<#list operations as o>
+${o.operation?lower_case} <#if o.name??>${o.name}</#if><@var o.variableDefinitions/><@dir o.directives/><@selection_set o.selectionSet/>
+</#list>
+<#list fragments as f>
+fragment ${f.name} on ${f.typeCondition.name}<@dir f.directives/><@selection_set f.selectionSet/>
+</#list>

@@ -1,0 +1,16 @@
+
+# queries
+
+query ($id : ID!, $certs : [[[X509Certificate!]!]!]! = {m:1e-3 v:null g:{t:"""n""" n:[5 4]}}) @D(a:"a") {
+	lic:license(id : $id) @d @f(a:false) {
+		con:conditions@d {...F1@d}
+		permissions@d {...on LicenseRule @d{key}}
+	}
+}
+
+query findSomething($v : AcceptTopicSuggestionInput!) @D(a:"a") {
+	lic:license(id : $id) @d @f(a:false) {
+		con:conditions@d {...F1@d}
+		permissions@d {...on LicenseRule @d{key}}
+	}
+}

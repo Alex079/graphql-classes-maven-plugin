@@ -1,0 +1,19 @@
+# fragments
+
+fragment F1 on LicenseRule @d{
+	...F2
+	description
+}
+
+fragment F2 on LicenseRule {
+	label
+	...F3
+}
+
+fragment F3 on LicenceRule {key}
+
+
+fragment UnusedFragment on LicenseRule {
+	label
+}
+

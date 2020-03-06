@@ -1,0 +1,18 @@
+package ${typesPackage};
+
+public class ${name}
+{
+
+	private final String value;
+
+	public ${name}(String v)
+	{
+		value = v;
+	}
+	
+	public String getValue()
+	{
+		return value;
+	}
+
+}

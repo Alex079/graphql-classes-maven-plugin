@@ -1,0 +1,12 @@
+package ${basePackage};
+
+public interface ${interfaceName}<Variables, Result>
+{
+
+	String getDocument();
+
+	String getOperation();
+
+	Variables getVariables();
+
+}

@@ -1,0 +1,3 @@
+package ${typesPackage};
+
+public interface ${name} { }

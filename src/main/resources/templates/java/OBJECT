@@ -1,0 +1,26 @@
+package ${typesPackage};
+
+import java.math.*;
+import java.net.*;
+import java.util.*;
+
+public class ${name}
+<#if 0 < members?size>
+implements ${members?join(", ")}
+</#if>
+{
+
+	<#list fields as f>
+	<#if jsonProperty?has_content>@${jsonProperty}("${f.name}")</#if>
+	private ${f.type.full} ${f.name}<#if jsonProperty?has_content>__</#if>;
+
+	public ${f.type.full} get${f.name?cap_first}() {
+		return this.${f.name}<#if jsonProperty?has_content>__</#if>;
+	}
+
+	public void set${f.name?cap_first}(${f.type.full} v) {
+		this.${f.name}<#if jsonProperty?has_content>__</#if> = v;
+	}
+
+	</#list>
+}
