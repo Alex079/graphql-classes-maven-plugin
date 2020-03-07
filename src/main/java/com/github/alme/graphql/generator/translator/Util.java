@@ -45,7 +45,6 @@ public final class Util {
 		else if (type instanceof TypeName) {
 			String name = ((TypeName) type).getName();
 			if (isScalar(name, doc, ctx)) {
-//				return GqlType.scalar(ctx.getScalarMap().getOrDefault(name, name));
 				return GqlType.named(formatTypeName(name, ctx.getScalarMap().getOrDefault(name, name)));
 			}
 			return GqlType.named(name);
@@ -59,39 +58,6 @@ public final class Util {
 		}
 		return String.format("/*%s=>*/%s", original, current);
 	}
-//	
-//	private static final GqlValue translateValue(Value<?> value, Document doc) {
-//		if (value.getClass() == ArrayValue.class) {
-//			return new GqlValue(((ArrayValue) value).getValues().stream()
-//				.map(v -> translateValue(v, doc))
-//				.collect(toList()));
-//		}
-//		if (value.getClass() == EnumValue.class) {
-//			return new GqlValue(((EnumValue) value).getName()); // TODO type is needed
-//		}
-//		if (value.getClass() == NullValue.class) {
-//			return new GqlValue("null");
-//		}
-//		if (value.getClass() == ObjectValue.class) {
-//			
-//		}
-//		if (value.getClass() == VariableReference.class) {
-//			return new GqlValue(((VariableReference) value).getName());
-//		}
-//		if (value.getClass() == BooleanValue.class) {
-//			return new GqlValue(String.valueOf(((BooleanValue) value).isValue()));
-//		}
-//		if (value.getClass() == FloatValue.class) {
-//			
-//		}
-//		if (value.getClass() == IntValue.class) {
-//			
-//		}
-//		if (value.getClass() == StringValue.class) {
-//			
-//		}
-//		return null;
-//	}
 	
 	public static final Collection<GqlSelection> translateSelection(SelectionSetContainer<?> container, Document doc, Context ctx, String typeName) {
 		Collection<GqlSelection> result = new ArrayList<>();
@@ -155,23 +121,15 @@ public final class Util {
 	}
 	
 	public static final Function<FieldDefinition, GqlField> fromFieldDef(Document doc, Context ctx) {
-		return (v) -> new GqlField(
-			v.getName(),
-			translateType(v.getType(), doc, ctx));
+		return (v) -> new GqlField(v.getName(), translateType(v.getType(), doc, ctx));
 	}
 	
 	public static final Function<InputValueDefinition, GqlField> fromInputValueDef(Document doc, Context ctx) {
-		return (v) -> new GqlField(
-			v.getName(),
-			translateType(v.getType(), doc, ctx));
-//			translateValue(v.getDefaultValue(), doc));
+		return (v) -> new GqlField(v.getName(), translateType(v.getType(), doc, ctx));
 	}
 	
 	public static final Function<VariableDefinition, GqlField> fromVariableDef(Document doc, Context ctx) {
-		return (v) -> new GqlField(
-			v.getName(),
-			translateType(v.getType(), doc, ctx));
-//			translateValue(v.getDefaultValue(), doc));
+		return (v) -> new GqlField(v.getName(), translateType(v.getType(), doc, ctx));
 	}
 	
 	private static final boolean isScalar(String name, Document doc, Context ctx) {
