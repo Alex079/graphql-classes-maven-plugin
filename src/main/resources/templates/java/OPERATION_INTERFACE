@@ -9,4 +9,6 @@ public interface ${interfaceName}<Variables, Result>
 
 	Variables getVariables();
 
+	Class<Result> getResultClass();
+
 }
