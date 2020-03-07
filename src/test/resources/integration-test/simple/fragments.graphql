@@ -1,0 +1,5 @@
+
+fragment ItemFragment on Item {
+	price
+	quantity
+}

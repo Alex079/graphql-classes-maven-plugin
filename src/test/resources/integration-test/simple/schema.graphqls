@@ -1,0 +1,46 @@
+scalar Address @string
+
+type Item {
+	id: ID!
+	price: Float!
+	quantity: Int!
+}
+
+type Location {
+	id: ID!
+	address: Address!
+	shelf: Int!
+}
+
+type Track {
+	id: ID!
+	itemId: ID!
+	from: Location!
+	fromDate: Date!
+	to: Address!
+	toDate: Date!
+	delivered: Boolean!
+	notes: String
+}
+
+enum PaymentType {
+	CARD
+	CASH
+	CHEQUE
+	OTHER
+}
+
+input SoldItem {
+	item: Item!
+	paidBy: PaymentType!
+	track: Track!
+}
+
+type Query {
+	itemsInDelivery(paidBy: PaymentType): [Item!]
+	trackingInfo(itemId: ID!): Track
+}
+
+type Mutation {
+	delivered(item: SoldItem!): Track! @currentDate
+}

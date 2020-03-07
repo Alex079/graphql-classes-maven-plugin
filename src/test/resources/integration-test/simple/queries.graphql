@@ -1,0 +1,21 @@
+
+{
+	itemsInDelivery {
+		...ItemFragment
+	}
+}
+
+query getItemsInDeliveryByPayment($paidBy: PaymentType!) {
+	itemsInDelivery(paidBy: $paidBy) {
+		...ItemFragment
+	}
+}
+
+query getTrackingInfo($itemId: ID!) {
+	trackingInfo(itemId: $itemId) {
+		fromDate
+		toDate
+		toAddress
+		delivered
+	}
+}

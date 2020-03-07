@@ -1,0 +1,4 @@
+
+mutation setDelivered($item: SoldItem!) {
+	delivered(item: $item)
+}

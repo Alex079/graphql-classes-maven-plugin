@@ -3,7 +3,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.alme.integration.test</groupId>
+  <groupId>com.github.alme.integration.test</groupId>
   <artifactId>simple-integration-test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
@@ -36,18 +36,15 @@
         <version>@project.version@</version>
         <configuration>
           <source>
-            <includes>schema*.graphql*</includes>
+            <includes>
+              <include>schema.graphqls</include>
+              <include>*.graphql</include>
+            </includes>
           </source>
           <packageName>integration.test</packageName>
           <outputDirectory>${project.build.directory}\generated-it-test-sources\java</outputDirectory>
           <scalarMap>
-            <DateTime>Date</DateTime>
-            <PreciseDateTime>Date</PreciseDateTime>
-            <GitTimestamp>Date</GitTimestamp>
-            <GitSSHRemote>URI</GitSSHRemote>
-            <HTML>String</HTML>
-            <GitObjectID>String</GitObjectID>
-            <X509Certificate>java.security.cert.X509Certificate</X509Certificate>
+            <Address>String</Address>
           </scalarMap>
 <!--           <jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation> -->
           <jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>

@@ -12,3 +12,5 @@ buildNumber.properties
 .project
 .classpath
 .settings
+.vscode
+.factorypath
