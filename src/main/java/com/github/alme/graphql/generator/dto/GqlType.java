@@ -68,6 +68,7 @@ public class GqlType {
 				return String.format("%s!", nested);
 			case LIST:
 				return String.format("[%s]", nested);
+			case NAMED:
 			default:
 				return name;
 		}
