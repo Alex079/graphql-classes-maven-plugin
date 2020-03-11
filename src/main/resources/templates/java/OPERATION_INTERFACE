@@ -9,6 +9,8 @@ public interface ${interfaceName}<Variables, Result>
 
 	Variables getVariables();
 
+	java.util.Map<String, Object> getVariablesAsMap();
+
 	Class<Result> getResultClass();
 
 }

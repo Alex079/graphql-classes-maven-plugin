@@ -9,7 +9,7 @@ package ${basePackage};
 			return this.${input.name}<#if jsonProperty?has_content>__</#if>;
 		}
 
-		public final class /*${input.type.inner}=>*/${input.name?cap_first} {
+		public class /*${input.type.inner}=>*/${input.name?cap_first} {
 		
 		<#list input.selection as s>
 		<@m_selection s/>
@@ -45,7 +45,7 @@ import java.math.*;
 import java.net.*;
 import java.util.*;
 
-public final class ${className} implements ${interfaceName}<${className}.Variables, ${className}.Result>
+public class ${className} implements ${interfaceName}<${className}.Variables, ${className}.Result>
 {
 
 	private final String document = <#if text??>"${text?j_string}"<#else>null</#if>;
@@ -66,11 +66,21 @@ public final class ${className} implements ${interfaceName}<${className}.Variabl
 		return variables;
 	}
 
+	public Map<String, Object> getVariablesAsMap() {
+		return variables.asMap();
+	}
+
 	public Class<Result> getResultClass() {
 		return Result.class;
 	}
 
-	public final class Variables {
+	public class Variables {
+
+		private final transient Map<String, Object> $values = new HashMap<>();
+
+		public Map<String, Object> asMap() {
+			return Collections.unmodifiableMap($values);
+		}
 
 		<#list variables as v>
 		<#if jsonProperty?has_content>@${jsonProperty}("${v.name}")</#if>
@@ -85,13 +95,14 @@ public final class ${className} implements ${interfaceName}<${className}.Variabl
 			<@m_check_null v.type/>
 			.forEach(($) -> {});
 			this.${v.name}<#if jsonProperty?has_content>__</#if> = v;
+			this.$values.put("${v.name}", v);
 			return this;
 		}
 
 		</#list>
 	}
 
-	public final class /*${type.inner}=>*/Result {
+	public class /*${type.inner}=>*/Result {
 
 		<#list selection as s>
 		<@m_selection s/>
