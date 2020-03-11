@@ -1,6 +1,8 @@
 package ${basePackage};
 
-<#macro m_selection input>
+<#macro m_selection selectionList>
+		<#list selectionList as input>
+
 		<#if jsonProperty?has_content>@${jsonProperty}("${input.name}")</#if>
 		<#if input.selection?has_content>
 		private final ${input.type.getCustom(input.name?cap_first)} ${input.name}<#if jsonProperty?has_content>__</#if> = null;
@@ -10,20 +12,25 @@ package ${basePackage};
 		}
 
 		public class /*${input.type.inner}=>*/${input.name?cap_first} {
-		
-		<#list input.selection as s>
-		<@m_selection s/>
-		</#list>
-		}
+		<@m_selection input.selection/>
 
+		}
 		<#else>
 		private final ${input.type.full} ${input.name}<#if jsonProperty?has_content>__</#if> = null;
 
 		public ${input.type.full} get${input.name?cap_first}() {
 			return this.${input.name}<#if jsonProperty?has_content>__</#if>;
 		}
-
 		</#if>
+		</#list>
+
+		public String toString() {
+			return new StringBuilder().append("{")
+			<#list selectionList as input>
+			.append(" ${input.name} = ").append(get${input.name?cap_first}())
+			</#list>
+			.append(" }").toString();
+		}
 </#macro>
 
 <#macro m_check_null input>
@@ -81,8 +88,8 @@ public class ${className} implements ${interfaceName}<${className}.Variables, ${
 		public Map<String, Object> asMap() {
 			return Collections.unmodifiableMap($values);
 		}
-
 		<#list variables as v>
+
 		<#if jsonProperty?has_content>@${jsonProperty}("${v.name}")</#if>
 		private ${v.type.full} ${v.name}<#if jsonProperty?has_content>__</#if>;
 	
@@ -98,15 +105,12 @@ public class ${className} implements ${interfaceName}<${className}.Variables, ${
 			this.$values.put("${v.name}", v);
 			return this;
 		}
-
 		</#list>
 	}
 
 	public class /*${type.inner}=>*/Result {
+		<@m_selection selection/>
 
-		<#list selection as s>
-		<@m_selection s/>
-		</#list>
 	}
 
 }
