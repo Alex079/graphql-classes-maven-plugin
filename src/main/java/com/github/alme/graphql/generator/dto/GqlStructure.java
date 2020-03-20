@@ -17,8 +17,13 @@ public class GqlStructure {
 	private final Collection<String> members = new HashSet<>();
 	private final Collection<GqlField> fields = new HashSet<>();
 	
-	public GqlStructure addMembers(Collection<String> parents) {
-		this.members.addAll(parents);
+	public GqlStructure addMembers(Collection<String> members) {
+		this.members.addAll(members);
+		return this;
+	}
+
+	public GqlStructure addMember(String member) {
+		this.members.add(member);
 		return this;
 	}
 	

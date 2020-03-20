@@ -96,7 +96,6 @@ public final class Util {
 
 	private static GqlType guessTypeOfField(Field field, Context ctx, String containerType) {
 		return Stream.concat(
-			Stream.concat(
 				Optional.ofNullable(ctx.getObjectTypes().get(containerType))
 				.map(GqlStructure::getFields)
 				.map(Collection::stream)
@@ -104,20 +103,11 @@ public final class Util {
 				Optional.ofNullable(ctx.getInterfaceTypes().get(containerType))
 				.map(GqlStructure::getFields)
 				.map(Collection::stream)
-				.orElseGet(Stream::empty)
-			),
-			Optional.ofNullable(ctx.getUnionTypes().get(containerType))
-			.map(GqlStructure::getMembers)
-			.map(Collection::stream)
-			.orElseGet(Stream::empty)
-			.map(ctx.getObjectTypes()::get)
-			.map(GqlStructure::getFields)
-			.flatMap(Collection::stream)
-		)
-		.filter((candidate) -> Objects.equals(field.getName(), candidate.getName()))
-		.map(GqlField::getType)
-		.findAny()
-		.orElse(GqlType.named("String"));
+				.orElseGet(Stream::empty))
+			.filter((candidate) -> Objects.equals(field.getName(), candidate.getName()))
+			.map(GqlField::getType)
+			.findAny()
+			.orElse(GqlType.named("String"));
 	}
 	
 	public static final Function<FieldDefinition, GqlField> fromFieldDef(Document doc, Context ctx) {
