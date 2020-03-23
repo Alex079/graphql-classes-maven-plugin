@@ -52,7 +52,6 @@ import java.math.*;
 import java.net.*;
 import java.util.*;
 
-@javax.annotation.processing.Generated("com.github.alme.graphql.generator.io.GqlWriter")
 public class ${className}
 implements ${interfaceName}<${className}.Variables, ${className}.Result>
 {

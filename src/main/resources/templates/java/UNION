@@ -1,4 +1,3 @@
 package ${typesPackage};
 
-@javax.annotation.processing.Generated("com.github.alme.graphql.generator.io.GqlWriter")
 public interface ${name} { }
