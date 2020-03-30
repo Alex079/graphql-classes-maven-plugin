@@ -46,10 +46,8 @@ public class GqlWriter {
 
 	public void write(Context ctx, String rootOutputDir, String basePackageName) throws MojoExecutionException {
 		String typesPackageName = basePackageName + SUBPACKAGE_SEPARATOR + TYPES_SUBPACKAGE;
-		Path basePackageFolder = Paths.get(rootOutputDir.toString(),
-				basePackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
-		Path typesPackageFolder = Paths.get(rootOutputDir.toString(),
-				typesPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
+		Path basePackageFolder = Paths.get(rootOutputDir, basePackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
+		Path typesPackageFolder = Paths.get(rootOutputDir, typesPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
 		try {
 			Files.createDirectories(typesPackageFolder);
 		} catch (IOException e) {
@@ -72,7 +70,7 @@ public class GqlWriter {
 	}
 
 	private void dumpTypeClasses(Context ctx, Path typesPackageFolder) {
-		ctx.getStructures().forEach((category, structures) -> {
+		ctx.getStructures().forEach((category, structures) ->
 			structures.forEach((name, i) -> {
 				Path path = Paths.get(typesPackageFolder.toString(), name + FILE_EXTENSION);
 				try (Writer writer = Files.newBufferedWriter(path)) {
@@ -80,8 +78,8 @@ public class GqlWriter {
 				} catch (TemplateException | IOException e) {
 					ctx.getLog().error(String.format(LOG_CANNOT_CREATE, name), e);
 				}
-			});
-		});
+			})
+		);
 	}
 
 	private void dumpOperationInterfaces(Context ctx, Path basePackageFolder) {
