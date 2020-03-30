@@ -34,7 +34,7 @@ public class GqlWriter {
 	private static final String TYPES_SUBPACKAGE = "types";
 	private static final String SUBPACKAGE_SEPARATOR = ".";
 	private static final String LOG_CANNOT_CREATE = "Cannot create [%s] due to error.";
-	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_29);
+	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_30);
 	static {
 		CFG.setClassLoaderForTemplateLoading(GqlWriter.class.getClassLoader(), "/templates/java");
 		CFG.setDefaultEncoding("UTF-8");

@@ -30,7 +30,7 @@ public class OperationTranslator implements Translator {
 	private static final String FRAGMENTS_KEY = "fragments";
 	private static final String OPERATIONS_KEY = "operations";
 	private static final String OPERATION_DOCUMENT = "OPERATION_DOCUMENT";
-	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_29);
+	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_30);
 	static {
 		CFG.setClassLoaderForTemplateLoading(OperationTranslator.class.getClassLoader(), "/templates/text");
 		CFG.setDefaultEncoding("UTF-8");
