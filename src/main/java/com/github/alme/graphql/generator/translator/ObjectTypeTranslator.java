@@ -18,7 +18,7 @@ import graphql.language.TypeName;
 
 public class ObjectTypeTranslator implements Translator {
 
-	private static final Collection<String> IMPLICIT_SCHEMA = new HashSet<String>();
+	private static final Collection<String> IMPLICIT_SCHEMA = new HashSet<>();
 	static {
 		IMPLICIT_SCHEMA.add("Query");
 		IMPLICIT_SCHEMA.add("Mutation");

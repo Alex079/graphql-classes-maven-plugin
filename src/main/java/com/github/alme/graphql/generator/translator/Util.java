@@ -35,7 +35,7 @@ public final class Util {
 	
 	private Util() {}
 	
-	public static final GqlType translateType(Type<?> type, Document doc, Context ctx) {
+	public static GqlType translateType(Type<?> type, Document doc, Context ctx) {
 		if (type instanceof NonNullType) {
 			return GqlType.mandatory(translateType(((NonNullType) type).getType(), doc, ctx));
 		}
@@ -59,7 +59,7 @@ public final class Util {
 		return String.format("/*%s=>*/%s", original, current);
 	}
 	
-	public static final Collection<GqlSelection> translateSelection(SelectionSetContainer<?> container, Document doc, Context ctx, String typeName) {
+	public static Collection<GqlSelection> translateSelection(SelectionSetContainer<?> container, Document doc, Context ctx, String typeName) {
 		Collection<GqlSelection> result = new ArrayList<>();
 		SelectionSet selectionSet = container.getSelectionSet();
 		result.addAll(
@@ -110,20 +110,20 @@ public final class Util {
 			.orElse(GqlType.named("String"));
 	}
 	
-	public static final Function<FieldDefinition, GqlField> fromFieldDef(Document doc, Context ctx) {
+	public static Function<FieldDefinition, GqlField> fromFieldDef(Document doc, Context ctx) {
 		return (v) -> new GqlField(v.getName(), translateType(v.getType(), doc, ctx));
 	}
 	
-	public static final Function<InputValueDefinition, GqlField> fromInputValueDef(Document doc, Context ctx) {
+	public static Function<InputValueDefinition, GqlField> fromInputValueDef(Document doc, Context ctx) {
 		return (v) -> new GqlField(v.getName(), translateType(v.getType(), doc, ctx));
 	}
 	
-	public static final Function<VariableDefinition, GqlField> fromVariableDef(Document doc, Context ctx) {
+	public static Function<VariableDefinition, GqlField> fromVariableDef(Document doc, Context ctx) {
 		return (v) -> new GqlField(v.getName(), translateType(v.getType(), doc, ctx));
 	}
 	
-	private static final boolean isScalar(String name, Document doc, Context ctx) {
-		return ctx.getScalarMap().keySet().contains(name) ||
+	private static boolean isScalar(String name, Document doc, Context ctx) {
+		return ctx.getScalarMap().containsKey(name) ||
 			doc.getDefinitionsOfType(ScalarTypeDefinition.class).stream()
 			.map(ScalarTypeDefinition::getName)
 			.anyMatch((s) -> s.equals(name));
