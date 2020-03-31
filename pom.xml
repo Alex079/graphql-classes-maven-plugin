@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.alex079</groupId>
@@ -9,20 +8,13 @@
 
   <name>GraphQL client-side java classes generator</name>
   <description>Maven plugin to generate GraphQL client-side java classes</description>
+  <url>https://github.com/Alex079/graphql-classes-maven-plugin</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
-
-  <licenses>
-    <license>
-      <name>MIT License</name>
-      <url>https://github.com/Alex079/graphql-classes-maven-plugin/blob/master/LICENSE</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
 
   <dependencies>
     <dependency>
@@ -155,32 +147,20 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
             <version>3.2.1</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>3.2.0</version>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
             <version>1.6</version>
+            <configuration>
+              <useAgent>true</useAgent>
+              <executable>gpg2</executable>
+            </configuration>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -195,6 +175,14 @@
       </build>
     </profile>
   </profiles>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://github.com/Alex079/graphql-classes-maven-plugin/blob/master/LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <distributionManagement>
     <snapshotRepository>
@@ -212,5 +200,12 @@
     <url>https://github.com/Alex079/graphql-classes-maven-plugin</url>
     <tag>HEAD</tag>
   </scm>
+
+  <developers>
+    <developer>
+      <name>Alexander</name>
+      <id>Alex079</id>
+    </developer>
+  </developers>
 
 </project>
