@@ -1,3 +1,5 @@
+![Maven build](https://github.com/Alex079/graphql-classes-maven-plugin/workflows/Java%20CI%20with%20Maven/badge.svg)
+
 # GraphQL Classes Generator
 
 This is a maven 3.x plugin intended to simplify communication with schema-first GraphQL servers from client applications written in Java. This plugin can generate client-side java classes for GraphQL operations using only schema file.
