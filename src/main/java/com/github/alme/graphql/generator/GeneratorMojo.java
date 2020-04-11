@@ -21,21 +21,39 @@ import com.github.alme.graphql.generator.io.GqlWriter;
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class GeneratorMojo extends AbstractMojo {
 
+	/**
+	 * A root directory to create files in
+	 */
 	@Parameter(required = true, defaultValue = "${project.build.directory}/generated-sources/java")
 	private File outputDirectory;
 
+	/**
+	 * A set of source files including both schema files and operation files
+	 */
 	@Parameter(required = true)
 	private FileSet source;
 
+	/**
+	 * A name of the package to create files in
+	 */
 	@Parameter(required = true, defaultValue = "gql.generated")
 	private String packageName;
 
+	/**
+	 * A mapping of GraphQL scalars to known java classes
+	 */
 	@Parameter
 	private Map<String, String> scalarMap;
 
+	/**
+	 * An annotation to be used on generated fields to avoid java keywords collisions
+	 */
 	@Parameter
 	private String jsonPropertyAnnotation;
 
+	/**
+	 * A maven project to add newly generated sources into
+	 */
 	@Parameter(defaultValue="${project}")
 	private MavenProject project;
 
