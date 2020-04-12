@@ -56,4 +56,4 @@ The only goal of this plugin. This goal runs the classes generation and is bound
 ## Operation
 
 The plugin uses graphql-java internally to build an AST and freemarker to create Java files form the AST. The generation process is therefore split in two steps: AST generation and files creation. The AST produced by graphql-java is compacted into a custom reduced AST which excludes optional content.
-The actual client code generation is intentinally left out of the scope of this plugin.
+The actual client code generation is intentionally left out of the scope of this plugin.
