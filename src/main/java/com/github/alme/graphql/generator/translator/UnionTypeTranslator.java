@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import com.github.alme.graphql.generator.dto.Context;
 import com.github.alme.graphql.generator.dto.GqlStructure;
-
 import graphql.language.Document;
 import graphql.language.TypeName;
 import graphql.language.UnionTypeDefinition;

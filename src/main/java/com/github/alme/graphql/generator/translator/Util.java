@@ -14,7 +14,6 @@ import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlSelection;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 import com.github.alme.graphql.generator.dto.GqlType;
-
 import graphql.language.Document;
 import graphql.language.Field;
 import graphql.language.FieldDefinition;

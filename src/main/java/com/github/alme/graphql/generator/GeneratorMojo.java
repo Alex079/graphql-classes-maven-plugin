@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.io.GqlReader;
+import com.github.alme.graphql.generator.io.GqlWriter;
 import org.apache.maven.model.FileSet;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -13,10 +16,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
-
-import com.github.alme.graphql.generator.dto.Context;
-import com.github.alme.graphql.generator.io.GqlReader;
-import com.github.alme.graphql.generator.io.GqlWriter;
 
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class GeneratorMojo extends AbstractMojo {

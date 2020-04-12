@@ -7,9 +7,6 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Objects;
 
-import org.antlr.v4.runtime.misc.Pair;
-import org.apache.maven.plugin.logging.Log;
-
 import com.github.alme.graphql.generator.dto.Context;
 import com.github.alme.graphql.generator.translator.EnumTypeTranslator;
 import com.github.alme.graphql.generator.translator.InputObjectTypeTranslator;
@@ -18,10 +15,11 @@ import com.github.alme.graphql.generator.translator.ObjectTypeTranslator;
 import com.github.alme.graphql.generator.translator.OperationTranslator;
 import com.github.alme.graphql.generator.translator.SchemaTranslator;
 import com.github.alme.graphql.generator.translator.UnionTypeTranslator;
-
 import graphql.language.Document;
 import graphql.parser.MultiSourceReader;
 import graphql.parser.Parser;
+import org.antlr.v4.runtime.misc.Pair;
+import org.apache.maven.plugin.logging.Log;
 
 public class GqlReader {
 

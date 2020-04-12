@@ -10,15 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.maven.plugin.MojoExecutionException;
-
 import com.github.alme.graphql.generator.dto.Context;
 import com.github.alme.graphql.generator.dto.GqlOperation;
-
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModelException;
+import org.apache.maven.plugin.MojoExecutionException;
 
 public class GqlWriter {
 
