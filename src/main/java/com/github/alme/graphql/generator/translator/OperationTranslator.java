@@ -10,20 +10,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
-import org.apache.maven.plugin.logging.Log;
 
 import com.github.alme.graphql.generator.dto.Context;
-import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlOperation;
-
+import com.github.alme.graphql.generator.dto.GqlType;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import graphql.language.Document;
 import graphql.language.FragmentDefinition;
 import graphql.language.OperationDefinition;
+import org.apache.maven.plugin.logging.Log;
 
 public class OperationTranslator implements Translator {
 
@@ -50,19 +47,17 @@ public class OperationTranslator implements Translator {
 		List<FragmentDefinition> fragmentDefs = doc.getDefinitionsOfType(FragmentDefinition.class);
 		definitions.forEach((opDef) -> {
 			String operation = opDef.getOperation().name().toLowerCase();
-			ctx.getSchema().stream()
-			.filter((existingOp) -> Objects.equals(operation, existingOp.getName()))
-			.findAny()
-			.map(GqlField::getType)
-			.ifPresent((type) ->
+			String typeName = ctx.getSchema().get(operation);
+			if (typeName != null) {
 				ctx.getOperations()
-				.computeIfAbsent(opDef.getName(), (name) -> new GqlOperation(name, operation, type))
+				.computeIfAbsent(opDef.getName(), (name) -> new GqlOperation(name, operation, GqlType.named(typeName)))
 				.setText(getDocumentString(opDef, fragmentDefs, ctx.getLog()))
-				.addSelection(Util.translateSelection(opDef, doc, ctx, type.getName()))
+				.addSelection(Util.translateSelection(opDef, doc, ctx, typeName))
 				.addVariables(
 					opDef.getVariableDefinitions().stream()
 					.map(Util.fromVariableDef(doc, ctx))
-					.collect(toSet())));
+					.collect(toSet()));
+			}
 		});
 	}
 

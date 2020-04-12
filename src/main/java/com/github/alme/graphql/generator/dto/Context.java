@@ -1,21 +1,18 @@
 package com.github.alme.graphql.generator.dto;
 
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.maven.plugin.logging.Log;
-
 import lombok.Data;
+import org.apache.maven.plugin.logging.Log;
 
 @Data
 public class Context {
 
 	private String jsonPropertyAnnotation;
 	private final Log log;
-	private final Collection<GqlField> schema = new HashSet<>();
+	private final Map<String, String> schema = new HashMap<>();
 	private final Map<Structure, Map<String, GqlStructure>> structures = new EnumMap<>(Structure.class);
 	private final Map<String, GqlOperation> operations = new HashMap<>();
 	private final Map<String, String> scalarMap = new HashMap<>();

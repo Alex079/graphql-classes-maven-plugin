@@ -7,10 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import com.github.alme.graphql.generator.dto.Context;
-import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlStructure;
-import com.github.alme.graphql.generator.dto.GqlType;
-
 import graphql.language.Document;
 import graphql.language.ObjectTypeDefinition;
 import graphql.language.ObjectTypeExtensionDefinition;
@@ -54,7 +51,7 @@ public class ObjectTypeTranslator implements Translator {
 				.map(Util.fromFieldDef(doc, ctx))
 				.collect(toSet()));
 			if (IMPLICIT_SCHEMA.contains(def.getName())) {
-				ctx.getSchema().add(new GqlField(def.getName().toLowerCase(), GqlType.named(def.getName())));
+				ctx.getSchema().put(def.getName().toLowerCase(), def.getName());
 			}
 		});
 	}
