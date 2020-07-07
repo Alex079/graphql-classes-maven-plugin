@@ -1,3 +1,6 @@
+directive @string on SCALAR
+directive @currentDate on FIELD_DEFINITION
+
 scalar Address @string
 
 type Item {
@@ -17,11 +20,13 @@ type Track {
 	itemId: ID!
 	from: Location!
 	fromDate: Date!
-	to: Address!
+	toAddress: Address!
 	toDate: Date!
 	delivered: Boolean!
 	notes: String
 }
+
+scalar Date
 
 enum PaymentType {
 	CARD
@@ -31,9 +36,9 @@ enum PaymentType {
 }
 
 input SoldItem {
-	item: Item!
+	item: ID!
 	paidBy: PaymentType!
-	track: Track!
+	track: ID!
 }
 
 type Query {
@@ -43,4 +48,10 @@ type Query {
 
 type Mutation {
 	delivered(item: SoldItem!): Track! @currentDate
+}
+
+{
+	itemsInDelivery {
+		...ItemFragment
+	}
 }

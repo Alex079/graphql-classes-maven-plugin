@@ -1,4 +1,8 @@
 
-mutation setDelivered($item: SoldItem!) {
-	delivered(item: $item)
+mutation delivered($item: SoldItem!) {
+	delivered(item: $item) {
+        delivered
+        id
+        itemId
+    }
 }
