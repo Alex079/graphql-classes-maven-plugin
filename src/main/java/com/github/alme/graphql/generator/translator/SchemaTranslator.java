@@ -24,11 +24,11 @@ public class SchemaTranslator implements Translator {
 				ext.add((SchemaExtensionDefinition) i);
 			}
 		});
-		populate(doc, ctx, main);
-		populate(doc, ctx, ext);
+		populate(ctx, main);
+		populate(ctx, ext);
 	}
 
-	private void populate(Document doc, Context ctx, Collection<? extends SchemaDefinition> definitions) {
+	private void populate(Context ctx, Collection<? extends SchemaDefinition> definitions) {
 		ctx.getSchema().putAll(
 			definitions.stream()
 			.map(SchemaDefinition::getOperationTypeDefinitions)
