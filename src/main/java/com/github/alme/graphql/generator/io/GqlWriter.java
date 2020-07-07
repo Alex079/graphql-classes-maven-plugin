@@ -84,18 +84,18 @@ public class GqlWriter {
 		ctx.getOperations().values().stream()
 		.map(GqlOperation::getOperation)
 		.map(GqlWriter::capitalize)
-		.collect(Collectors.toSet()).forEach((name) -> {
+		.collect(Collectors.toSet()).forEach((interfaceName) -> {
 			try {
-				CFG.setSharedVariable(INTERFACE_NAME_KEY, name);
+				CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
 			} catch (TemplateModelException e) {
-				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, name), e);
+				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
 				return;
 			}
-			Path path = Paths.get(basePackageFolder.toString(), name + FILE_EXTENSION);
+			Path path = Paths.get(basePackageFolder.toString(), interfaceName + FILE_EXTENSION);
 			try (Writer writer = Files.newBufferedWriter(path)) {
 				CFG.getTemplate(OPERATION_INTERFACE_TEMPLATE).process(null, writer);
 			} catch (TemplateException | IOException e) {
-				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, name), e);
+				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
 			}
 		});
 	}
@@ -103,19 +103,19 @@ public class GqlWriter {
 	private void dumpOperationClasses(Context ctx, Path basePackageFolder) {
 		ctx.getOperations().forEach((name, operation) -> {
 			String interfaceName = capitalize(operation.getOperation());
-			name = (name == null ? UNNAMED_OPERATION : capitalize(name)) + interfaceName;
+			String className = (name == null ? UNNAMED_OPERATION : capitalize(name)) + interfaceName;
 			try {
-				CFG.setSharedVariable(CLASS_NAME_KEY, name);
+				CFG.setSharedVariable(CLASS_NAME_KEY, className);
 				CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
 			} catch (TemplateModelException e) {
-				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, name), e);
+				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
 				return;
 			}
-			Path path = Paths.get(basePackageFolder.toString(), name + FILE_EXTENSION);
+			Path path = Paths.get(basePackageFolder.toString(), className + FILE_EXTENSION);
 			try (Writer writer = Files.newBufferedWriter(path)) {
 				CFG.getTemplate(OPERATION_TEMPLATE).process(operation, writer);
 			} catch (TemplateException | IOException e) {
-				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, name), e);
+				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
 			}
 		});
 	}
