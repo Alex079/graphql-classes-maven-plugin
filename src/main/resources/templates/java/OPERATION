@@ -56,16 +56,16 @@ public class ${className}
 implements ${interfaceName}<${className}.Variables, ${className}.Result>
 {
 
-	private final String document = <#if text??>"${text?j_string}"<#else>null</#if>;
+	private static final String DOCUMENT = <#if text??>"${text?j_string}"<#else>null</#if>;
 
 	public String getDocument() {
-		return document;
+		return DOCUMENT;
 	}
 
-	private final String operation = <#if name??>"${name}"<#else>null</#if>;
+	private static final String OPERATION = <#if name??>"${name}"<#else>null</#if>;
 
 	public String getOperation() {
-		return operation;
+		return OPERATION;
 	}
 
 	private final Variables variables = new Variables();
