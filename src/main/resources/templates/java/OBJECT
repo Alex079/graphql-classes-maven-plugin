@@ -1,8 +1,8 @@
 package ${typesPackage};
 
-import java.math.*;
-import java.net.*;
-import java.util.*;
+<#list importSet as i>
+import ${i}.*;
+</#list>
 
 public class ${name}
 <#if 0 < members?size>

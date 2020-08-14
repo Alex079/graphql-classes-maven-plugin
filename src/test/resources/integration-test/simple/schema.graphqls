@@ -15,7 +15,17 @@ type Location {
 	shelf: Int!
 }
 
-type Track {
+interface TrackedFromTo {
+	from: Location!
+	toAddress: Address!
+}
+
+interface TimedFromTo {
+	fromDate: Date!
+	toDate: Date!
+}
+
+type Track implements TrackedFromTo TimedFromTo {
 	id: ID!
 	itemId: ID!
 	from: Location!
@@ -34,6 +44,8 @@ enum PaymentType {
 	CHEQUE
 	OTHER
 }
+
+union LocationOrTrack = Location | Track
 
 input SoldItem {
 	item: ID!
