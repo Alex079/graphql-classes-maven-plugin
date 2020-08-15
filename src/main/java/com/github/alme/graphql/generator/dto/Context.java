@@ -18,12 +18,12 @@ public class Context {
 	private final Map<Structure, Map<String, GqlStructure>> structures = new EnumMap<>(Structure.class);
 	private final Map<String, GqlOperation> operations = new HashMap<>();
 	private final Map<String, String> scalarMap = new HashMap<>();
-	private final Set<String> importSet = new HashSet<>();
+	private final Set<String> importPackages = new HashSet<>();
 	{ // built-in
 		scalarMap.put("Int", "Integer");
 		scalarMap.put("Float", "Double");
 		scalarMap.put("ID", "String");
-		importSet.add("java.util");
+		importPackages.add("java.util");
 	}
 
 	public Context(Log log) {

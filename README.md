@@ -20,7 +20,7 @@ The only goal of this plugin. This goal runs the classes generation and is bound
 |source|FileSet|+||A set of source files including both schema files and operation files|
 |packageName|String|+|gql.generated|A name of the package to create files in|
 |scalarMap|Map<String, String>|||A mapping of GraphQL scalars to known java classes|
-|importSet|Set<String>|||A set of packages to import into generated classes|
+|importPackages|Set<String>|||A set of packages to import into generated classes|
 |jsonPropertyAnnotation|String|||An annotation to be used on generated fields to avoid java keywords collisions|
 
 ### Example
@@ -42,9 +42,9 @@ The only goal of this plugin. This goal runs the classes generation and is bound
     <scalarMap>
       <Address>String</Address>
     </scalarMap>
-    <importSet>
+    <importPackages>
       <value>java.math</value>
-    </importSet>
+    </importPackages>
     <jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>
   </configuration>
   <executions>

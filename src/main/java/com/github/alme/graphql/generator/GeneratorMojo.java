@@ -49,7 +49,7 @@ public class GeneratorMojo extends AbstractMojo {
 	 * A set of packages to import into generated classes
 	 */
 	@Parameter
-	private Set<String> importSet;
+	private Set<String> importPackages;
 
 	/**
 	 * An annotation to be used on generated fields to avoid java keywords collisions
@@ -83,10 +83,10 @@ public class GeneratorMojo extends AbstractMojo {
 			ctx.getScalarMap().putAll(scalarMap);
 		}
 		getLog().info(String.format("Scalar types mapping rules: %s.", ctx.getScalarMap()));
-		if (importSet != null) {
-			ctx.getImportSet().addAll(importSet);
+		if (importPackages != null) {
+			ctx.getImportPackages().addAll(importPackages);
 		}
-		getLog().info(String.format("Packages to import: %s.", ctx.getImportSet()));
+		getLog().info(String.format("Packages to import: %s.", ctx.getImportPackages()));
 		if (jsonPropertyAnnotation != null) {
 			ctx.setJsonPropertyAnnotation(jsonPropertyAnnotation);
 			getLog().info(String.format("Annotating serializable properties with [%s].", jsonPropertyAnnotation));

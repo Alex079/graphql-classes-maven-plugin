@@ -47,7 +47,7 @@ package ${basePackage};
 
 import ${typesPackage}.*;
 
-<#list importSet as i>
+<#list importPackages as i>
 import ${i}.*;
 </#list>
 
