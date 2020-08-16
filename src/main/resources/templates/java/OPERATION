@@ -1,5 +1,3 @@
-package ${basePackage};
-
 <#macro m_selection selectionList>
 		<#list selectionList as input>
 
@@ -11,7 +9,7 @@ package ${basePackage};
 			return this.${input.name}<#if jsonProperty?has_content>__</#if>;
 		}
 
-		public class /*${input.type.inner}=>*/${input.name?cap_first} {
+		public static class /*${input.type.inner}=>*/${input.name?cap_first} {
 		<@m_selection input.selection/>
 
 		}
@@ -45,12 +43,13 @@ package ${basePackage};
 			<#break>
 			</#switch>
 </#macro>
+package ${basePackage};
 
 import ${typesPackage}.*;
 
-import java.math.*;
-import java.net.*;
-import java.util.*;
+<#list importPackages as i>
+import ${i}.*;
+</#list>
 
 public class ${className}
 implements ${interfaceName}<${className}.Variables, ${className}.Result>
@@ -82,7 +81,7 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 		return Result.class;
 	}
 
-	public class Variables {
+	public static class Variables {
 
 		private final transient Map<String, Object> $values = new HashMap<>();
 
@@ -109,7 +108,7 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 		</#list>
 	}
 
-	public class /*${type.inner}=>*/Result {
+	public static class /*${type.inner}=>*/Result {
 		<@m_selection selection/>
 
 	}

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.github.alme.graphql.generator.dto.Context;
 import com.github.alme.graphql.generator.io.GqlReader;
@@ -45,6 +46,12 @@ public class GeneratorMojo extends AbstractMojo {
 	private Map<String, String> scalarMap;
 
 	/**
+	 * A set of packages to import into generated classes
+	 */
+	@Parameter
+	private Set<String> importPackages;
+
+	/**
 	 * An annotation to be used on generated fields to avoid java keywords collisions
 	 */
 	@Parameter
@@ -74,8 +81,12 @@ public class GeneratorMojo extends AbstractMojo {
 		Context ctx = new Context(getLog());
 		if (scalarMap != null) {
 			ctx.getScalarMap().putAll(scalarMap);
-			getLog().info(String.format("Scalar types remapping rules: %s.", ctx.getScalarMap()));
 		}
+		getLog().info(String.format("Scalar types mapping rules: %s.", ctx.getScalarMap()));
+		if (importPackages != null) {
+			ctx.getImportPackages().addAll(importPackages);
+		}
+		getLog().info(String.format("Packages to import: %s.", ctx.getImportPackages()));
 		if (jsonPropertyAnnotation != null) {
 			ctx.setJsonPropertyAnnotation(jsonPropertyAnnotation);
 			getLog().info(String.format("Annotating serializable properties with [%s].", jsonPropertyAnnotation));

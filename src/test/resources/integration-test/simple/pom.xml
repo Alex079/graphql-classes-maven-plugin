@@ -46,6 +46,9 @@
           <scalarMap>
             <Address>String</Address>
           </scalarMap>
+          <importPackages>
+            <value>java.math</value>
+          </importPackages>
 <!--           <jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation> -->
           <jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>
         </configuration>
