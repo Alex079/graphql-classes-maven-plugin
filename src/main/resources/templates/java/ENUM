@@ -2,9 +2,8 @@ package ${typesPackage};
 
 public enum ${name}
 {
-
 <#list members as m>
-	${m},
-
+	${m}<#sep>,
 </#list>
+
 }
