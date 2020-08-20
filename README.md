@@ -10,6 +10,11 @@ This is a maven 3.x plugin intended to simplify communication with schema-first 
 
 The only goal of this plugin. This goal runs the classes generation and is bound to the phase generate-sources by default.
 
+## Operation
+
+The plugin uses graphql-java internally to build an AST and freemarker to create Java files form the AST. The generation process is therefore split in two steps: AST generation and files creation. The AST produced by graphql-java is compacted into a custom reduced AST which excludes optional content.
+The actual client code generation is intentionally left out of the scope of this plugin.
+
 ## Usage
 
 ### Configuration
@@ -23,7 +28,7 @@ The only goal of this plugin. This goal runs the classes generation and is bound
 |importPackages|Set\<String\>|||A set of packages to import into generated classes|
 |jsonPropertyAnnotation|String|||An annotation to be used on generated fields to avoid java keywords collisions|
 
-### Example
+### POM Example
 
 ```
 <plugin>
@@ -56,8 +61,3 @@ The only goal of this plugin. This goal runs the classes generation and is bound
   </executions>
 </plugin>
 ```
-
-## Operation
-
-The plugin uses graphql-java internally to build an AST and freemarker to create Java files form the AST. The generation process is therefore split in two steps: AST generation and files creation. The AST produced by graphql-java is compacted into a custom reduced AST which excludes optional content.
-The actual client code generation is intentionally left out of the scope of this plugin.
