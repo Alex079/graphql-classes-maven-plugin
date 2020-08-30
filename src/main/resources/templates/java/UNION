@@ -1,3 +1,6 @@
+//CHECKSTYLE:OFF
 package ${typesPackage};
 
+@SuppressWarnings({"all", "PMD"})
 public interface ${name} { }
+//CHECKSTYLE:ON

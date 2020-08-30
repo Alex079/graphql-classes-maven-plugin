@@ -1,9 +1,11 @@
+//CHECKSTYLE:OFF
 package ${typesPackage};
 
 <#list importPackages as i>
 import ${i}.*;
 </#list>
 
+@SuppressWarnings({"all", "PMD"})
 public class ${name}
 <#if 0 < members?size>
 implements ${members?join(", ")}
@@ -25,3 +27,4 @@ implements ${members?join(", ")}
 
 	</#list>
 }
+//CHECKSTYLE:ON

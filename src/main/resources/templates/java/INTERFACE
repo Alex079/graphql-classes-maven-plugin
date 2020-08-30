@@ -1,9 +1,11 @@
+//CHECKSTYLE:OFF
 package ${typesPackage};
 
 <#list importPackages as i>
 import ${i}.*;
 </#list>
 
+@SuppressWarnings({"all", "PMD"})
 public interface ${name}
 {
 
@@ -14,3 +16,4 @@ public interface ${name}
 
 </#list>
 }
+//CHECKSTYLE:ON

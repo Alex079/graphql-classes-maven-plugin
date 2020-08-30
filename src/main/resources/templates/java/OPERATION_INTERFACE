@@ -1,5 +1,7 @@
+//CHECKSTYLE:OFF
 package ${basePackage};
 
+@SuppressWarnings({"all", "PMD"})
 public interface ${interfaceName}<Variables, Result>
 {
 
@@ -14,3 +16,4 @@ public interface ${interfaceName}<Variables, Result>
 	Class<Result> getResultClass();
 
 }
+//CHECKSTYLE:ON

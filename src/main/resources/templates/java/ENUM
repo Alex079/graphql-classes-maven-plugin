@@ -1,5 +1,7 @@
+//CHECKSTYLE:OFF
 package ${typesPackage};
 
+@SuppressWarnings({"all", "PMD"})
 public enum ${name}
 {
 <#list members as m>
@@ -7,3 +9,4 @@ public enum ${name}
 </#list>
 
 }
+//CHECKSTYLE:ON
