@@ -45,7 +45,9 @@ enum PaymentType {
 	OTHER
 }
 
-union LocationOrTrack = Location | Track
+union LocationOrTrack = Location
+
+extend union LocationOrTrack = Track
 
 input SoldItem {
 	item: ID!
