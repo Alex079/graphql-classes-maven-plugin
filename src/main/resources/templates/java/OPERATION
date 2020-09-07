@@ -105,7 +105,7 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 			.forEach(($) -> {});
 			this.${v.name}<#if jsonProperty?has_content>__</#if> = v;
 			this.$values.put("${v.name}", v);<#if useChainedAccessors>
-            return this;</#if>
+			return this;</#if>
 		}
 		</#list>
 	}
