@@ -99,13 +99,13 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 			return this.${v.name}<#if jsonProperty?has_content>__</#if>;
 		}
 
-		public Variables set${v.name?cap_first}(${v.type.full} v) {
+		public <#if useChainedAccessors>Variables<#else>void</#if> set${v.name?cap_first}(${v.type.full} v) {
 			java.util.stream.Stream.of(v)
 			<@m_check_null v.type/>
 			.forEach(($) -> {});
 			this.${v.name}<#if jsonProperty?has_content>__</#if> = v;
-			this.$values.put("${v.name}", v);
-			return this;
+			this.$values.put("${v.name}", v);<#if useChainedAccessors>
+            return this;</#if>
 		}
 		</#list>
 	}

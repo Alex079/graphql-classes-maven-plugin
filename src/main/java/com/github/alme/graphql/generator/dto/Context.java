@@ -13,6 +13,8 @@ import org.apache.maven.plugin.logging.Log;
 public class Context {
 
 	private String jsonPropertyAnnotation;
+	private boolean useChainedAccessors;
+
 	private final Log log;
 	private final Map<String, String> schema = new HashMap<>();
 	private final Map<Structure, Map<String, GqlStructure>> structures = new EnumMap<>(Structure.class);

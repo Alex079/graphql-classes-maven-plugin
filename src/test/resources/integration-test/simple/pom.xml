@@ -49,6 +49,7 @@
           <importPackages>
             <value>java.math</value>
           </importPackages>
+          <useChainedAccessors>true</useChainedAccessors>
           <jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation>
 <!--          <jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>-->
         </configuration>

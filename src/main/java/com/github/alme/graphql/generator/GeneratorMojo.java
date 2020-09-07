@@ -22,16 +22,16 @@ import org.codehaus.plexus.util.FileUtils;
 public class GeneratorMojo extends AbstractMojo {
 
 	/**
-	 * A root directory to create files in
-	 */
-	@Parameter(required = true, defaultValue = "${project.build.directory}/generated-sources/java")
-	private File outputDirectory;
-
-	/**
 	 * A set of source files including both schema files and operation files
 	 */
 	@Parameter(required = true)
 	private FileSet source;
+
+	/**
+	 * A root directory to create files in
+	 */
+	@Parameter(required = true, defaultValue = "${project.build.directory}/generated-sources/java")
+	private File outputDirectory;
 
 	/**
 	 * A name of the package to create files in
@@ -56,6 +56,12 @@ public class GeneratorMojo extends AbstractMojo {
 	 */
 	@Parameter
 	private String jsonPropertyAnnotation;
+
+	/**
+	 * A flag indicating whether generated setters should return <b>void</b> (when set to false) or <b>this</b> (when set to true)
+	 */
+	@Parameter(defaultValue = "false")
+	private boolean useChainedAccessors;
 
 	/**
 	 * A maven project to add newly generated sources into
@@ -91,6 +97,8 @@ public class GeneratorMojo extends AbstractMojo {
 			ctx.setJsonPropertyAnnotation(jsonPropertyAnnotation);
 			getLog().info(String.format("Annotating serializable properties with [%s].", jsonPropertyAnnotation));
 		}
+		ctx.setUseChainedAccessors(useChainedAccessors);
+		getLog().info(String.format("Chained accessors: %b.", useChainedAccessors));
 
 		getLog().info(String.format("Source files detected: %s.", files.toString()));
 		new GqlReader().read(ctx, files);
