@@ -24,6 +24,7 @@ public class GqlWriter {
 	private static final String INTERFACE_NAME_KEY = "interfaceName";
 	private static final String CLASS_NAME_KEY = "className";
 	private static final String ANNOTATION_KEY = "jsonProperty";
+	private static final String CHAINED_ACCESSORS_KEY = "useChainedAccessors";
 	private static final String IMPORT_PACKAGES_KEY = "importPackages";
 	private static final String FILE_EXTENSION = ".java";
 	private static final String BASE_PACKAGE_KEY = "basePackage";
@@ -55,6 +56,7 @@ public class GqlWriter {
 			CFG.setSharedVariable(BASE_PACKAGE_KEY, basePackageName);
 			CFG.setSharedVariable(TYPES_PACKAGE_KEY, typesPackageName);
 			CFG.setSharedVariable(ANNOTATION_KEY, ctx.getJsonPropertyAnnotation());
+			CFG.setSharedVariable(CHAINED_ACCESSORS_KEY, ctx.isUseChainedAccessors());
 			CFG.setSharedVariable(IMPORT_PACKAGES_KEY, ctx.getImportPackages());
 		} catch (TemplateModelException e) {
 			throw new MojoExecutionException("Cannot set shared variables.", e);

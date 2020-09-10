@@ -12,7 +12,7 @@ public interface ${name}
 <#list fields as f>
 	${f.type.full} get${f.name?cap_first}();
 
-	${name} set${f.name?cap_first}(${f.type.full} v);
+	<#if useChainedAccessors>${name}<#else>void</#if> set${f.name?cap_first}(${f.type.full} v);
 
 </#list>
 }
