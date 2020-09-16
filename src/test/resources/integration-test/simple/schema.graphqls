@@ -21,22 +21,22 @@ interface TrackedFromTo {
 }
 
 interface TimedFromTo {
-	fromDate: Date!
-	toDate: Date!
+	fromDate: DateTime!
+	toDate: DateTime!
 }
 
 type Track implements TrackedFromTo TimedFromTo {
 	id: ID!
 	itemId: ID!
 	from: Location!
-	fromDate: Date!
+	fromDate: DateTime!
 	toAddress: Address!
-	toDate: Date!
+	toDate: DateTime!
 	delivered: Boolean!
 	notes: String
 }
 
-scalar Date
+scalar DateTime
 
 enum PaymentType {
 	CARD

@@ -93,18 +93,14 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 		<#list variables as v>
 
 		<#if jsonProperty?has_content>@${jsonProperty}("${v.name}")</#if>
-		private ${v.type.full} ${v.name}<#if jsonProperty?has_content>__</#if>;
-	
-		public ${v.type.full} get${v.name?cap_first}() {
-			return this.${v.name}<#if jsonProperty?has_content>__</#if>;
-		}
+		private <#if scalars?seq_contains(v.type.full)>String<#else>${v.type.full}</#if> ${v.name}<#if jsonProperty?has_content>__</#if>;
 
 		public <#if useChainedAccessors>Variables<#else>void</#if> set${v.name?cap_first}(${v.type.full} v) {
 			java.util.stream.Stream.of(v)
 			<@m_check_null v.type/>
 			.forEach(($) -> {});
-			this.${v.name}<#if jsonProperty?has_content>__</#if> = v;
-			this.$values.put("${v.name}", v);<#if useChainedAccessors>
+			this.${v.name}<#if jsonProperty?has_content>__</#if> = <#if scalars?seq_contains(v.type.full)>v == null ? null : v.toString()<#else>v</#if>;
+			this.$values.put("${v.name}", <#if scalars?seq_contains(v.type.full)>v == null ? null : v.toString()<#else>v</#if>);<#if useChainedAccessors>
 			return this;</#if>
 		}
 		</#list>
