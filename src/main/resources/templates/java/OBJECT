@@ -26,13 +26,17 @@ implements ${members?join(", ")}
 
 	<#list fields as f>
 	<#if jsonProperty?has_content>@${jsonProperty}("${f.name}")</#if>
-	private <#if scalars?seq_contains(f.type.full)>String<#else>${f.type.full}</#if> ${f.name}<#if jsonProperty?has_content>__</#if>;
+	private ${f.type.full} ${f.name}<#if jsonProperty?has_content>__</#if>;
 
-	public <#if useChainedAccessors>${name}<#else>void</#if> set${f.name?cap_first}(${f.type.full} v) {
+	public ${f.type.full} get${f.name?cap_first}() {
+		return this.${f.name}<#if jsonProperty?has_content>__</#if>;
+	}
+
+	public ${useChainedAccessors?string(name,"void")} set${f.name?cap_first}(${f.type.full} v) {
         java.util.stream.Stream.of(v)
         <@m_check_null f.type/>
         .forEach(($) -> {});
-		this.${f.name}<#if jsonProperty?has_content>__</#if> = <#if scalars?seq_contains(f.type.full)>v == null ? null : v.toString()<#else>v</#if>;<#if useChainedAccessors>
+		this.${f.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
 		return this;</#if>
 	}
 

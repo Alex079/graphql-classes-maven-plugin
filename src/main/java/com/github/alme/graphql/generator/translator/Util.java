@@ -44,11 +44,18 @@ public final class Util {
 		else if (type instanceof TypeName) {
 			String name = ((TypeName) type).getName();
 			if (isScalar(name, doc, ctx)) {
-				return GqlType.named(ctx.getScalarMap().getOrDefault(name, name));
+				return GqlType.named(formatTypeName(name, ctx.getScalarMap().getOrDefault(name, name)));
 			}
 			return GqlType.named(name);
 		}
 		return null;
+	}
+
+	private static String formatTypeName(String original, String current) {
+		if (Objects.equals(original, current)) {
+			return current;
+		}
+		return String.format("/*%s=>*/%s", original, current);
 	}
 
 	public static Collection<GqlSelection> translateSelection(SelectionSetContainer<?> container, Document doc, Context ctx, String typeName) {

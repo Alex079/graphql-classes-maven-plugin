@@ -105,6 +105,7 @@
           <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
           <settingsFile>src/test/resources/integration-test/settings.xml</settingsFile>
           <postBuildHookScript>verify</postBuildHookScript>
+          <addTestClassPath>true</addTestClassPath>
           <goals>
             <goal>clean</goal>
             <goal>test-compile</goal>

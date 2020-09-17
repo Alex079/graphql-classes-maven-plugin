@@ -10,7 +10,9 @@ public interface ${name}
 {
 
 <#list fields as f>
-	<#if useChainedAccessors>${name}<#else>void</#if> set${f.name?cap_first}(${f.type.full} v);
+	${f.type.full} get${f.name?cap_first}();
+
+	${useChainedAccessors?string(name,"void")} set${f.name?cap_first}(${f.type.full} v);
 
 </#list>
 }
