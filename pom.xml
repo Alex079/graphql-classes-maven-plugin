@@ -101,7 +101,6 @@
           <cloneProjectsTo>${project.build.directory}/integration-test</cloneProjectsTo>
           <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
           <settingsFile>src/integration-test/settings.xml</settingsFile>
-          <addTestClassPath>true</addTestClassPath>
           <goals>
             <goal>clean</goal>
             <goal>test</goal>
