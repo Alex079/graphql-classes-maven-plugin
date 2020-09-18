@@ -4,9 +4,8 @@ package ${typesPackage};
 @SuppressWarnings({"all", "PMD"})
 public enum ${name}
 {
-<#list members as m>
-	${m}<#sep>,
-</#list>
-
+	<#list members as m>
+	${m}<#sep>,</#sep>
+	</#list>
 }
 //CHECKSTYLE:ON

@@ -1,4 +1,4 @@
-package integration.test;
+package it.test.support;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 
 public class JacksonDateTimeSerializer extends StdScalarSerializer<OffsetDateTime> {
 
-    protected JacksonDateTimeSerializer() {
+    public JacksonDateTimeSerializer() {
         super(OffsetDateTime.class);
     }
 

@@ -24,21 +24,31 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.8.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
       <version>2.11.2</version>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>2.8.1</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.6.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>2.23.4</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>@project.groupId@</groupId>
@@ -51,7 +61,6 @@
               <include>*.graphql</include>
             </includes>
           </source>
-          <packageName>integration.test</packageName>
           <outputDirectory>${project.build.directory}\generated-it-test-sources\java</outputDirectory>
           <scalarMap>
             <Address>String</Address>
@@ -61,17 +70,31 @@
             <value>java.math</value>
           </importPackages>
           <useChainedAccessors>true</useChainedAccessors>
-          <jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation>
-<!--          <jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>-->
         </configuration>
         <executions>
           <execution>
+            <id>for use with Gson</id>
             <goals>
               <goal>generate</goal>
             </goals>
+            <configuration>
+              <packageName>it.gson</packageName>
+              <jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>
+            </configuration>
+          </execution>
+          <execution>
+            <id>for use with Jackson</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <packageName>it.jackson</packageName>
+              <jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation>
+            </configuration>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
 </project>

@@ -1,4 +1,4 @@
-package integration.test;
+package it.test.support;
 
 import java.lang.reflect.Type;
 import java.time.OffsetDateTime;

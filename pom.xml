@@ -97,18 +97,14 @@
         <version>3.2.1</version>
         <configuration>
           <debug>false</debug>
-          <projectsDirectory>src/test/resources/integration-test</projectsDirectory>
-          <pomIncludes>
-            <pomInclude>*/pom.xml</pomInclude>
-          </pomIncludes>
+          <projectsDirectory>src/integration-test</projectsDirectory>
           <cloneProjectsTo>${project.build.directory}/integration-test</cloneProjectsTo>
           <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-          <settingsFile>src/test/resources/integration-test/settings.xml</settingsFile>
-          <postBuildHookScript>verify</postBuildHookScript>
+          <settingsFile>src/integration-test/settings.xml</settingsFile>
           <addTestClassPath>true</addTestClassPath>
           <goals>
             <goal>clean</goal>
-            <goal>test-compile</goal>
+            <goal>test</goal>
           </goals>
         </configuration>
         <executions>

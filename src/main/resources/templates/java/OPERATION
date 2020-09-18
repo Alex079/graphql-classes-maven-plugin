@@ -1,7 +1,6 @@
 //CHECKSTYLE:OFF
 <#macro m_selection selectionList name>
 		<#list selectionList as input>
-
 		<#if jsonProperty?has_content>@${jsonProperty}("${input.name}")</#if>
 		<#if input.selection?has_content>
 		private ${input.type.getCustom(input.name?cap_first)} ${input.name}<#if jsonProperty?has_content>__</#if> = null;
@@ -10,17 +9,17 @@
 			return this.${input.name}<#if jsonProperty?has_content>__</#if>;
 		}
 
-        public ${useChainedAccessors?string(name,"void")} set${input.name?cap_first}(${input.type.getCustom(input.name?cap_first)} v) {
-            java.util.stream.Stream.of(v)
-            <@m_check_null input.type/>
-            .forEach(($) -> {});
-            this.${input.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
-            return this;</#if>
-        }
+		public ${useChainedAccessors?string(name,"void")} set${input.name?cap_first}(${input.type.getCustom(input.name?cap_first)} v) {
+			java.util.stream.Stream.of(v)
+			<@m_check_null input.type/>
+			.forEach(($) -> {});
+			this.${input.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
+			return this;</#if>
+		}
 
-		public static class /*${input.type.inner}=>*/${input.name?cap_first} {
-		<@m_selection input.selection input.name?cap_first/>
-
+		public static class /*${input.type.inner}=>*/${input.name?cap_first}
+		{
+			<@m_selection input.selection input.name?cap_first/>
 		}
 		<#else>
 		private ${input.type.full} ${input.name}<#if jsonProperty?has_content>__</#if> = null;
@@ -29,23 +28,24 @@
 			return this.${input.name}<#if jsonProperty?has_content>__</#if>;
 		}
 
-        public ${useChainedAccessors?string(name,"void")} set${input.name?cap_first}(${input.type.full} v) {
-            java.util.stream.Stream.of(v)
-            <@m_check_null input.type/>
-            .forEach(($) -> {});
-            this.${input.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
-            return this;</#if>
-        }
+		public ${useChainedAccessors?string(name,"void")} set${input.name?cap_first}(${input.type.full} v) {
+			java.util.stream.Stream.of(v)
+			<@m_check_null input.type/>
+			.forEach(($) -> {});
+			this.${input.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
+			return this;</#if>
+		}
 		</#if>
-		</#list>
 
+		</#list>
 		public String toString() {
 			return new StringBuilder().append("{")
 			<#list selectionList as input>
-			.append(" ${input.name} = ").append(get${input.name?cap_first}())
+			.append(" ${input.name} = ").append(get${input.name?cap_first}())<#sep>.append(",")</#sep>
 			</#list>
 			.append(" }").toString();
 		}
+
 </#macro>
 
 <#macro m_check_null input>
@@ -72,7 +72,6 @@ import ${i}.*;
 public class ${className}
 implements ${interfaceName}<${className}.Variables, ${className}.Result>
 {
-
 	private static final String DOCUMENT = <#if text??>"${text?j_string}"<#else>null</#if>;
 
 	public String getDocument() {
@@ -85,6 +84,7 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 		return OPERATION;
 	}
 
+	<#if jsonProperty?has_content>@${jsonProperty}("variables")</#if>
 	private final Variables variables = new Variables();
 
 	public Variables getVariables() {
@@ -99,15 +99,15 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 		return Result.class;
 	}
 
-	public static class Variables {
-
+	public static class Variables
+	{
 		private final transient Map<String, Object> $values = new HashMap<>();
 
 		public Map<String, Object> asMap() {
 			return Collections.unmodifiableMap($values);
 		}
-		<#list variables as v>
 
+		<#list variables as v>
 		<#if jsonProperty?has_content>@${jsonProperty}("${v.name}")</#if>
 		private ${v.type.full} ${v.name}<#if jsonProperty?has_content>__</#if>;
 
@@ -123,12 +123,29 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 			this.$values.put("${v.name}", v);<#if useChainedAccessors>
 			return this;</#if>
 		}
+
 		</#list>
+		public String toString() {
+			return new StringBuilder().append("{")
+			<#list variables as v>
+			.append(" ${v.name} = ").append(get${v.name?cap_first}())<#sep>.append(",")</#sep>
+			</#list>
+			.append(" }").toString();
+		}
+
 	}
 
-	public static class /*${type.inner}=>*/Result {
+	public static class /*${type.inner}=>*/Result
+	{
 		<@m_selection selection 'Result'/>
+	}
 
+	public String toString() {
+		return new StringBuilder().append("{")
+		.append(" document = ").append(getDocument())
+		.append(", operation = ").append(getOperation())
+		.append(", variables = ").append(getVariables())
+		.append(" }").toString();
 	}
 
 }

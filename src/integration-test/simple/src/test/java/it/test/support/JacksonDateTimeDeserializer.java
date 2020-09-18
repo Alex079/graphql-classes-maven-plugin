@@ -1,4 +1,4 @@
-package integration.test;
+package it.test.support;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 
 public class JacksonDateTimeDeserializer extends StdScalarDeserializer<OffsetDateTime> {
 
-    protected JacksonDateTimeDeserializer() {
+    public JacksonDateTimeDeserializer() {
         super(OffsetDateTime.class);
     }
 

@@ -1,15 +1,15 @@
 //CHECKSTYLE:OFF
 <#macro m_check_null input>
-        <#switch input.flag>
-        <#case 'MANDATORY'>
-        .map(Objects::requireNonNull)
-        <@m_check_null input.nested/>
-        <#break>
-        <#case 'LIST'>
-        .flatMap(Collection::stream)
-        <@m_check_null input.nested/>
-        <#break>
-        </#switch>
+		<#switch input.flag>
+		<#case 'MANDATORY'>
+		.map(Objects::requireNonNull)
+		<@m_check_null input.nested/>
+		<#break>
+		<#case 'LIST'>
+		.flatMap(Collection::stream)
+		<@m_check_null input.nested/>
+		<#break>
+		</#switch>
 </#macro>
 package ${typesPackage};
 
@@ -23,7 +23,6 @@ public class ${name}
 implements ${members?join(", ")}
 </#if>
 {
-
 	<#list fields as f>
 	<#if jsonProperty?has_content>@${jsonProperty}("${f.name}")</#if>
 	private ${f.type.full} ${f.name}<#if jsonProperty?has_content>__</#if>;
@@ -33,13 +32,21 @@ implements ${members?join(", ")}
 	}
 
 	public ${useChainedAccessors?string(name,"void")} set${f.name?cap_first}(${f.type.full} v) {
-        java.util.stream.Stream.of(v)
-        <@m_check_null f.type/>
-        .forEach(($) -> {});
+		java.util.stream.Stream.of(v)
+		<@m_check_null f.type/>
+		.forEach(($) -> {});
 		this.${f.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
 		return this;</#if>
 	}
 
 	</#list>
+	public String toString() {
+		return new StringBuilder().append("{")
+		<#list fields as f>
+		.append(" ${f.name} = ").append(get${f.name?cap_first}())<#sep>.append(",")</#sep>
+		</#list>
+		.append(" }").toString();
+	}
+
 }
 //CHECKSTYLE:ON

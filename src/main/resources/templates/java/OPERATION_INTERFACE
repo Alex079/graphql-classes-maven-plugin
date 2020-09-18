@@ -4,16 +4,10 @@ package ${basePackage};
 @SuppressWarnings({"all", "PMD"})
 public interface ${interfaceName}<Variables, Result>
 {
-
 	String getDocument();
-
 	String getOperation();
-
 	Variables getVariables();
-
 	java.util.Map<String, Object> getVariablesAsMap();
-
 	Class<Result> getResultClass();
-
 }
 //CHECKSTYLE:ON
