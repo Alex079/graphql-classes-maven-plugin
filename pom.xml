@@ -127,17 +127,21 @@
           <arguments>
             <argument>${project.groupId}:${project.artifactId}:${project.version}:generate</argument>
             <argument>-Dgql.sourceDirectory=../simple</argument>
-            <argument>-Dgql.sourceIncludes=*.graphql,*.graphqls</argument>
+            <argument>-Dgql.sourceIncludes=*.graphql,*.graphqls,,,</argument>
             <argument>-Dgql.outputDirectory=output</argument>
+            <argument>-Dgql.scalarMap=S1=String,S2=Integer,,,A</argument>
+            <argument>-e</argument>
+            <argument>-Dmaven.repo.local=${project.build.directory}/local-repo</argument>
           </arguments>
+          <outputFile>${project.build.directory}/integration-test/cmd/build.log</outputFile>
         </configuration>
         <executions>
           <execution>
             <id>integration-test</id>
+            <phase>integration-test</phase>
             <goals>
               <goal>exec</goal>
             </goals>
-            <phase>integration-test</phase>
           </execution>
         </executions>
       </plugin>

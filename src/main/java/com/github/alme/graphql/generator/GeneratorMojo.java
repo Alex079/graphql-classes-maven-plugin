@@ -6,7 +6,9 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.alme.graphql.generator.dto.Context;
 import com.github.alme.graphql.generator.io.GqlReader;
@@ -66,8 +68,15 @@ public class GeneratorMojo extends AbstractMojo {
 	/**
 	 * A mapping of GraphQL scalars to known java classes
 	 */
-	@Parameter(property = "gql.scalarMap")
+	@Parameter
 	private Map<String, String> scalarMap;
+
+	/**
+	 * <b>This parameter is used when running from command line and is ignored when POM configuration exists.</b>
+	 * See "scalarMap" parameter.
+	 */
+	@Parameter(property = "gql.scalarMap")
+	private Set<String> scalarMapAlternative;
 
 	/**
 	 * A set of packages to import into generated classes
@@ -138,7 +147,15 @@ public class GeneratorMojo extends AbstractMojo {
 		getLog().info(String.format("Source files: %s.", sourceFiles.toString()));
 
 		Context ctx = new Context(getLog());
-		if (scalarMap != null) {
+
+		if (scalarMap == null) {
+			ctx.getScalarMap().putAll(scalarMapAlternative.stream()
+				.filter(Objects::nonNull)
+				.map(item -> item.split("=", 2))
+				.filter(item -> item.length == 2)
+				.collect(Collectors.toMap(item -> item[0], item -> item[1])));
+		}
+		else {
 			ctx.getScalarMap().putAll(scalarMap);
 		}
 		getLog().info(String.format("Scalar types mapping rules: %s.", ctx.getScalarMap()));
