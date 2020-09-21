@@ -10,11 +10,13 @@ import java.util.stream.Collectors;
 
 import com.github.alme.graphql.generator.dto.Context;
 import com.github.alme.graphql.generator.dto.GqlOperation;
+
+import org.apache.maven.plugin.MojoExecutionException;
+
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModelException;
-import org.apache.maven.plugin.MojoExecutionException;
 
 public class GqlWriter {
 
@@ -69,10 +71,10 @@ public class GqlWriter {
 
 	private void dumpTypeClasses(Context ctx, Path typesPackageFolder) {
 		ctx.getStructures().forEach((category, structures) ->
-			structures.forEach((name, i) -> {
+			structures.forEach((name, type) -> {
 				Path path = Paths.get(typesPackageFolder.toString(), name + FILE_EXTENSION);
 				try (Writer writer = Files.newBufferedWriter(path)) {
-					CFG.getTemplate(category.name()).process(i, writer);
+					CFG.getTemplate(category.name()).process(type, writer);
 				} catch (TemplateException | IOException e) {
 					ctx.getLog().error(String.format(LOG_CANNOT_CREATE, name), e);
 				}

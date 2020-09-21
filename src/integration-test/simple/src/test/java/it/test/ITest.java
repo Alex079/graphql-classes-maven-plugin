@@ -30,7 +30,7 @@ class ITest {
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     private Map<?, ?> testGson(Object input) {
-        System.out.println(input);
+        System.out.printf("Transforming %s using Gson%n", input);
         String json = G.toJson(input);
         Map<?, ?> output = G.fromJson(json, Map.class);
         System.out.printf("To JSON:%n%s%nTo Map:%n%s%n%n", json, output);
@@ -38,7 +38,7 @@ class ITest {
     }
 
     private Map<?, ?> testJackson(Object input) throws JsonProcessingException {
-        System.out.println(input);
+        System.out.printf("Transforming %s using Jackson%n", input);
         String json = J.writeValueAsString(input);
         Map<?, ?> output = J.readValue(json, Map.class);
         System.out.printf("To JSON:%n%s%nTo Map:%n%s%n%n", json, output);

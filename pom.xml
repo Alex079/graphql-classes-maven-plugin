@@ -101,6 +101,7 @@
           <cloneProjectsTo>${project.build.directory}/integration-test</cloneProjectsTo>
           <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
           <settingsFile>src/integration-test/settings.xml</settingsFile>
+          <showErrors>true</showErrors>
           <goals>
             <goal>clean</goal>
             <goal>test</goal>
@@ -113,6 +114,30 @@
               <goal>install</goal>
               <goal>run</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <workingDirectory>${project.build.directory}/integration-test/cmd</workingDirectory>
+          <executable>mvn</executable>
+          <arguments>
+            <argument>${project.groupId}:${project.artifactId}:${project.version}:generate</argument>
+            <argument>-Dgql.sourceDirectory=../simple</argument>
+            <argument>-Dgql.sourceIncludes=*.graphql,*.graphqls</argument>
+            <argument>-Dgql.outputDirectory=output</argument>
+          </arguments>
+        </configuration>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <phase>integration-test</phase>
           </execution>
         </executions>
       </plugin>
