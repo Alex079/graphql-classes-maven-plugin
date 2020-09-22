@@ -3,7 +3,6 @@ package com.github.alme.graphql.generator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,24 +33,24 @@ public class GeneratorMojo extends AbstractMojo {
 
 	/**
 	 * <b>This parameter is used when running from command line and is ignored when POM configuration exists.</b>
-	 * Set "directory" value of source file set. See "source" parameter.
+	 * A directory containing source files. See "source" parameter.
 	 */
-	@Parameter(property = "gql.sourceDirectory")
+	@Parameter(property = "gql.sourceDirectory", readonly = true)
 	private File sourceDirectoryAlternative;
 
 	/**
 	 * <b>This parameter is used when running from command line and is ignored when POM configuration exists.</b>
-	 * Set "includes" value of source file set. See "source" parameter.
+	 * A set of patterns to include. See "source" parameter.
 	 */
-	@Parameter(property = "gql.sourceIncludes")
-	private List<String> sourceIncludesAlternative;
+	@Parameter(property = "gql.sourceIncludes", readonly = true)
+	private Set<String> sourceIncludesAlternative;
 
 	/**
 	 * <b>This parameter is used when running from command line and is ignored when POM configuration exists.</b>
-	 * Set "excludes" value of source file set. See "source" parameter.
+	 * A set of patterns to exclude. See "source" parameter.
 	 */
-	@Parameter(property = "gql.sourceExcludes")
-	private List<String> sourceExcludesAlternative;
+	@Parameter(property = "gql.sourceExcludes", readonly = true)
+	private Set<String> sourceExcludesAlternative;
 
 	/**
 	 * A root directory to create files in
@@ -72,10 +71,10 @@ public class GeneratorMojo extends AbstractMojo {
 	private Map<String, String> scalarMap;
 
 	/**
-	 * <b>This parameter is used when running from command line and is ignored when POM configuration exists.</b>
-	 * See "scalarMap" parameter.
+	 * <b>This parameter is used when running from command line and is ignored when "scalarMap" configuration exists.</b>
+	 * A mapping of GraphQL scalars to known java classes formatted as a list of key=value pairs. See "scalarMap" parameter.
 	 */
-	@Parameter(property = "gql.scalarMap")
+	@Parameter(property = "gql.scalarMap", readonly = true)
 	private Set<String> scalarMapAlternative;
 
 	/**
@@ -115,29 +114,47 @@ public class GeneratorMojo extends AbstractMojo {
 		return new File("").getAbsoluteFile();
 	}
 
-	private List<String> getSourceIncludes() {
-		if (source == null) {
-			return sourceIncludesAlternative == null ? Collections.emptyList() : sourceIncludesAlternative;
-		}
-		return source.getIncludes() == null ? Collections.emptyList() : source.getIncludes();
+	private String join(Iterable<? extends CharSequence> i) {
+		return i == null ? "" : String.join(",", i);
 	}
 
-	private List<String> getSourceExcludes() {
-		if (source == null) {
-			return sourceExcludesAlternative == null ? Collections.emptyList() : sourceExcludesAlternative;
-		}
-		return source.getExcludes() == null ? Collections.emptyList() : source.getExcludes();
+	private String getSourceIncludes() {
+		return join(source == null ? sourceIncludesAlternative : source.getIncludes());
+	}
+
+	private String getSourceExcludes() {
+		return join(source == null ? sourceExcludesAlternative : source.getExcludes());
+	}
+
+	private Map<String, String> getScalarMap() {
+		return scalarMap == null
+			? scalarMapAlternative.stream()
+				.filter(Objects::nonNull)
+				.map(item -> item.split("=", 2))
+				.filter(item -> item.length == 2)
+				.collect(Collectors.toMap(item -> item[0], item -> item[1]))
+			: scalarMap;
+	}
+
+	private String getOutputDirectory() {
+		return outputDirectory == null
+			? Paths
+				.get(project.getBasedir() == null ? "" : project.getBuild().getDirectory())
+				.resolve("generated-sources")
+				.resolve("java")
+				.toString()
+			: outputDirectory.getPath();
 	}
 
 	@Override
 	public void execute() throws MojoExecutionException {
 		File directory = getSourceDirectory();
-		List<String> includes = getSourceIncludes();
-		List<String> excludes = getSourceExcludes();
-		getLog().info(String.format("Source: {directory=[%s], includes=%s, excludes=%s}.", directory, includes, excludes));
+		String includes = getSourceIncludes();
+		String excludes = getSourceExcludes();
+		getLog().info(String.format("Source: {directory=[%s], includes=[%s], excludes=[%s]}.", directory, includes, excludes));
 		List<File> sourceFiles;
 		try {
-			sourceFiles = FileUtils.getFiles(directory, String.join(",", includes), String.join(",", excludes));
+			sourceFiles = FileUtils.getFiles(directory, includes, excludes);
 		} catch (IOException e) {
 			throw new MojoExecutionException("Could not collect source files.", e);
 		}
@@ -148,16 +165,7 @@ public class GeneratorMojo extends AbstractMojo {
 
 		Context ctx = new Context(getLog());
 
-		if (scalarMap == null) {
-			ctx.getScalarMap().putAll(scalarMapAlternative.stream()
-				.filter(Objects::nonNull)
-				.map(item -> item.split("=", 2))
-				.filter(item -> item.length == 2)
-				.collect(Collectors.toMap(item -> item[0], item -> item[1])));
-		}
-		else {
-			ctx.getScalarMap().putAll(scalarMap);
-		}
+		ctx.getScalarMap().putAll(getScalarMap());
 		getLog().info(String.format("Scalar types mapping rules: %s.", ctx.getScalarMap()));
 
 		if (importPackages != null) {
@@ -173,17 +181,7 @@ public class GeneratorMojo extends AbstractMojo {
 		ctx.setUseChainedAccessors(useChainedAccessors);
 		getLog().info(String.format("Chained accessors: %b.", useChainedAccessors));
 
-		String outputRoot;
-		if (outputDirectory == null) {
-			outputRoot = Paths
-				.get(project.getBasedir() == null ? "" : project.getBuild().getDirectory())
-				.resolve("generated-sources")
-				.resolve("java")
-				.toString();
-		}
-		else {
-			outputRoot = outputDirectory.getPath();
-		}
+		String outputRoot = getOutputDirectory();
 		getLog().info(String.format("Output directory: [%s].", outputRoot));
 
 		getLog().info(String.format("Output package name: [%s].", packageName));

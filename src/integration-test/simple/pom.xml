@@ -61,7 +61,7 @@
               <include>*.graphql</include>
             </includes>
           </source>
-          <sourceDirectory>wrong_directory</sourceDirectory>
+          <sourceDirectoryAlternative>wrong_directory</sourceDirectoryAlternative>
           <outputDirectory>${project.build.directory}\generated-it-test-sources\java</outputDirectory>
           <scalarMap>
             <Address>String</Address>
