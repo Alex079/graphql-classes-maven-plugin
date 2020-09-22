@@ -17,19 +17,17 @@ The actual client code generation is intentionally left out of the scope of this
 
 ## Usage
 
-### Configuration
+### POM
 
-|Parameter|Type|Required|Default|Description|
-|-|-|-|-|-|
-|source|FileSet|+||A set of source files including both schema files and operation files|
-|outputDirectory|String||"${project.build.directory}/generated-sources/java"|A root directory to create files in|
-|packageName|String||gql.generated|A name of the package to create files in|
-|scalarMap|Map\<String, String\>|||A mapping of GraphQL scalars to known java classes|
-|importPackages|Set\<String\>|||A set of packages to import into generated classes|
-|jsonPropertyAnnotation|String|||An annotation to be used on generated fields to avoid java keywords collisions|
-|useChainedAccessors|boolean||false|A flag indicating whether generated setters should return <b>void</b> (when set to false) or <b>this</b> (when set to true)|
-
-### POM Example
+|Parameter|Type|Default|Description|
+|-|-|-|-|
+|source|FileSet||A set of source files including both schema files and operation files|
+|outputDirectory|File|"${project.build.directory}/generated-sources/java"|A root directory to create files in|
+|packageName|String|"gql.generated"|A name of the package to create files in|
+|scalarMap|Map\<String, String\>||A mapping of GraphQL scalars to known java classes|
+|importPackages|Set\<String\>||A set of packages to import into generated classes|
+|jsonPropertyAnnotation|String||An annotation to be used on generated fields to avoid java keywords collisions|
+|useChainedAccessors|boolean|false|A flag indicating whether generated setters should return <b>void</b> (when set to false) or <b>this</b> (when set to true)|
 
 ```
 <plugin>
@@ -44,7 +42,7 @@ The actual client code generation is intentionally left out of the scope of this
       </includes>
     </source>
     <packageName>integration.test</packageName>
-    <outputDirectory>${project.build.directory}\generated-it-test-sources\java</outputDirectory>
+    <outputDirectory>${project.build.directory}\generated-gql-sources\java</outputDirectory>
     <scalarMap>
       <Address>String</Address>
     </scalarMap>
@@ -62,4 +60,27 @@ The actual client code generation is intentionally left out of the scope of this
     </execution>
   </executions>
 </plugin>
+```
+
+### Command Line
+
+|Property|Type|Default|Description|
+|-|-|-|-|
+|gql.sourceDirectory|File|(current directory)|A directory containing source files|
+|gql.sourceIncludes|Set\<String\>||A set of patterns to include|
+|gql.sourceExcludes|Set\<String\>||A set of patterns to exclude|
+|gql.outputDirectory|File|"generated-sources/java"|A root directory to create files in|
+|gql.packageName|String|"gql.generated"|A name of the package to create files in|
+|gql.scalarMap|Set\<String\>||A mapping of GraphQL scalars to known java classes formatted as a list of key=value pairs|
+|gql.importPackages|Set\<String\>||A set of packages to import into generated classes|
+|gql.jsonPropertyAnnotation|String||An annotation to be used on generated fields to avoid java keywords collisions|
+|gql.useChainedAccessors|boolean|false|A flag indicating whether generated setters should return <b>void</b> (when set to false) or <b>this</b> (when set to true)|
+
+```
+mvn com.github.alex079:graphql-classes-maven-plugin:${VERSION}:generate \
+-Dgql.sourceDirectory=src/main/resources \
+-Dgql.sourceIncludes=*.graphql,*.graphqls \
+-Dgql.outputDirectory=target/generated-sources/java \
+-Dgql.importPackages=java.time \
+-Dgql.scalarMap=CustomType1=String,CustomType2=Integer
 ```
