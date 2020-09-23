@@ -62,7 +62,7 @@ The actual client code generation is intentionally left out of the scope of this
 </plugin>
 ```
 
-### Command Line
+### Without POM
 
 |Property|Type|Default|Description|
 |-|-|-|-|
