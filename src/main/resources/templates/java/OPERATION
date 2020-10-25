@@ -12,7 +12,7 @@
 		public ${useChainedAccessors?string(name,"void")} set${input.name?cap_first}(${input.type.getCustom(input.name?cap_first)} v) {
 			java.util.stream.Stream.of(v)
 			<@m_check_null input.type/>
-			.forEach(($) -> {});
+			.forEach($ -> {});
 			this.${input.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
 			return this;</#if>
 		}
@@ -31,7 +31,7 @@
 		public ${useChainedAccessors?string(name,"void")} set${input.name?cap_first}(${input.type.full} v) {
 			java.util.stream.Stream.of(v)
 			<@m_check_null input.type/>
-			.forEach(($) -> {});
+			.forEach($ -> {});
 			this.${input.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
 			return this;</#if>
 		}
@@ -55,6 +55,7 @@
 			<@m_check_null input.nested/>
 			<#break>
 			<#case 'LIST'>
+			.filter(Objects::nonNull)
 			.flatMap(Collection::stream)
 			<@m_check_null input.nested/>
 			<#break>
@@ -118,7 +119,7 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 		public ${useChainedAccessors?string("Variables","void")} set${v.name?cap_first}(${v.type.full} v) {
 			java.util.stream.Stream.of(v)
 			<@m_check_null v.type/>
-			.forEach(($) -> {});
+			.forEach($ -> {});
 			this.${v.name}<#if jsonProperty?has_content>__</#if> = v;
 			this.$values.put("${v.name}", v);<#if useChainedAccessors>
 			return this;</#if>
