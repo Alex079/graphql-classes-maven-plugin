@@ -1,5 +1,6 @@
 package com.github.alme.graphql.generator.translator;
 
+import static com.github.alme.graphql.generator.translator.Util.fromFieldDef;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
@@ -36,24 +37,19 @@ public class ObjectTypeTranslator implements Translator {
 				ext.add((ObjectTypeExtensionDefinition) i);
 			}
 		});
-		populate(doc, ctx, main);
-		populate(doc, ctx, ext);
+		populate(ctx, main);
+		populate(ctx, ext);
 	}
 
-	private void populate(Document doc, Context ctx, Collection<? extends ObjectTypeDefinition> definitions) {
-		definitions.forEach((def) -> {
+	private void populate(Context ctx, Collection<? extends ObjectTypeDefinition> definitions) {
+		definitions.forEach((definition) -> {
+			String name = definition.getName();
 			ctx.getObjectTypes()
-				.computeIfAbsent(def.getName(), GqlStructure::new)
-				.addMembers(
-					def.getImplements().stream()
-						.map(TypeName.class::cast).map(TypeName::getName)
-						.collect(toSet()))
-				.addFields(
-					def.getFieldDefinitions().stream()
-						.map(Util.fromFieldDef(doc, ctx))
-						.collect(toSet()));
-			if (IMPLICIT_SCHEMA.contains(def.getName())) {
-				ctx.getSchema().put(def.getName().toLowerCase(), def.getName());
+				.computeIfAbsent(name, GqlStructure::new)
+				.addMembers(definition.getImplements().stream().map(TypeName.class::cast).map(TypeName::getName).collect(toSet()))
+				.addFields(definition.getFieldDefinitions().stream().map(fromFieldDef(ctx)).collect(toSet()));
+			if (IMPLICIT_SCHEMA.contains(name)) {
+				ctx.getSchema().put(name.toLowerCase(), name);
 			}
 		});
 	}

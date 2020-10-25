@@ -1,5 +1,6 @@
 package com.github.alme.graphql.generator.translator;
 
+import static com.github.alme.graphql.generator.translator.Util.fromFieldDef;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
@@ -26,18 +27,15 @@ public class InterfaceTypeTranslator implements Translator {
 				ext.add((InterfaceTypeExtensionDefinition) i);
 			}
 		});
-		populate(doc, ctx, main);
-		populate(doc, ctx, ext);
+		populate(ctx, main);
+		populate(ctx, ext);
 	}
 
-	private void populate(Document doc, Context ctx, Collection<? extends InterfaceTypeDefinition> definitions) {
-		definitions.forEach((def) ->
+	private void populate(Context ctx, Collection<? extends InterfaceTypeDefinition> definitions) {
+		definitions.forEach((definition) ->
 			ctx.getInterfaceTypes()
-				.computeIfAbsent(def.getName(), GqlStructure::new)
-				.addFields(
-					def.getFieldDefinitions().stream()
-						.map(Util.fromFieldDef(doc, ctx))
-						.collect(toSet())));
+				.computeIfAbsent(definition.getName(), GqlStructure::new)
+				.addFields(definition.getFieldDefinitions().stream().map(fromFieldDef(ctx)).collect(toSet())));
 	}
 
 }

@@ -30,12 +30,12 @@ public class UnionTypeTranslator implements Translator {
 	}
 
 	private void populate(Context ctx, Collection<? extends UnionTypeDefinition> definitions) {
-		definitions.forEach((def) -> {
-			ctx.getUnionTypes().computeIfAbsent(def.getName(), GqlStructure::new);
-			def.getMemberTypes().stream()
+		definitions.forEach((definition) -> {
+			ctx.getUnionTypes().computeIfAbsent(definition.getName(), GqlStructure::new);
+			definition.getMemberTypes().stream()
 				.map(TypeName.class::cast).map(TypeName::getName)
 				.map((name) -> ctx.getObjectTypes().computeIfAbsent(name, GqlStructure::new))
-				.forEach((ot) -> ot.addMember(def.getName()));
+				.forEach((ot) -> ot.addMember(definition.getName()));
 		});
 	}
 

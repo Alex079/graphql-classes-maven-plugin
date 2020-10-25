@@ -2,7 +2,7 @@
 <#macro m_selection selectionList name>
 		<#list selectionList as input>
 		<#if jsonProperty?has_content>@${jsonProperty}("${input.name}")</#if>
-		<#if input.selection?has_content>
+		<#if input.selections?has_content>
 		private ${input.type.getCustom(input.name?cap_first)} ${input.name}<#if jsonProperty?has_content>__</#if> = null;
 
 		public ${input.type.getCustom(input.name?cap_first)} get${input.name?cap_first}() {
@@ -19,7 +19,7 @@
 
 		public static class /*${input.type.inner}=>*/${input.name?cap_first}
 		{
-			<@m_selection input.selection input.name?cap_first/>
+			<@m_selection input.selections input.name?cap_first/>
 		}
 		<#else>
 		private ${input.type.full} ${input.name}<#if jsonProperty?has_content>__</#if> = null;
@@ -136,9 +136,9 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 
 	}
 
-	public static class /*${type.inner}=>*/Result
+	public static class /*${typeName}=>*/Result
 	{
-		<@m_selection selection 'Result'/>
+		<@m_selection selections 'Result'/>
 	}
 
 	public String toString() {

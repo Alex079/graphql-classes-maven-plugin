@@ -1,21 +1,17 @@
 package com.github.alme.graphql.generator.dto;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
-@Getter
-@EqualsAndHashCode
-@RequiredArgsConstructor
+@Value
 public class GqlType {
 
 	public enum Flag {
 		MANDATORY, LIST, NAMED
 	}
 
-	private final Flag flag;
-	private final String name;
-	private final GqlType nested;
+	Flag flag;
+	String name;
+	GqlType nested;
 
 	public static GqlType mandatory(GqlType nested) {
 		return new GqlType(Flag.MANDATORY, null, nested);
