@@ -35,6 +35,7 @@ public class GqlWriter {
 	private static final String SUBPACKAGE_SEPARATOR = ".";
 	private static final String LOG_CANNOT_CREATE = "Cannot create [%s] due to error.";
 	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_30);
+
 	static {
 		CFG.setClassLoaderForTemplateLoading(GqlWriter.class.getClassLoader(), "/templates/java");
 		CFG.setDefaultEncoding("UTF-8");
@@ -84,22 +85,23 @@ public class GqlWriter {
 
 	private void dumpOperationInterfaces(Context ctx, Path basePackageFolder) {
 		ctx.getOperations().values().stream()
-		.map(GqlOperation::getOperation)
-		.map(GqlWriter::capitalize)
-		.collect(Collectors.toSet()).forEach((interfaceName) -> {
-			try {
-				CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
-			} catch (TemplateModelException e) {
-				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
-				return;
-			}
-			Path path = Paths.get(basePackageFolder.toString(), interfaceName + FILE_EXTENSION);
-			try (Writer writer = Files.newBufferedWriter(path)) {
-				CFG.getTemplate(OPERATION_INTERFACE_TEMPLATE).process(null, writer);
-			} catch (TemplateException | IOException e) {
-				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
-			}
-		});
+			.map(GqlOperation::getOperation)
+			.map(GqlWriter::capitalize)
+			.collect(Collectors.toSet())
+			.forEach((interfaceName) -> {
+				try {
+					CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
+				} catch (TemplateModelException e) {
+					ctx.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
+					return;
+				}
+				Path path = Paths.get(basePackageFolder.toString(), interfaceName + FILE_EXTENSION);
+				try (Writer writer = Files.newBufferedWriter(path)) {
+					CFG.getTemplate(OPERATION_INTERFACE_TEMPLATE).process(null, writer);
+				} catch (TemplateException | IOException e) {
+					ctx.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
+				}
+			});
 	}
 
 	private void dumpOperationClasses(Context ctx, Path basePackageFolder) {

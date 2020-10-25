@@ -16,7 +16,7 @@ public class GqlStructure {
 	@Getter private final String name;
 	private final Collection<String> members = new HashSet<>();
 	private final Collection<GqlField> fields = new HashSet<>();
-	
+
 	public GqlStructure addMembers(Collection<String> members) {
 		this.members.addAll(members);
 		return this;
@@ -26,16 +26,16 @@ public class GqlStructure {
 		this.members.add(member);
 		return this;
 	}
-	
+
 	public Collection<String> getMembers() {
 		return new HashSet<>(members);
 	}
-	
+
 	public GqlStructure addFields(Collection<GqlField> fields) {
 		this.fields.addAll(fields);
 		return this;
 	}
-	
+
 	public Collection<GqlField> getFields() {
 		return new HashSet<>(fields);
 	}

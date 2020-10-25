@@ -6,8 +6,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.Data;
 import org.apache.maven.plugin.logging.Log;
+
+import lombok.Data;
 
 @Data
 public class Context {
@@ -21,6 +22,7 @@ public class Context {
 	private final Map<String, GqlOperation> operations = new HashMap<>();
 	private final Map<String, String> scalarMap = new HashMap<>();
 	private final Set<String> importPackages = new HashSet<>();
+
 	{ // built-in
 		scalarMap.put("Int", "Integer");
 		scalarMap.put("Float", "Double");

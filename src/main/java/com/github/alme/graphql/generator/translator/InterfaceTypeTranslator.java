@@ -7,6 +7,7 @@ import java.util.Collection;
 
 import com.github.alme.graphql.generator.dto.Context;
 import com.github.alme.graphql.generator.dto.GqlStructure;
+
 import graphql.language.Document;
 import graphql.language.InterfaceTypeDefinition;
 import graphql.language.InterfaceTypeExtensionDefinition;
@@ -32,11 +33,11 @@ public class InterfaceTypeTranslator implements Translator {
 	private void populate(Document doc, Context ctx, Collection<? extends InterfaceTypeDefinition> definitions) {
 		definitions.forEach((def) ->
 			ctx.getInterfaceTypes()
-			.computeIfAbsent(def.getName(), GqlStructure::new)
-			.addFields(
-				def.getFieldDefinitions().stream()
-				.map(Util.fromFieldDef(doc, ctx))
-				.collect(toSet())));
+				.computeIfAbsent(def.getName(), GqlStructure::new)
+				.addFields(
+					def.getFieldDefinitions().stream()
+						.map(Util.fromFieldDef(doc, ctx))
+						.collect(toSet())));
 	}
 
 }

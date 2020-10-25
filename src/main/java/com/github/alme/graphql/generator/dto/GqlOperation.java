@@ -28,7 +28,7 @@ public class GqlOperation {
 	public Collection<GqlField> getVariables() {
 		return new HashSet<>(variables);
 	}
-	
+
 	public GqlOperation addSelection(Collection<GqlSelection> selection) {
 		this.selection.addAll(selection);
 		return this;

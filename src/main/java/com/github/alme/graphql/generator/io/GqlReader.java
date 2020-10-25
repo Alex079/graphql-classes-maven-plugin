@@ -15,11 +15,13 @@ import com.github.alme.graphql.generator.translator.ObjectTypeTranslator;
 import com.github.alme.graphql.generator.translator.OperationTranslator;
 import com.github.alme.graphql.generator.translator.SchemaTranslator;
 import com.github.alme.graphql.generator.translator.UnionTypeTranslator;
+
+import org.antlr.v4.runtime.misc.Pair;
+import org.apache.maven.plugin.logging.Log;
+
 import graphql.language.Document;
 import graphql.parser.MultiSourceReader;
 import graphql.parser.Parser;
-import org.antlr.v4.runtime.misc.Pair;
-import org.apache.maven.plugin.logging.Log;
 
 public class GqlReader {
 

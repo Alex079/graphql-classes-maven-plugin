@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import com.github.alme.graphql.generator.dto.Context;
+
 import graphql.language.Document;
 import graphql.language.OperationTypeDefinition;
 import graphql.language.SchemaDefinition;
@@ -31,9 +32,9 @@ public class SchemaTranslator implements Translator {
 	private void populate(Context ctx, Collection<? extends SchemaDefinition> definitions) {
 		ctx.getSchema().putAll(
 			definitions.stream()
-			.map(SchemaDefinition::getOperationTypeDefinitions)
-			.flatMap(Collection::stream)
-			.collect(Collectors.toMap(OperationTypeDefinition::getName, (def) -> def.getTypeName().getName())));
+				.map(SchemaDefinition::getOperationTypeDefinitions)
+				.flatMap(Collection::stream)
+				.collect(Collectors.toMap(OperationTypeDefinition::getName, (def) -> def.getTypeName().getName())));
 	}
 
 }

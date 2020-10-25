@@ -16,7 +16,7 @@ public class GqlSelection {
 	@Getter private final String name;
 	@Getter private final GqlType type;
 	private final Collection<GqlSelection> selection = new HashSet<>();
-	
+
 	public GqlSelection addSelection(Collection<GqlSelection> selection) {
 		this.selection.addAll(selection);
 		return this;

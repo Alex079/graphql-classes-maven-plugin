@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import com.github.alme.graphql.generator.dto.Context;
 import com.github.alme.graphql.generator.dto.GqlStructure;
+
 import graphql.language.Document;
 import graphql.language.TypeName;
 import graphql.language.UnionTypeDefinition;
@@ -32,9 +33,9 @@ public class UnionTypeTranslator implements Translator {
 		definitions.forEach((def) -> {
 			ctx.getUnionTypes().computeIfAbsent(def.getName(), GqlStructure::new);
 			def.getMemberTypes().stream()
-			.map(TypeName.class::cast).map(TypeName::getName)
-			.map((name) -> ctx.getObjectTypes().computeIfAbsent(name, GqlStructure::new))
-			.forEach((ot) -> ot.addMember(def.getName()));
+				.map(TypeName.class::cast).map(TypeName::getName)
+				.map((name) -> ctx.getObjectTypes().computeIfAbsent(name, GqlStructure::new))
+				.forEach((ot) -> ot.addMember(def.getName()));
 		});
 	}
 

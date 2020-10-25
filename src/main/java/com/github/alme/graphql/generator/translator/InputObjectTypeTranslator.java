@@ -7,6 +7,7 @@ import java.util.Collection;
 
 import com.github.alme.graphql.generator.dto.Context;
 import com.github.alme.graphql.generator.dto.GqlStructure;
+
 import graphql.language.Document;
 import graphql.language.InputObjectTypeDefinition;
 import graphql.language.InputObjectTypeExtensionDefinition;
@@ -32,11 +33,11 @@ public class InputObjectTypeTranslator implements Translator {
 	private void populate(Document doc, Context ctx, Collection<? extends InputObjectTypeDefinition> definitions) {
 		definitions.forEach((def) ->
 			ctx.getObjectTypes()
-			.computeIfAbsent(def.getName(), GqlStructure::new)
-			.addFields(
-				def.getInputValueDefinitions().stream()
-				.map(Util.fromInputValueDef(doc, ctx))
-				.collect(toSet())));
+				.computeIfAbsent(def.getName(), GqlStructure::new)
+				.addFields(
+					def.getInputValueDefinitions().stream()
+						.map(Util.fromInputValueDef(doc, ctx))
+						.collect(toSet())));
 	}
 
 }

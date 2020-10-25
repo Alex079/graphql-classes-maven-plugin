@@ -98,7 +98,7 @@ public class GeneratorMojo extends AbstractMojo {
 	/**
 	 * A maven project to add newly generated sources into
 	 */
-	@Parameter(defaultValue="${project}", readonly = true)
+	@Parameter(defaultValue = "${project}", readonly = true)
 	private MavenProject project;
 
 	private File getSourceDirectory() {
