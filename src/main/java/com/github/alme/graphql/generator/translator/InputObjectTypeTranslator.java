@@ -1,5 +1,6 @@
 package com.github.alme.graphql.generator.translator;
 
+import static com.github.alme.graphql.generator.translator.Util.fromInputValueDef;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.Collection;
 
 import com.github.alme.graphql.generator.dto.Context;
 import com.github.alme.graphql.generator.dto.GqlStructure;
+
 import graphql.language.Document;
 import graphql.language.InputObjectTypeDefinition;
 import graphql.language.InputObjectTypeExtensionDefinition;
@@ -25,18 +27,15 @@ public class InputObjectTypeTranslator implements Translator {
 				ext.add((InputObjectTypeExtensionDefinition) i);
 			}
 		});
-		populate(doc, ctx, main);
-		populate(doc, ctx, ext);
+		populate(ctx, main);
+		populate(ctx, ext);
 	}
 
-	private void populate(Document doc, Context ctx, Collection<? extends InputObjectTypeDefinition> definitions) {
-		definitions.forEach((def) ->
+	private void populate(Context ctx, Collection<? extends InputObjectTypeDefinition> definitions) {
+		definitions.forEach((definition) ->
 			ctx.getObjectTypes()
-			.computeIfAbsent(def.getName(), GqlStructure::new)
-			.addFields(
-				def.getInputValueDefinitions().stream()
-				.map(Util.fromInputValueDef(doc, ctx))
-				.collect(toSet())));
+				.computeIfAbsent(definition.getName(), GqlStructure::new)
+				.addFields(definition.getInputValueDefinitions().stream().map(fromInputValueDef(ctx)).collect(toSet())));
 	}
 
 }

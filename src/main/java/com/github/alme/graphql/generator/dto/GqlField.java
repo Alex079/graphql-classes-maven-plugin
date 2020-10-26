@@ -1,17 +1,11 @@
 package com.github.alme.graphql.generator.dto;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.Value;
 
-@Getter
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor
+@Value
 public class GqlField {
 
-	private final String name;
-	private final GqlType type;
+	String name;
+	GqlType type;
 
 }

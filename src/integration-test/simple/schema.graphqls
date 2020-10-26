@@ -56,7 +56,7 @@ input SoldItem {
 }
 
 type Query {
-	itemsInDelivery(paidBy: PaymentType): [Item!]
+	itemsInDelivery(paidBy: PaymentType): [Item!]!
 	trackingInfo(itemId: ID!): Track
 }
 

@@ -1,4 +1,3 @@
-
 name: Java CI with Maven
 
 on:
@@ -16,11 +15,11 @@ jobs:
     name: with Java ${{ matrix.version }}
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Set up Java
-      uses: actions/setup-java@v1
-      with:
-        java-version: ${{ matrix.version }}
-    - name: Build with Maven
-      run: mvn -B integration-test --file pom.xml
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.version }}
+      - name: Build with Maven
+        run: mvn -B integration-test --file pom.xml

@@ -2,7 +2,7 @@
 <#macro m_selection selectionList name>
 		<#list selectionList as input>
 		<#if jsonProperty?has_content>@${jsonProperty}("${input.name}")</#if>
-		<#if input.selection?has_content>
+		<#if input.selections?has_content>
 		private ${input.type.getCustom(input.name?cap_first)} ${input.name}<#if jsonProperty?has_content>__</#if> = null;
 
 		public ${input.type.getCustom(input.name?cap_first)} get${input.name?cap_first}() {
@@ -12,14 +12,14 @@
 		public ${useChainedAccessors?string(name,"void")} set${input.name?cap_first}(${input.type.getCustom(input.name?cap_first)} v) {
 			java.util.stream.Stream.of(v)
 			<@m_check_null input.type/>
-			.forEach(($) -> {});
+			.forEach($ -> {});
 			this.${input.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
 			return this;</#if>
 		}
 
 		public static class /*${input.type.inner}=>*/${input.name?cap_first}
 		{
-			<@m_selection input.selection input.name?cap_first/>
+			<@m_selection input.selections input.name?cap_first/>
 		}
 		<#else>
 		private ${input.type.full} ${input.name}<#if jsonProperty?has_content>__</#if> = null;
@@ -31,7 +31,7 @@
 		public ${useChainedAccessors?string(name,"void")} set${input.name?cap_first}(${input.type.full} v) {
 			java.util.stream.Stream.of(v)
 			<@m_check_null input.type/>
-			.forEach(($) -> {});
+			.forEach($ -> {});
 			this.${input.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
 			return this;</#if>
 		}
@@ -55,6 +55,7 @@
 			<@m_check_null input.nested/>
 			<#break>
 			<#case 'LIST'>
+			.filter(Objects::nonNull)
 			.flatMap(Collection::stream)
 			<@m_check_null input.nested/>
 			<#break>
@@ -118,7 +119,7 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 		public ${useChainedAccessors?string("Variables","void")} set${v.name?cap_first}(${v.type.full} v) {
 			java.util.stream.Stream.of(v)
 			<@m_check_null v.type/>
-			.forEach(($) -> {});
+			.forEach($ -> {});
 			this.${v.name}<#if jsonProperty?has_content>__</#if> = v;
 			this.$values.put("${v.name}", v);<#if useChainedAccessors>
 			return this;</#if>
@@ -135,9 +136,9 @@ implements ${interfaceName}<${className}.Variables, ${className}.Result>
 
 	}
 
-	public static class /*${type.inner}=>*/Result
+	public static class /*${typeName}=>*/Result
 	{
-		<@m_selection selection 'Result'/>
+		<@m_selection selections 'Result'/>
 	}
 
 	public String toString() {

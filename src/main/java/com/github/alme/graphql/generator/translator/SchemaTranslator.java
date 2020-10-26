@@ -2,11 +2,10 @@ package com.github.alme.graphql.generator.translator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import com.github.alme.graphql.generator.dto.Context;
+
 import graphql.language.Document;
-import graphql.language.OperationTypeDefinition;
 import graphql.language.SchemaDefinition;
 import graphql.language.SchemaExtensionDefinition;
 
@@ -29,11 +28,10 @@ public class SchemaTranslator implements Translator {
 	}
 
 	private void populate(Context ctx, Collection<? extends SchemaDefinition> definitions) {
-		ctx.getSchema().putAll(
-			definitions.stream()
+		definitions.stream()
 			.map(SchemaDefinition::getOperationTypeDefinitions)
 			.flatMap(Collection::stream)
-			.collect(Collectors.toMap(OperationTypeDefinition::getName, (def) -> def.getTypeName().getName())));
+			.forEach(def -> ctx.getSchema().put(def.getName(), def.getTypeName().getName()));
 	}
 
 }
