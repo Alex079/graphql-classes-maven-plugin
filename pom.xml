@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>com.graphql-java</groupId>
 			<artifactId>graphql-java</artifactId>
-			<version>15.0</version>
+			<version>16.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
@@ -78,13 +78,7 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>mojo-descriptor</id>
-						<goals>
-							<goal>descriptor</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>help-goal</id>
+						<id>generate-help</id>
 						<goals>
 							<goal>helpmojo</goal>
 						</goals>

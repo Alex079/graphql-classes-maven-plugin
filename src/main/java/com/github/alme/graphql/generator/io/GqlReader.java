@@ -15,18 +15,22 @@ import com.github.alme.graphql.generator.translator.ObjectTypeTranslator;
 import com.github.alme.graphql.generator.translator.OperationTranslator;
 import com.github.alme.graphql.generator.translator.SchemaTranslator;
 import com.github.alme.graphql.generator.translator.UnionTypeTranslator;
-
-import org.antlr.v4.runtime.misc.Pair;
-import org.apache.maven.plugin.logging.Log;
-
 import graphql.language.Document;
 import graphql.parser.MultiSourceReader;
 import graphql.parser.Parser;
+import lombok.Value;
+import org.apache.maven.plugin.logging.Log;
 
 public class GqlReader {
 
 	private static final String LOG_PARSER = "Parser has encountered %d definition(s).";
 	private static final String LOG_TRANSLATOR = "Finished translating %d %s definition(s).";
+
+	@Value
+	static class FileInfo {
+		Reader reader;
+		String path;
+	}
 
 	public void read(Context ctx, Collection<File> sources) {
 		try (Reader reader = getReader(sources, ctx.getLog())) {
@@ -61,7 +65,7 @@ public class GqlReader {
 			.map(File::toPath)
 			.map((path) -> {
 				try {
-					return new Pair<>(Files.newBufferedReader(path), path.toString());
+					return new FileInfo(Files.newBufferedReader(path), path.toString());
 				} catch (IOException e) {
 					log.error(String.format("Skipping [%s] due to error.", path), e);
 					return null;
@@ -70,7 +74,7 @@ public class GqlReader {
 			.filter(Objects::nonNull)
 			.reduce(
 				MultiSourceReader.newMultiSourceReader(),
-				(multiReader, pair) -> multiReader.reader(pair.a, pair.b),
+				(multiReader, pair) -> multiReader.reader(pair.reader, pair.path),
 				(r1, r2) -> null /* unused */)
 			.build();
 	}

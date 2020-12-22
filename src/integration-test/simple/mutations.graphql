@@ -4,5 +4,6 @@ mutation delivered($item: SoldItem!) {
         delivered
         id
         itemId
+        from {...SameNameFragment}
     }
 }

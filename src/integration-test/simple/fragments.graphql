@@ -3,3 +3,17 @@ fragment ItemFragment on Item {
 	price
 	quantity
 }
+
+fragment SameNameFragment on Track {
+	fromDate
+	toDate
+}
+
+fragment SameNameFragment on Location {
+	address
+	...InnerFragment
+}
+
+fragment InnerFragment on Location {
+	shelf
+}
