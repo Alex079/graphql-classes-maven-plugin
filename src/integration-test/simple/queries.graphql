@@ -7,9 +7,11 @@ query itemsInDeliveryByPayment($paidBy: PaymentType!) {
 
 query trackingInfo($itemId: ID!) {
 	trackingInfo(itemId: $itemId) {
-		fromDate
-		toDate
+		...SameNameFragment
 		toAddress
 		delivered
+		from {
+			...SameNameFragment
+		}
 	}
 }
