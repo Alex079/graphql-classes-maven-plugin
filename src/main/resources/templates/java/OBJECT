@@ -41,12 +41,34 @@ implements ${members?join(", ")}
 	}
 
 	</#list>
+	@Override
 	public String toString() {
 		return new StringBuilder().append("{")
 		<#list fields as f>
-		.append(" ${f.name} = ").append(get${f.name?cap_first}())<#sep>.append(",")</#sep>
+			.append(" ${f.name} = ").append(get${f.name?cap_first}())<#sep>.append(",")</#sep>
 		</#list>
-		.append(" }").toString();
+			.append(" }").toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof ${name})) return false;
+		${name} other = (${name}) o;
+		return
+		<#list fields as f>
+			Objects.equals(this.get${f.name?cap_first}(), other.get${f.name?cap_first}())<#sep> &&</#sep>
+		</#list>
+		;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(
+		<#list fields as f>
+			get${f.name?cap_first}()<#sep>,</#sep>
+		</#list>
+		);
 	}
 
 }
