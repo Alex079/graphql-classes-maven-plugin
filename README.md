@@ -17,11 +17,62 @@ This is a maven 3 plugin for generating boilerplate Java classes from GraphQL ty
 
 This goal runs the classes generation and is bound to the phase generate-sources by default.
 
-## Operation
+## Details
 
 The plugin uses graphql-java to parse GraphQL SDL files.
 Freemarker templates are used to output Java source files.
 The generated sources are added to maven build.
+
+### Mapping from GraphQL to Java
+
+<table>
+  <thead>
+    <tr>
+      <th>GraphQL</th>
+      <th>Java</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>enum</td>
+      <td>enum</td>
+    </tr>
+    <tr>
+      <td>interface</td>
+      <td>interface with accessors for each GraphQL field</td>
+    </tr>
+    <tr>
+      <td>union</td>
+      <td>empty interface which is added to the list of implemented interfaces of Java classes representing union members</td>
+    </tr>
+    <tr>
+      <td>type or input</td>
+      <td>class with<br/>
+- private fields with public accessors<br/>
+- <code>String toString()</code><br/>
+- <code>boolean equals(Object)</code><br/>
+- <code>int hashCode()</code></td>
+    </tr>
+    <tr>
+      <td>operation</td>
+      <td>class with<br/>
+- <code>String getDocument()</code><br/>
+- <code>String getOperation()</code><br/>
+-	<code>Variables getVariables()</code><br/>
+-	<code>Map&lt;String, Object&gt; getVariablesAsMap()</code><br/>
+-	<code>Class&lt;Result&gt; getResultClass()</code><br/>
+- nested public static classes corresponding to field selection set with aliases and fragments resolved</td>
+    </tr>
+    <tr>
+      <td>[]</td>
+      <td>java.util.List</td>
+    </tr>
+    <tr>
+      <td>!</td>
+      <td>null check in setters</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Usage
 
@@ -92,3 +143,43 @@ mvn com.github.alex079:graphql-classes-maven-plugin:${VERSION}:generate \
 -Dgql.importPackages=java.time \
 -Dgql.scalarMap=CustomType1=String,CustomType2=Integer
 ```
+
+## Examples
+
+<table>
+  <thead>
+    <tr>
+      <th>GraphQL</th>
+      <th>Java</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+<pre>
+type Sample {
+	id: ID!
+	scalar: Address!
+	number: Int!
+}
+</pre>
+      </td>
+      <td>
+<pre>
+public class Sample {
+	private String id;
+	public String getId() { ... }
+	public void setId(String v) { ... }
+	private Integer number;
+	public Integer getNumber() { ... }
+	public void setNumber(Integer v) { ... }
+	private String scalar;
+	public String getScalar() { ... }
+	public void setScalar(String v) { ... }
+	...
+}
+</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
