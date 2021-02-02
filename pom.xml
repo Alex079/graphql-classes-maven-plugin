@@ -123,7 +123,7 @@
 						<argument>-Dgql.sourceDirectory=../simple</argument>
 						<argument>-Dgql.sourceIncludes=*.graphql,*.graphqls,,,</argument>
 						<argument>-Dgql.outputDirectory=output</argument>
-						<argument>-Dgql.scalarMap=S1=String,S2=Integer,,,A</argument>
+						<argument>-Dgql.scalarMap=S1=String,S2=Integer,,,Address=String</argument>
 						<argument>-e</argument>
 						<argument>-Dmaven.repo.local=${project.build.directory}/local-repo</argument>
 					</arguments>
