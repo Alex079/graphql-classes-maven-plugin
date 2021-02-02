@@ -2,18 +2,26 @@
 
 # GraphQL Classes Generator
 
-This is a maven 3.x plugin intended to simplify communication with schema-first GraphQL servers from client applications written in Java. This plugin can generate client-side java classes for GraphQL operations using only schema file.
+This is a maven 3 plugin for generating boilerplate Java classes from GraphQL types and operations.
+
+## Features
+
+- Uses only GraphQL SDL files as input
+- Runs with or without POM configuration
+- Can be used on both server and client side
+- Generates only classes necessary to represent types and operations
 
 ## Goals
 
 ### generate
 
-The only goal of this plugin. This goal runs the classes generation and is bound to the phase generate-sources by default.
+This goal runs the classes generation and is bound to the phase generate-sources by default.
 
 ## Operation
 
-The plugin uses graphql-java internally to build an AST and freemarker to create Java files form the AST. The generation process is therefore split in two steps: AST generation and files creation. The AST produced by graphql-java is compacted into a custom reduced AST which excludes optional content.
-The actual client code generation is intentionally left out of the scope of this plugin.
+The plugin uses graphql-java to parse GraphQL SDL files.
+Freemarker templates are used to output Java source files.
+The generated sources are added to maven build.
 
 ## Usage
 
