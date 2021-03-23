@@ -4,21 +4,24 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-import static graphql.language.TypeName.newTypeName;
-import static graphql.language.UnionTypeDefinition.newUnionTypeDefinition;
-import static graphql.language.UnionTypeExtensionDefinition.newUnionTypeExtensionDefinition;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import static graphql.language.TypeName.newTypeName;
+import static graphql.language.UnionTypeDefinition.newUnionTypeDefinition;
+import static graphql.language.UnionTypeExtensionDefinition.newUnionTypeExtensionDefinition;
+
 import com.github.alme.graphql.generator.dto.Context;
-import graphql.language.Document;
-import graphql.language.UnionTypeDefinition;
+
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import graphql.language.Document;
+import graphql.language.UnionTypeDefinition;
 
 @ExtendWith(MockitoExtension.class)
 class UnionTypeTranslatorTest {
@@ -34,7 +37,7 @@ class UnionTypeTranslatorTest {
 	@Test
 	void translateNoUnions() {
 		when(doc.getDefinitionsOfType(UnionTypeDefinition.class)).thenReturn(emptyList());
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
@@ -49,7 +52,7 @@ class UnionTypeTranslatorTest {
 				.memberType(newTypeName("Type1").build())
 				.memberType(newTypeName("Type2").build())
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
@@ -70,7 +73,7 @@ class UnionTypeTranslatorTest {
 				.name("Union1")
 				.memberTypes(singletonList(newTypeName("Type1").build()))
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 

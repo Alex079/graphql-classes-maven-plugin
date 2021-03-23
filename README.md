@@ -81,8 +81,8 @@ The generated sources are added to maven build.
 |Parameter|Type|Default|Description|
 |-|-|-|-|
 |source|FileSet||A set of source files including both schema files and operation files|
-|outputDirectory|File|"${project.build.directory}/generated-sources/java"|A root directory to create files in|
-|packageName|String|"gql.generated"|A name of the package to create files in|
+|outputDirectory|File|"${project.build.directory}/generated-sources/java"|A root directory for generated files|
+|packageName|String|"gql.generated"|A name of base package for generated classes|
 |scalarMap|Map\<String, String\>||A mapping of GraphQL scalars to known java classes|
 |importPackages|Set\<String\>||A set of packages to import into generated classes|
 |jsonPropertyAnnotation|String||An annotation to be used on generated fields to avoid java keywords collisions|
@@ -128,8 +128,8 @@ The generated sources are added to maven build.
 |gql.sourceDirectory|File|(current directory)|A directory containing source files|
 |gql.sourceIncludes|Set\<String\>||A set of patterns to include|
 |gql.sourceExcludes|Set\<String\>||A set of patterns to exclude|
-|gql.outputDirectory|File|"generated-sources/java"|A root directory to create files in|
-|gql.packageName|String|"gql.generated"|A name of the package to create files in|
+|gql.outputDirectory|File|"generated-sources/java"|A root directory for generated files|
+|gql.packageName|String|"gql.generated"|A name of base package for generated classes|
 |gql.scalarMap|Set\<String\>||A mapping of GraphQL scalars to known java classes formatted as a list of key=value pairs|
 |gql.importPackages|Set\<String\>||A set of packages to import into generated classes|
 |gql.jsonPropertyAnnotation|String||An annotation to be used on generated fields to avoid java keywords collisions|

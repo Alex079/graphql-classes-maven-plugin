@@ -1,15 +1,17 @@
 package com.github.alme.graphql.generator.translator;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
 import static graphql.language.OperationTypeDefinition.newOperationTypeDefinition;
 import static graphql.language.SchemaDefinition.newSchemaDefinition;
 import static graphql.language.SchemaExtensionDefinition.newSchemaExtensionDefinition;
 import static graphql.language.TypeName.newTypeName;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 import com.github.alme.graphql.generator.dto.Context;
 
@@ -36,7 +38,7 @@ class SchemaTranslatorTest {
 	@Test
 	void translateEmptySchema() {
 		when(doc.getDefinitionsOfType(SchemaDefinition.class)).thenReturn(emptyList());
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
@@ -56,7 +58,7 @@ class SchemaTranslatorTest {
 					.typeName(newTypeName("Type2").build())
 					.build())
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
@@ -80,7 +82,7 @@ class SchemaTranslatorTest {
 					.typeName(newTypeName("Type2").build())
 					.build())
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 

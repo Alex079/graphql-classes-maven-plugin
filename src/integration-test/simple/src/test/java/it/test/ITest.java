@@ -3,9 +3,6 @@ package it.test;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +10,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import it.test.support.GsonDateTimeAdapter;
 import it.test.support.JacksonDateTimeDeserializer;
@@ -64,9 +64,9 @@ class ITest {
     @Test
     void testItemsInDeliveryByPaymentQuery() throws JsonProcessingException {
         Map<?, ?> g = testGson(new it.gson.ItemsInDeliveryByPaymentQuery().getVariables()
-                .setPaidBy(it.gson.types.PaymentType.CASH));
+                .setPaidWith(it.gson.types.PaymentType.CASH));
         Map<?, ?> j = testJackson(new it.jackson.ItemsInDeliveryByPaymentQuery().getVariables()
-                .setPaidBy(it.jackson.types.PaymentType.CASH));
+                .setPaidWith(it.jackson.types.PaymentType.CASH));
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
@@ -75,12 +75,12 @@ class ITest {
         Map<?, ?> g = testGson(new it.gson.DeliveredMutation().getVariables()
                 .setItem(new it.gson.types.SoldItem()
                         .setItem("Item")
-                        .setPaidBy(it.gson.types.PaymentType.CASH)
+                        .setPaidWith(it.gson.types.PaymentType.CASH)
                         .setTrack("Track")));
         Map<?, ?> j = testJackson(new it.jackson.DeliveredMutation().getVariables()
                 .setItem(new it.jackson.types.SoldItem()
                         .setItem("Item")
-                        .setPaidBy(it.jackson.types.PaymentType.CASH)
+                        .setPaidWith(it.jackson.types.PaymentType.CASH)
                         .setTrack("Track")));
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }

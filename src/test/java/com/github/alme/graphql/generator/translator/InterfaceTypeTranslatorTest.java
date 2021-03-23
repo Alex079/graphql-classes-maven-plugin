@@ -1,17 +1,19 @@
 package com.github.alme.graphql.generator.translator;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
 import static graphql.language.FieldDefinition.newFieldDefinition;
 import static graphql.language.InterfaceTypeDefinition.newInterfaceTypeDefinition;
 import static graphql.language.InterfaceTypeExtensionDefinition.newInterfaceTypeExtensionDefinition;
 import static graphql.language.ListType.newListType;
 import static graphql.language.NonNullType.newNonNullType;
 import static graphql.language.TypeName.newTypeName;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 
@@ -42,7 +44,7 @@ class InterfaceTypeTranslatorTest {
 	@Test
 	void translateNoInterfaces() {
 		when(doc.getDefinitionsOfType(InterfaceTypeDefinition.class)).thenReturn(emptyList());
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
@@ -63,7 +65,7 @@ class InterfaceTypeTranslatorTest {
 					.type(newNonNullType(newListType(newNonNullType(newTypeName("Type2").build()).build()).build()).build())
 					.build())
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
@@ -106,7 +108,7 @@ class InterfaceTypeTranslatorTest {
 					.type(newNonNullType(newListType(newNonNullType(newTypeName("Type2").build()).build()).build()).build())
 					.build()))
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 

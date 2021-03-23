@@ -34,7 +34,7 @@ class EnumTypeTranslatorTest {
 	@Test
 	void translateNoEnums() {
 		when(doc.getDefinitionsOfType(EnumTypeDefinition.class)).thenReturn(emptyList());
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
@@ -49,7 +49,7 @@ class EnumTypeTranslatorTest {
 				.enumValueDefinition(EnumValueDefinition.newEnumValueDefinition().name("V1").build())
 				.enumValueDefinition(EnumValueDefinition.newEnumValueDefinition().name("V2").build())
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
@@ -70,7 +70,7 @@ class EnumTypeTranslatorTest {
 				.name("Enum1")
 				.enumValueDefinitions(singletonList(EnumValueDefinition.newEnumValueDefinition().name("V1").build()))
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 

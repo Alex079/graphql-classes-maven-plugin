@@ -1,6 +1,6 @@
 
-query itemsInDeliveryByPayment($paidBy: PaymentType!) {
-	itemsInDelivery(paidBy: $paidBy) {
+query itemsInDeliveryByPayment($paidWith: PaymentType!) {
+	itemsInDelivery(paidWith: $paidWith) {
 		...ItemFragment
 	}
 }
@@ -12,6 +12,25 @@ query trackingInfo($itemId: ID!) {
 		delivered
 		from {
 			...SameNameFragment
+		}
+	}
+}
+
+query trackingInfoRelayConnection($itemId: ID! $first: Int $after: String) {
+	trackingInfoConnection(itemId: $itemId after: $after first: $first) {
+		edges {
+			cursor
+			node {
+				...SameNameFragment
+				toAddress
+				delivered
+				from {
+					...SameNameFragment
+				}
+			}
+		}
+		pageInfo {
+			hasNextPage
 		}
 	}
 }

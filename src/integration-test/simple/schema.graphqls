@@ -51,13 +51,14 @@ extend union LocationOrTrack = Track
 
 input SoldItem {
 	item: ID!
-	paidBy: PaymentType!
+	paidWith: PaymentType!
 	track: ID!
 }
 
 type Query {
-	itemsInDelivery(paidBy: PaymentType): [Item!]!
+	itemsInDelivery(paidWith: PaymentType): [Item!]!
 	trackingInfo(itemId: ID!): Track
+	trackingInfoConnection(itemId: ID! first: Int after: String): TrackConnection @connection(for:"Track")
 }
 
 type Mutation {

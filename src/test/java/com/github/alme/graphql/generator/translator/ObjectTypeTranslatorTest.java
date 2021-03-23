@@ -1,17 +1,19 @@
 package com.github.alme.graphql.generator.translator;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
 import static graphql.language.FieldDefinition.newFieldDefinition;
 import static graphql.language.InputValueDefinition.newInputValueDefinition;
 import static graphql.language.ListType.newListType;
 import static graphql.language.ObjectTypeDefinition.newObjectTypeDefinition;
 import static graphql.language.ObjectTypeExtensionDefinition.newObjectTypeExtensionDefinition;
 import static graphql.language.TypeName.newTypeName;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 
@@ -42,11 +44,11 @@ class ObjectTypeTranslatorTest {
 	@Test
 	void translateNoObjectTypes() {
 		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(emptyList());
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
-		assertTrue(ctx.getInterfaceTypes().isEmpty());
+		assertTrue(ctx.getObjectTypes().isEmpty());
 	}
 
 	@Test
@@ -67,15 +69,15 @@ class ObjectTypeTranslatorTest {
 					.type(newListType(newTypeName("Type3").build()).build())
 					.build())
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
 		assertEquals(1, ctx.getObjectTypes().size());
 		assertTrue(ctx.getObjectTypes().containsKey("Object1"));
-		Collection<GqlField> object1 = ctx.getObjectTypes().get("Object1").getFields();
-		assertEquals(2, object1.size());
-		object1.forEach(field -> {
+		Collection<GqlField> fields = ctx.getObjectTypes().get("Object1").getFields();
+		assertEquals(2, fields.size());
+		fields.forEach(field -> {
 			GqlType type = field.getType();
 			switch (field.getName()) {
 				case "field1":
@@ -111,15 +113,15 @@ class ObjectTypeTranslatorTest {
 						.build())
 					.build())
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
 		assertEquals(1, ctx.getObjectTypes().size());
 		assertTrue(ctx.getObjectTypes().containsKey("Object1"));
-		Collection<GqlField> object1 = ctx.getObjectTypes().get("Object1").getFields();
-		assertEquals(2, object1.size());
-		object1.forEach(field -> {
+		Collection<GqlField> fields = ctx.getObjectTypes().get("Object1").getFields();
+		assertEquals(2, fields.size());
+		fields.forEach(field -> {
 			GqlType type = field.getType();
 			switch (field.getName()) {
 				case "field1":
