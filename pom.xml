@@ -160,7 +160,7 @@
 							<executable>sh</executable>
 							<arguments>
 								<argument>-c</argument>
-								<argument>javac -d output-classes output/gql/generated/*.java output/gql/generated/types/*.java</argument>
+								<argument>mkdir -p output-classes ; javac -d output-classes output/gql/generated/*.java output/gql/generated/types/*.java</argument>
 							</arguments>
 						</configuration>
 					</execution>
