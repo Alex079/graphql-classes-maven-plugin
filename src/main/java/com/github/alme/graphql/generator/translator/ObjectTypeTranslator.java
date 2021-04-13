@@ -1,7 +1,8 @@
 package com.github.alme.graphql.generator.translator;
 
-import static com.github.alme.graphql.generator.translator.Util.fromFieldDef;
 import static java.util.stream.Collectors.toSet;
+
+import static com.github.alme.graphql.generator.translator.Util.fromFieldDef;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +30,7 @@ public class ObjectTypeTranslator implements Translator {
 	public void translate(Document doc, Context ctx) {
 		Collection<ObjectTypeDefinition> main = new ArrayList<>();
 		Collection<ObjectTypeExtensionDefinition> ext = new ArrayList<>();
-		doc.getDefinitionsOfType(ObjectTypeDefinition.class).forEach((i) -> {
+		doc.getDefinitionsOfType(ObjectTypeDefinition.class).forEach(i -> {
 			if (i.getClass() == ObjectTypeDefinition.class) {
 				main.add(i);
 			}
@@ -42,7 +43,7 @@ public class ObjectTypeTranslator implements Translator {
 	}
 
 	private void populate(Context ctx, Collection<? extends ObjectTypeDefinition> definitions) {
-		definitions.forEach((definition) -> {
+		definitions.forEach(definition -> {
 			String name = definition.getName();
 			ctx.getObjectTypes()
 				.computeIfAbsent(name, GqlStructure::new)

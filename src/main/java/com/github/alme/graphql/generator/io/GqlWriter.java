@@ -1,11 +1,9 @@
 package com.github.alme.graphql.generator.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 import com.github.alme.graphql.generator.dto.Context;
@@ -31,8 +29,6 @@ public class GqlWriter {
 	private static final String FILE_EXTENSION = ".java";
 	private static final String BASE_PACKAGE_KEY = "basePackage";
 	private static final String TYPES_PACKAGE_KEY = "typesPackage";
-	private static final String TYPES_SUBPACKAGE = "types";
-	private static final String SUBPACKAGE_SEPARATOR = ".";
 	private static final String LOG_CANNOT_CREATE = "Cannot create [%s] due to error.";
 	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_30);
 
@@ -45,35 +41,32 @@ public class GqlWriter {
 		CFG.setFallbackOnNullLoopVariable(false);
 	}
 
-	public void write(Context ctx, String rootOutputDir, String basePackageName) throws MojoExecutionException {
-		String typesPackageName = basePackageName + SUBPACKAGE_SEPARATOR + TYPES_SUBPACKAGE;
-		Path basePackageFolder = Paths.get(rootOutputDir, basePackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
-		Path typesPackageFolder = Paths.get(rootOutputDir, typesPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
+	public void write(Context ctx) throws MojoExecutionException {
 		try {
-			Files.createDirectories(typesPackageFolder);
+			Files.createDirectories(ctx.getTypesPackagePath());
 		} catch (IOException e) {
-			throw new MojoExecutionException(String.format(LOG_CANNOT_CREATE, typesPackageFolder), e);
+			throw new MojoExecutionException(String.format(LOG_CANNOT_CREATE, ctx.getTypesPackagePath()), e);
 		}
 
 		try {
-			CFG.setSharedVariable(BASE_PACKAGE_KEY, basePackageName);
-			CFG.setSharedVariable(TYPES_PACKAGE_KEY, typesPackageName);
+			CFG.setSharedVariable(BASE_PACKAGE_KEY, ctx.getBasePackageName());
+			CFG.setSharedVariable(TYPES_PACKAGE_KEY, ctx.getTypesPackageName());
 			CFG.setSharedVariable(ANNOTATION_KEY, ctx.getJsonPropertyAnnotation());
 			CFG.setSharedVariable(CHAINED_ACCESSORS_KEY, ctx.isUseChainedAccessors());
 			CFG.setSharedVariable(IMPORT_PACKAGES_KEY, ctx.getImportPackages());
 		} catch (TemplateModelException e) {
 			throw new MojoExecutionException("Cannot set shared variables.", e);
 		}
-		dumpTypeClasses(ctx, typesPackageFolder);
-		dumpOperationInterfaces(ctx, basePackageFolder);
-		dumpOperationClasses(ctx, basePackageFolder);
+		dumpTypeClasses(ctx);
+		dumpOperationInterfaces(ctx);
+		dumpOperationClasses(ctx);
 		CFG.clearSharedVariables();
 	}
 
-	private void dumpTypeClasses(Context ctx, Path typesPackageFolder) {
+	private void dumpTypeClasses(Context ctx) {
 		ctx.getStructures().forEach((category, structures) ->
 			structures.forEach((name, type) -> {
-				Path path = Paths.get(typesPackageFolder.toString(), name + FILE_EXTENSION);
+				Path path = ctx.getTypesPackagePath().resolve(name + FILE_EXTENSION);
 				try (Writer writer = Files.newBufferedWriter(path)) {
 					CFG.getTemplate(category.name()).process(type, writer);
 				} catch (TemplateException | IOException e) {
@@ -83,19 +76,19 @@ public class GqlWriter {
 		);
 	}
 
-	private void dumpOperationInterfaces(Context ctx, Path basePackageFolder) {
+	private void dumpOperationInterfaces(Context ctx) {
 		ctx.getOperations().values().stream()
 			.map(GqlOperation::getOperation)
 			.map(GqlWriter::capitalize)
 			.collect(Collectors.toSet())
-			.forEach((interfaceName) -> {
+			.forEach(interfaceName -> {
 				try {
 					CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
 				} catch (TemplateModelException e) {
 					ctx.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
 					return;
 				}
-				Path path = Paths.get(basePackageFolder.toString(), interfaceName + FILE_EXTENSION);
+				Path path = ctx.getBasePackagePath().resolve(interfaceName + FILE_EXTENSION);
 				try (Writer writer = Files.newBufferedWriter(path)) {
 					CFG.getTemplate(OPERATION_INTERFACE_TEMPLATE).process(null, writer);
 				} catch (TemplateException | IOException e) {
@@ -104,7 +97,7 @@ public class GqlWriter {
 			});
 	}
 
-	private void dumpOperationClasses(Context ctx, Path basePackageFolder) {
+	private void dumpOperationClasses(Context ctx) {
 		ctx.getOperations().forEach((name, operation) -> {
 			String interfaceName = capitalize(operation.getOperation());
 			String className = (name == null ? UNNAMED_OPERATION : capitalize(name)) + interfaceName;
@@ -115,7 +108,7 @@ public class GqlWriter {
 				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
 				return;
 			}
-			Path path = Paths.get(basePackageFolder.toString(), className + FILE_EXTENSION);
+			Path path = ctx.getBasePackagePath().resolve(className + FILE_EXTENSION);
 			try (Writer writer = Files.newBufferedWriter(path)) {
 				CFG.getTemplate(OPERATION_TEMPLATE).process(operation, writer);
 			} catch (TemplateException | IOException e) {

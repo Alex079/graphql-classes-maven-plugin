@@ -13,13 +13,16 @@ import com.github.alme.graphql.generator.translator.InputObjectTypeTranslator;
 import com.github.alme.graphql.generator.translator.InterfaceTypeTranslator;
 import com.github.alme.graphql.generator.translator.ObjectTypeTranslator;
 import com.github.alme.graphql.generator.translator.OperationTranslator;
+import com.github.alme.graphql.generator.translator.RelayConnectionTranslator;
 import com.github.alme.graphql.generator.translator.SchemaTranslator;
 import com.github.alme.graphql.generator.translator.UnionTypeTranslator;
+
+import org.apache.maven.plugin.logging.Log;
+
 import graphql.language.Document;
 import graphql.parser.MultiSourceReader;
 import graphql.parser.Parser;
 import lombok.Value;
-import org.apache.maven.plugin.logging.Log;
 
 public class GqlReader {
 
@@ -45,6 +48,7 @@ public class GqlReader {
 
 			new InputObjectTypeTranslator().translate(doc, ctx);
 			new ObjectTypeTranslator().translate(doc, ctx);
+			new RelayConnectionTranslator().translate(doc, ctx);
 			ctx.getLog().info(String.format(LOG_TRANSLATOR, ctx.getObjectTypes().size(), "Object and Input Object type"));
 
 			new UnionTypeTranslator().translate(doc, ctx);

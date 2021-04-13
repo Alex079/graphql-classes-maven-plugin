@@ -1,5 +1,13 @@
 package com.github.alme.graphql.generator.translator;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
 import static graphql.language.ArrayValue.newArrayValue;
 import static graphql.language.EnumValue.newEnumValue;
 import static graphql.language.InputObjectTypeDefinition.newInputObjectDefinition;
@@ -11,12 +19,6 @@ import static graphql.language.ObjectField.newObjectField;
 import static graphql.language.ObjectValue.newObjectValue;
 import static graphql.language.StringValue.newStringValue;
 import static graphql.language.TypeName.newTypeName;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 
@@ -47,7 +49,7 @@ class InputObjectTypeTranslatorTest {
 	@Test
 	void translateNoInputObjectTypes() {
 		when(doc.getDefinitionsOfType(InputObjectTypeDefinition.class)).thenReturn(emptyList());
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
@@ -71,7 +73,7 @@ class InputObjectTypeTranslatorTest {
 						newObjectField().name("n").value(newStringValue("v").build()).build()).build()).build())
 					.build())
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 
@@ -116,7 +118,7 @@ class InputObjectTypeTranslatorTest {
 						newObjectField().name("n").value(newStringValue("v").build()).build()).build()).build())
 					.build()))
 				.build()));
-		Context ctx = new Context(log);
+		Context ctx = new Context(log, "", "");
 
 		translator.translate(doc, ctx);
 

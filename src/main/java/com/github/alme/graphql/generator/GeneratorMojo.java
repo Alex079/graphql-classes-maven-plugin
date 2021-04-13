@@ -53,13 +53,13 @@ public class GeneratorMojo extends AbstractMojo {
 	private Set<String> sourceExcludesAlternative;
 
 	/**
-	 * A root directory to create files in
+	 * A root directory for generated files
 	 */
 	@Parameter(property = "gql.outputDirectory")
 	private File outputDirectory;
 
 	/**
-	 * A name of the package to create files in
+	 * A name of base package for generated classes
 	 */
 	@Parameter(property = "gql.packageName", defaultValue = "gql.generated")
 	private String packageName;
@@ -163,7 +163,12 @@ public class GeneratorMojo extends AbstractMojo {
 		}
 		getLog().info(String.format("Source files: %s.", sourceFiles.toString()));
 
-		Context ctx = new Context(getLog());
+		String outputRoot = getOutputDirectory();
+		getLog().info(String.format("Output directory: [%s].", outputRoot));
+
+		getLog().info(String.format("Output base package name: [%s].", packageName));
+
+		Context ctx = new Context(getLog(), packageName, outputRoot);
 
 		ctx.getScalarMap().putAll(getScalarMap());
 		getLog().info(String.format("Scalar types mapping rules: %s.", ctx.getScalarMap()));
@@ -181,14 +186,9 @@ public class GeneratorMojo extends AbstractMojo {
 		ctx.setUseChainedAccessors(useChainedAccessors);
 		getLog().info(String.format("Chained accessors: %b.", useChainedAccessors));
 
-		String outputRoot = getOutputDirectory();
-		getLog().info(String.format("Output directory: [%s].", outputRoot));
-
-		getLog().info(String.format("Output package name: [%s].", packageName));
-
 		new GqlReader().read(ctx, sourceFiles);
 		getLog().debug(String.format("Current context: %s.", ctx));
-		new GqlWriter().write(ctx, outputRoot, packageName);
+		new GqlWriter().write(ctx);
 		getLog().info("Generation is done.");
 		project.addCompileSourceRoot(outputRoot);
 	}
