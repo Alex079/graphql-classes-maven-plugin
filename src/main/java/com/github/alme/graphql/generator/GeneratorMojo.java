@@ -1,5 +1,7 @@
 package com.github.alme.graphql.generator;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -9,7 +11,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlConfiguration;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.io.GqlReader;
 import com.github.alme.graphql.generator.io.GqlWriter;
 
@@ -101,6 +104,11 @@ public class GeneratorMojo extends AbstractMojo {
 	@Parameter(defaultValue = "${project}", readonly = true)
 	private MavenProject project;
 
+	private static final String TYPES_SUBPACKAGE = ".types";
+	private static final String SUBPACKAGE_SEPARATOR = ".";
+	private static final String LIST_SEPARATOR = ",";
+	private static final String KEY_VALUE_SEPARATOR = "=";
+
 	private File getSourceDirectory() {
 		if (source == null && sourceDirectoryAlternative != null) {
 			return sourceDirectoryAlternative;
@@ -115,7 +123,7 @@ public class GeneratorMojo extends AbstractMojo {
 	}
 
 	private String join(Iterable<? extends CharSequence> i) {
-		return i == null ? "" : String.join(",", i);
+		return i == null ? "" : String.join(LIST_SEPARATOR, i);
 	}
 
 	private String getSourceIncludes() {
@@ -130,7 +138,7 @@ public class GeneratorMojo extends AbstractMojo {
 		return scalarMap == null
 			? scalarMapAlternative.stream()
 				.filter(Objects::nonNull)
-				.map(item -> item.split("=", 2))
+				.map(item -> item.split(KEY_VALUE_SEPARATOR, 2))
 				.filter(item -> item.length == 2)
 				.collect(Collectors.toMap(item -> item[0], item -> item[1]))
 			: scalarMap;
@@ -146,12 +154,7 @@ public class GeneratorMojo extends AbstractMojo {
 			: outputDirectory.getPath();
 	}
 
-	@Override
-	public void execute() throws MojoExecutionException {
-		File directory = getSourceDirectory();
-		String includes = getSourceIncludes();
-		String excludes = getSourceExcludes();
-		getLog().info(String.format("Source: {directory=[%s], includes=[%s], excludes=[%s]}.", directory, includes, excludes));
+	private List<File> getSourceFiles(File directory, String includes, String excludes) throws MojoExecutionException {
 		List<File> sourceFiles;
 		try {
 			sourceFiles = FileUtils.getFiles(directory, includes, excludes);
@@ -161,35 +164,49 @@ public class GeneratorMojo extends AbstractMojo {
 		if (sourceFiles.isEmpty()) {
 			throw new MojoExecutionException("Could not find any source files.");
 		}
-		getLog().info(String.format("Source files: %s.", sourceFiles.toString()));
+		return sourceFiles;
+	}
+
+	private GqlConfiguration.GqlConfigurationBuilder getDefaultConfigurationBuilder() {
+		return GqlConfiguration.builder()
+			.importPackage("java.util")
+			.scalar("Int", "Integer")
+			.scalar("Float", "Double")
+			.scalar("ID", "String");
+	}
+
+	@Override
+	public void execute() throws MojoExecutionException {
+		File directory = getSourceDirectory();
+		String includes = getSourceIncludes();
+		String excludes = getSourceExcludes();
+		getLog().info(format("Source: {directory=[%s], includes=[%s], excludes=[%s]}.", directory, includes, excludes));
+
+		List<File> sourceFiles = getSourceFiles(directory, includes, excludes);
+		getLog().info(format("Source files: %s.", sourceFiles));
 
 		String outputRoot = getOutputDirectory();
-		getLog().info(String.format("Output directory: [%s].", outputRoot));
+		getLog().info(format("Output directory: [%s].", outputRoot));
 
-		getLog().info(String.format("Output base package name: [%s].", packageName));
+		String typesPackageName = packageName + TYPES_SUBPACKAGE;
+		GqlConfiguration configuration = getDefaultConfigurationBuilder()
+			.basePackageName(packageName)
+			.typesPackageName(typesPackageName)
+			.basePackagePath(Paths.get(outputRoot, packageName.replace(SUBPACKAGE_SEPARATOR, File.separator)))
+			.typesPackagePath(Paths.get(outputRoot, typesPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator)))
+			.importPackages(importPackages)
+			.scalars(getScalarMap())
+			.jsonPropertyAnnotation(jsonPropertyAnnotation)
+			.useChainedAccessors(useChainedAccessors)
+			.build();
+		getLog().info(format("Current configuration: %s.", configuration));
 
-		Context ctx = new Context(getLog(), packageName, outputRoot);
-
-		ctx.getScalarMap().putAll(getScalarMap());
-		getLog().info(String.format("Scalar types mapping rules: %s.", ctx.getScalarMap()));
-
-		if (importPackages != null) {
-			ctx.getImportPackages().addAll(importPackages);
-		}
-		getLog().info(String.format("Packages to import: %s.", ctx.getImportPackages()));
-
-		if (jsonPropertyAnnotation != null) {
-			ctx.setJsonPropertyAnnotation(jsonPropertyAnnotation);
-			getLog().info(String.format("Annotating serializable properties with [%s].", jsonPropertyAnnotation));
-		}
-
-		ctx.setUseChainedAccessors(useChainedAccessors);
-		getLog().info(String.format("Chained accessors: %b.", useChainedAccessors));
-
-		new GqlReader().read(ctx, sourceFiles);
-		getLog().debug(String.format("Current context: %s.", ctx));
-		new GqlWriter().write(ctx);
+		GqlContext context = new GqlContext(getLog(), configuration.getScalars());
+		new GqlReader().read(context, sourceFiles);
+		getLog().debug(format("Current context: %s.", context));
+		new GqlWriter().write(context, configuration);
 		getLog().info("Generation is done.");
+
 		project.addCompileSourceRoot(outputRoot);
 	}
 

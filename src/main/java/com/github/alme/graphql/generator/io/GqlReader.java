@@ -1,5 +1,7 @@
 package com.github.alme.graphql.generator.io;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -7,7 +9,7 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Objects;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.translator.EnumTypeTranslator;
 import com.github.alme.graphql.generator.translator.InputObjectTypeTranslator;
 import com.github.alme.graphql.generator.translator.InterfaceTypeTranslator;
@@ -35,31 +37,31 @@ public class GqlReader {
 		String path;
 	}
 
-	public void read(Context ctx, Collection<File> sources) {
-		try (Reader reader = getReader(sources, ctx.getLog())) {
+	public void read(GqlContext context, Collection<File> sources) {
+		try (Reader reader = getReader(sources, context.getLog())) {
 			Document doc = new Parser().parseDocument(reader);
-			ctx.getLog().info(String.format(LOG_PARSER, doc.getDefinitions().size()));
+			context.getLog().info(format(LOG_PARSER, doc.getDefinitions().size()));
 
-			new EnumTypeTranslator().translate(doc, ctx);
-			ctx.getLog().info(String.format(LOG_TRANSLATOR, ctx.getEnumTypes().size(), "Enum type"));
+			new EnumTypeTranslator().translate(doc, context);
+			context.getLog().info(format(LOG_TRANSLATOR, context.getEnumTypes().size(), "Enum type"));
 
-			new InterfaceTypeTranslator().translate(doc, ctx);
-			ctx.getLog().info(String.format(LOG_TRANSLATOR, ctx.getInterfaceTypes().size(), "Interface type"));
+			new InterfaceTypeTranslator().translate(doc, context);
+			context.getLog().info(format(LOG_TRANSLATOR, context.getInterfaceTypes().size(), "Interface type"));
 
-			new InputObjectTypeTranslator().translate(doc, ctx);
-			new ObjectTypeTranslator().translate(doc, ctx);
-			new RelayConnectionTranslator().translate(doc, ctx);
-			ctx.getLog().info(String.format(LOG_TRANSLATOR, ctx.getObjectTypes().size(), "Object and Input Object type"));
+			new InputObjectTypeTranslator().translate(doc, context);
+			new ObjectTypeTranslator().translate(doc, context);
+			new RelayConnectionTranslator().translate(doc, context);
+			context.getLog().info(format(LOG_TRANSLATOR, context.getObjectTypes().size(), "Object and Input Object type"));
 
-			new UnionTypeTranslator().translate(doc, ctx);
-			ctx.getLog().info(String.format(LOG_TRANSLATOR, ctx.getUnionTypes().size(), "Union type"));
+			new UnionTypeTranslator().translate(doc, context);
+			context.getLog().info(format(LOG_TRANSLATOR, context.getUnionTypes().size(), "Union type"));
 
-			new SchemaTranslator().translate(doc, ctx);
-			new OperationTranslator().translate(doc, ctx);
-			ctx.getLog().info(String.format(LOG_TRANSLATOR, ctx.getOperations().size(), "Operation"));
+			new SchemaTranslator().translate(doc, context);
+			new OperationTranslator().translate(doc, context);
+			context.getLog().info(format(LOG_TRANSLATOR, context.getOperations().size(), "Operation"));
 
 		} catch (IOException e) {
-			ctx.getLog().error(e);
+			context.getLog().error(e);
 		}
 
 	}
@@ -67,11 +69,11 @@ public class GqlReader {
 	private Reader getReader(Collection<File> sources, Log log) {
 		return sources.stream()
 			.map(File::toPath)
-			.map((path) -> {
+			.map(path -> {
 				try {
 					return new FileInfo(Files.newBufferedReader(path), path.toString());
 				} catch (IOException e) {
-					log.error(String.format("Skipping [%s] due to error.", path), e);
+					log.error(format("Skipping [%s] due to error.", path), e);
 					return null;
 				}
 			})

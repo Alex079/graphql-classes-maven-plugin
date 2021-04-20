@@ -2,12 +2,14 @@ package com.github.alme.graphql.generator.translator;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,7 @@ class EnumTypeTranslatorTest {
 	@Test
 	void translateNoEnums() {
 		when(doc.getDefinitionsOfType(EnumTypeDefinition.class)).thenReturn(emptyList());
-		Context ctx = new Context(log, "", "");
+		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -49,7 +51,7 @@ class EnumTypeTranslatorTest {
 				.enumValueDefinition(EnumValueDefinition.newEnumValueDefinition().name("V1").build())
 				.enumValueDefinition(EnumValueDefinition.newEnumValueDefinition().name("V2").build())
 				.build()));
-		Context ctx = new Context(log, "", "");
+		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -70,7 +72,7 @@ class EnumTypeTranslatorTest {
 				.name("Enum1")
 				.enumValueDefinitions(singletonList(EnumValueDefinition.newEnumValueDefinition().name("V1").build()))
 				.build()));
-		Context ctx = new Context(log, "", "");
+		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
 

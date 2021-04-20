@@ -8,7 +8,7 @@ import static com.github.alme.graphql.generator.translator.Util.fromFieldDef;
 import java.util.Collection;
 import java.util.List;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 
 import graphql.kickstart.tools.relay.RelayConnectionFactory;
@@ -22,7 +22,7 @@ import graphql.language.TypeName;
 public class RelayConnectionTranslator implements Translator {
 
 	@Override
-	public void translate(Document doc, Context ctx) {
+	public void translate(Document doc, GqlContext ctx) {
 		List<ObjectTypeDefinition> definitions = doc.getDefinitionsOfType(ObjectTypeDefinition.class);
 		boolean connectionDirectiveIsFound = definitions.stream()
 			.map(ObjectTypeDefinition::getFieldDefinitions)
@@ -37,7 +37,7 @@ public class RelayConnectionTranslator implements Translator {
 		}
 	}
 
-	private void populate(Context ctx, Collection<ObjectTypeDefinition> definitions) {
+	private void populate(GqlContext ctx, Collection<ObjectTypeDefinition> definitions) {
 		definitions.forEach(definition ->
 			ctx.getObjectTypes()
 				.computeIfAbsent(definition.getName(), GqlStructure::new)

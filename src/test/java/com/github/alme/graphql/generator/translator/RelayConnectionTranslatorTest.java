@@ -2,6 +2,7 @@ package com.github.alme.graphql.generator.translator;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,7 +18,7 @@ import static graphql.language.ObjectTypeExtensionDefinition.newObjectTypeExtens
 import static graphql.language.StringValue.newStringValue;
 import static graphql.language.TypeName.newTypeName;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlType;
 
@@ -45,7 +46,7 @@ class RelayConnectionTranslatorTest {
 	@Test
 	void translateNoObjectTypes() {
 		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(emptyList());
-		Context ctx = new Context(log, "", "");
+		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -66,7 +67,7 @@ class RelayConnectionTranslatorTest {
 						.build())
 					.build())
 				.build()));
-		Context ctx = new Context(log, "", "");
+		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -92,7 +93,7 @@ class RelayConnectionTranslatorTest {
 						.build())
 					.build())
 				.build()));
-		Context ctx = new Context(log, "", "");
+		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -139,7 +140,7 @@ class RelayConnectionTranslatorTest {
 						.build())
 					.build())
 				.build()));
-		Context ctx = new Context(log, "", "");
+		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
 
