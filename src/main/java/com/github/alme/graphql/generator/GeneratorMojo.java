@@ -93,6 +93,12 @@ public class GeneratorMojo extends AbstractMojo {
 	private String jsonPropertyAnnotation;
 
 	/**
+	 * A version of '@Generated' annotation to use on generated classes
+	 */
+	@Parameter(property = "gql.generatedAnnotationVersion")
+	private String generatedAnnotationVersion;
+
+	/**
 	 * A flag indicating whether generated setters should return <b>void</b> (when set to false) or <b>this</b> (when set to true)
 	 */
 	@Parameter(property = "gql.useChainedAccessors", defaultValue = "false")
@@ -198,6 +204,7 @@ public class GeneratorMojo extends AbstractMojo {
 			.scalars(getScalarMap())
 			.jsonPropertyAnnotation(jsonPropertyAnnotation)
 			.useChainedAccessors(useChainedAccessors)
+			.generatedAnnotationVersion(generatedAnnotationVersion)
 			.build();
 		getLog().info(format("Current configuration: %s.", configuration));
 

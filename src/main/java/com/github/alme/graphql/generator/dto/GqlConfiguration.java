@@ -18,6 +18,7 @@ public class GqlConfiguration {
 	String typesPackageName;
 	Path basePackagePath;
 	Path typesPackagePath;
+	String generatedAnnotationVersion;
 	@Singular Set<String> importPackages;
 	@Singular Map<String, String> scalars;
 

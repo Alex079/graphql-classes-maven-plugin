@@ -88,12 +88,13 @@ The generated sources are added to maven build.
 |importPackages|Set\<String\>||A set of packages to import into generated classes|
 |jsonPropertyAnnotation|String||An annotation to be used on generated fields to avoid java keywords collisions|
 |useChainedAccessors|boolean|false|A flag indicating whether generated setters should return <b>void</b> (when set to false) or <b>this</b> (when set to true)|
+|generatedAnnotationVersion|String||A version of '@Generated' annotation to use on generated classes (1.8, 11, 15)|
 
 ```
 <plugin>
   <groupId>com.github.alex079</groupId>
   <artifactId>graphql-classes-maven-plugin</artifactId>
-  <version>@project.version@</version>
+  <version>${VERSION}</version>
   <configuration>
     <source>
       <includes>
@@ -111,6 +112,7 @@ The generated sources are added to maven build.
     </importPackages>
     <jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>
     <useChainedAccessors>true</useChainedAccessors>
+    <generatedAnnotationVersion>1.8</generatedAnnotationVersion>
   </configuration>
   <executions>
     <execution>
@@ -135,6 +137,7 @@ The generated sources are added to maven build.
 |gql.importPackages|Set\<String\>||A set of packages to import into generated classes|
 |gql.jsonPropertyAnnotation|String||An annotation to be used on generated fields to avoid java keywords collisions|
 |gql.useChainedAccessors|boolean|false|A flag indicating whether generated setters should return <b>void</b> (when set to false) or <b>this</b> (when set to true)|
+|gql.generatedAnnotationVersion|String||A version of '@Generated' annotation to use on generated classes (1.8, 11, 15)|
 
 ```
 mvn com.github.alex079:graphql-classes-maven-plugin:${VERSION}:generate \
@@ -142,7 +145,8 @@ mvn com.github.alex079:graphql-classes-maven-plugin:${VERSION}:generate \
 -Dgql.sourceIncludes=*.graphql,*.graphqls \
 -Dgql.outputDirectory=target/generated-sources/java \
 -Dgql.importPackages=java.time \
--Dgql.scalarMap=CustomType1=String,CustomType2=Integer
+-Dgql.scalarMap=CustomType1=String,CustomType2=Integer \
+-Dgql.generatedAnnotationVersion=1.8
 ```
 
 ## Examples
@@ -160,7 +164,7 @@ mvn com.github.alex079:graphql-classes-maven-plugin:${VERSION}:generate \
 <pre>
 type Sample {
 	id: ID!
-	scalar: Address!
+	scalarAddress: Address!
 	number: Int!
 }
 </pre>
@@ -174,9 +178,9 @@ public class Sample {
 	private Integer number;
 	public Integer getNumber() { ... }
 	public void setNumber(Integer v) { ... }
-	private String scalar;
-	public String getScalar() { ... }
-	public void setScalar(String v) { ... }
+	private String scalarAddress;
+	public String getScalarAddress() { ... }
+	public void setScalarAddress(String v) { ... }
 	...
 }
 </pre>

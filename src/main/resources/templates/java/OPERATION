@@ -69,6 +69,7 @@ import ${typesPackage}.*;
 import ${i}.*;
 </#list>
 
+<#if annotationVersion?has_content>@javax.annotation<#if annotationVersion!='1.8'>.processing</#if>.Generated(value = "com.github.alme.graphql.generator.GeneratorMojo", date = "${.now?iso_utc_ms}")</#if>
 @SuppressWarnings({"all", "PMD"})
 public class ${className}
 implements ${interfaceName}<${className}.Variables, ${className}.Result>

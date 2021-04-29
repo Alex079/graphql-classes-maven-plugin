@@ -27,6 +27,7 @@ public class GqlWriter {
 	private static final String ANNOTATION_KEY = "jsonProperty";
 	private static final String CHAINED_ACCESSORS_KEY = "useChainedAccessors";
 	private static final String IMPORT_PACKAGES_KEY = "importPackages";
+	private static final String ANNOTATION_VERSION_KEY = "annotationVersion";
 	private static final String FILE_EXTENSION = ".java";
 	private static final String BASE_PACKAGE_KEY = "basePackage";
 	private static final String TYPES_PACKAGE_KEY = "typesPackage";
@@ -55,6 +56,7 @@ public class GqlWriter {
 			CFG.setSharedVariable(ANNOTATION_KEY, configuration.getJsonPropertyAnnotation());
 			CFG.setSharedVariable(CHAINED_ACCESSORS_KEY, configuration.isUseChainedAccessors());
 			CFG.setSharedVariable(IMPORT_PACKAGES_KEY, configuration.getImportPackages());
+			CFG.setSharedVariable(ANNOTATION_VERSION_KEY, configuration.getGeneratedAnnotationVersion());
 		} catch (TemplateModelException e) {
 			throw new MojoExecutionException("Cannot set shared variables.", e);
 		}
