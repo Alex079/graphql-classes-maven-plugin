@@ -5,7 +5,7 @@ import static java.util.stream.Collectors.toSet;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 
 import graphql.language.Document;
@@ -16,7 +16,7 @@ import graphql.language.EnumValueDefinition;
 public class EnumTypeTranslator implements Translator {
 
 	@Override
-	public void translate(Document doc, Context ctx) {
+	public void translate(Document doc, GqlContext ctx) {
 
 		Collection<EnumTypeDefinition> main = new ArrayList<>();
 		Collection<EnumTypeExtensionDefinition> ext = new ArrayList<>();
@@ -32,7 +32,7 @@ public class EnumTypeTranslator implements Translator {
 		populate(ctx, ext);
 	}
 
-	private void populate(Context ctx, Collection<? extends EnumTypeDefinition> definitions) {
+	private void populate(GqlContext ctx, Collection<? extends EnumTypeDefinition> definitions) {
 		definitions.forEach((definition) ->
 			ctx.getEnumTypes()
 				.computeIfAbsent(definition.getName(), GqlStructure::new)

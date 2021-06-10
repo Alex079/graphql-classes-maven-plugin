@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlSelection;
 import com.github.alme.graphql.generator.dto.GqlStructure;
@@ -34,7 +34,7 @@ public final class Util {
 
 	private Util() {}
 
-	public static GqlType translateType(Type<?> type, Context ctx) {
+	public static GqlType translateType(Type<?> type, GqlContext ctx) {
 		if (type instanceof NonNullType) {
 			return GqlType.mandatory(translateType(((NonNullType) type).getType(), ctx));
 		}
@@ -43,7 +43,7 @@ public final class Util {
 		}
 		else if (type instanceof TypeName) {
 			String name = ((TypeName) type).getName();
-			return GqlType.named(ctx.getScalarMap().getOrDefault(name, name));
+			return GqlType.named(ctx.getScalars().getOrDefault(name, name));
 		}
 		return null;
 	}
@@ -52,7 +52,7 @@ public final class Util {
 		SelectionSet selectionSet,
 		Collection<FragmentDefinition> allFragments,
 		Collection<FragmentDefinition> requiredFragments,
-		Context ctx,
+		GqlContext ctx,
 		String typeName
 	) {
 		Collection<GqlSelection> result = new ArrayList<>();
@@ -89,7 +89,7 @@ public final class Util {
 		return result;
 	}
 
-	private static GqlType guessTypeOfField(Field field, Context ctx, String containerType) {
+	private static GqlType guessTypeOfField(Field field, GqlContext ctx, String containerType) {
 		return Stream.concat(
 			Optional.ofNullable(ctx.getObjectTypes().get(containerType))
 				.map(GqlStructure::getFields)
@@ -105,7 +105,7 @@ public final class Util {
 			.orElse(GqlType.named("String"));
 	}
 
-	private static boolean matchesByNameAndType(FragmentDefinition candidate, String fragmentName, String selectionType, Context ctx) {
+	private static boolean matchesByNameAndType(FragmentDefinition candidate, String fragmentName, String selectionType, GqlContext ctx) {
 		if (!Objects.equals(fragmentName, candidate.getName())) {
 			return false;
 		}
@@ -136,15 +136,15 @@ public final class Util {
 		return !Collections.disjoint(selectionTypes, candidateTypes);
 	}
 
-	public static Function<FieldDefinition, GqlField> fromFieldDef(Context ctx) {
+	public static Function<FieldDefinition, GqlField> fromFieldDef(GqlContext ctx) {
 		return (v) -> new GqlField(v.getName(), translateType(v.getType(), ctx));
 	}
 
-	public static Function<InputValueDefinition, GqlField> fromInputValueDef(Context ctx) {
+	public static Function<InputValueDefinition, GqlField> fromInputValueDef(GqlContext ctx) {
 		return (v) -> new GqlField(v.getName(), translateType(v.getType(), ctx));
 	}
 
-	public static Function<VariableDefinition, GqlField> fromVariableDef(Context ctx) {
+	public static Function<VariableDefinition, GqlField> fromVariableDef(GqlContext ctx) {
 		return (v) -> new GqlField(v.getName(), translateType(v.getType(), ctx));
 	}
 

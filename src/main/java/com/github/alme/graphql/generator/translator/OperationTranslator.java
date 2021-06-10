@@ -14,16 +14,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlOperation;
 import com.github.alme.graphql.generator.dto.GqlSelection;
+
+import org.apache.maven.plugin.logging.Log;
+
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import graphql.language.Document;
 import graphql.language.FragmentDefinition;
 import graphql.language.OperationDefinition;
-import org.apache.maven.plugin.logging.Log;
 
 public class OperationTranslator implements Translator {
 
@@ -42,12 +44,12 @@ public class OperationTranslator implements Translator {
 	}
 
 	@Override
-	public void translate(Document doc, Context ctx) {
+	public void translate(Document doc, GqlContext ctx) {
 		Collection<OperationDefinition> operations = doc.getDefinitionsOfType(OperationDefinition.class);
 		populate(doc, ctx, operations);
 	}
 
-	private void populate(Document doc, Context ctx, Collection<OperationDefinition> definitions) {
+	private void populate(Document doc, GqlContext ctx, Collection<OperationDefinition> definitions) {
 		definitions.forEach((definition) -> {
 			String operation = definition.getOperation().name().toLowerCase();
 			String typeName = ctx.getSchema().get(operation);

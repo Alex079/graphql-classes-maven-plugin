@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 
 import graphql.language.Document;
@@ -27,7 +27,7 @@ public class ObjectTypeTranslator implements Translator {
 	}
 
 	@Override
-	public void translate(Document doc, Context ctx) {
+	public void translate(Document doc, GqlContext ctx) {
 		Collection<ObjectTypeDefinition> main = new ArrayList<>();
 		Collection<ObjectTypeExtensionDefinition> ext = new ArrayList<>();
 		doc.getDefinitionsOfType(ObjectTypeDefinition.class).forEach(i -> {
@@ -42,7 +42,7 @@ public class ObjectTypeTranslator implements Translator {
 		populate(ctx, ext);
 	}
 
-	private void populate(Context ctx, Collection<? extends ObjectTypeDefinition> definitions) {
+	private void populate(GqlContext ctx, Collection<? extends ObjectTypeDefinition> definitions) {
 		definitions.forEach(definition -> {
 			String name = definition.getName();
 			ctx.getObjectTypes()

@@ -6,7 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlConfiguration;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlOperation;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -26,6 +27,7 @@ public class GqlWriter {
 	private static final String ANNOTATION_KEY = "jsonProperty";
 	private static final String CHAINED_ACCESSORS_KEY = "useChainedAccessors";
 	private static final String IMPORT_PACKAGES_KEY = "importPackages";
+	private static final String ANNOTATION_VERSION_KEY = "annotationVersion";
 	private static final String FILE_EXTENSION = ".java";
 	private static final String BASE_PACKAGE_KEY = "basePackage";
 	private static final String TYPES_PACKAGE_KEY = "typesPackage";
@@ -41,43 +43,44 @@ public class GqlWriter {
 		CFG.setFallbackOnNullLoopVariable(false);
 	}
 
-	public void write(Context ctx) throws MojoExecutionException {
+	public void write(GqlContext context, GqlConfiguration configuration) throws MojoExecutionException {
 		try {
-			Files.createDirectories(ctx.getTypesPackagePath());
+			Files.createDirectories(configuration.getTypesPackagePath());
 		} catch (IOException e) {
-			throw new MojoExecutionException(String.format(LOG_CANNOT_CREATE, ctx.getTypesPackagePath()), e);
+			throw new MojoExecutionException(String.format(LOG_CANNOT_CREATE, configuration.getTypesPackagePath()), e);
 		}
 
 		try {
-			CFG.setSharedVariable(BASE_PACKAGE_KEY, ctx.getBasePackageName());
-			CFG.setSharedVariable(TYPES_PACKAGE_KEY, ctx.getTypesPackageName());
-			CFG.setSharedVariable(ANNOTATION_KEY, ctx.getJsonPropertyAnnotation());
-			CFG.setSharedVariable(CHAINED_ACCESSORS_KEY, ctx.isUseChainedAccessors());
-			CFG.setSharedVariable(IMPORT_PACKAGES_KEY, ctx.getImportPackages());
+			CFG.setSharedVariable(BASE_PACKAGE_KEY, configuration.getBasePackageName());
+			CFG.setSharedVariable(TYPES_PACKAGE_KEY, configuration.getTypesPackageName());
+			CFG.setSharedVariable(ANNOTATION_KEY, configuration.getJsonPropertyAnnotation());
+			CFG.setSharedVariable(CHAINED_ACCESSORS_KEY, configuration.isUseChainedAccessors());
+			CFG.setSharedVariable(IMPORT_PACKAGES_KEY, configuration.getImportPackages());
+			CFG.setSharedVariable(ANNOTATION_VERSION_KEY, configuration.getGeneratedAnnotationVersion());
 		} catch (TemplateModelException e) {
 			throw new MojoExecutionException("Cannot set shared variables.", e);
 		}
-		dumpTypeClasses(ctx);
-		dumpOperationInterfaces(ctx);
-		dumpOperationClasses(ctx);
+		dumpTypeClasses(context, configuration);
+		dumpOperationInterfaces(context, configuration);
+		dumpOperationClasses(context, configuration);
 		CFG.clearSharedVariables();
 	}
 
-	private void dumpTypeClasses(Context ctx) {
-		ctx.getStructures().forEach((category, structures) ->
+	private void dumpTypeClasses(GqlContext context, GqlConfiguration configuration) {
+		context.getStructures().forEach((category, structures) ->
 			structures.forEach((name, type) -> {
-				Path path = ctx.getTypesPackagePath().resolve(name + FILE_EXTENSION);
+				Path path = configuration.getTypesPackagePath().resolve(name + FILE_EXTENSION);
 				try (Writer writer = Files.newBufferedWriter(path)) {
 					CFG.getTemplate(category.name()).process(type, writer);
 				} catch (TemplateException | IOException e) {
-					ctx.getLog().error(String.format(LOG_CANNOT_CREATE, name), e);
+					context.getLog().error(String.format(LOG_CANNOT_CREATE, name), e);
 				}
 			})
 		);
 	}
 
-	private void dumpOperationInterfaces(Context ctx) {
-		ctx.getOperations().values().stream()
+	private void dumpOperationInterfaces(GqlContext context, GqlConfiguration configuration) {
+		context.getOperations().values().stream()
 			.map(GqlOperation::getOperation)
 			.map(GqlWriter::capitalize)
 			.collect(Collectors.toSet())
@@ -85,34 +88,34 @@ public class GqlWriter {
 				try {
 					CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
 				} catch (TemplateModelException e) {
-					ctx.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
+					context.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
 					return;
 				}
-				Path path = ctx.getBasePackagePath().resolve(interfaceName + FILE_EXTENSION);
+				Path path = configuration.getBasePackagePath().resolve(interfaceName + FILE_EXTENSION);
 				try (Writer writer = Files.newBufferedWriter(path)) {
 					CFG.getTemplate(OPERATION_INTERFACE_TEMPLATE).process(null, writer);
 				} catch (TemplateException | IOException e) {
-					ctx.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
+					context.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
 				}
 			});
 	}
 
-	private void dumpOperationClasses(Context ctx) {
-		ctx.getOperations().forEach((name, operation) -> {
+	private void dumpOperationClasses(GqlContext context, GqlConfiguration configuration) {
+		context.getOperations().forEach((name, operation) -> {
 			String interfaceName = capitalize(operation.getOperation());
 			String className = (name == null ? UNNAMED_OPERATION : capitalize(name)) + interfaceName;
 			try {
 				CFG.setSharedVariable(CLASS_NAME_KEY, className);
 				CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
 			} catch (TemplateModelException e) {
-				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
+				context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
 				return;
 			}
-			Path path = ctx.getBasePackagePath().resolve(className + FILE_EXTENSION);
+			Path path = configuration.getBasePackagePath().resolve(className + FILE_EXTENSION);
 			try (Writer writer = Files.newBufferedWriter(path)) {
 				CFG.getTemplate(OPERATION_TEMPLATE).process(operation, writer);
 			} catch (TemplateException | IOException e) {
-				ctx.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
+				context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
 			}
 		});
 	}

@@ -2,6 +2,7 @@ package com.github.alme.graphql.generator.translator;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,7 +23,7 @@ import static graphql.language.TypeName.newTypeName;
 
 import java.util.Collection;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlType;
 
@@ -49,7 +50,7 @@ class InputObjectTypeTranslatorTest {
 	@Test
 	void translateNoInputObjectTypes() {
 		when(doc.getDefinitionsOfType(InputObjectTypeDefinition.class)).thenReturn(emptyList());
-		Context ctx = new Context(log, "", "");
+		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -73,7 +74,7 @@ class InputObjectTypeTranslatorTest {
 						newObjectField().name("n").value(newStringValue("v").build()).build()).build()).build())
 					.build())
 				.build()));
-		Context ctx = new Context(log, "", "");
+		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -118,7 +119,7 @@ class InputObjectTypeTranslatorTest {
 						newObjectField().name("n").value(newStringValue("v").build()).build()).build()).build())
 					.build()))
 				.build()));
-		Context ctx = new Context(log, "", "");
+		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
 

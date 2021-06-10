@@ -3,7 +3,7 @@ package com.github.alme.graphql.generator.translator;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 import graphql.language.Document;
 import graphql.language.TypeName;
@@ -13,7 +13,7 @@ import graphql.language.UnionTypeExtensionDefinition;
 public class UnionTypeTranslator implements Translator {
 
 	@Override
-	public void translate(Document doc, Context ctx) {
+	public void translate(Document doc, GqlContext ctx) {
 		Collection<UnionTypeDefinition> main = new ArrayList<>();
 		Collection<UnionTypeExtensionDefinition> ext = new ArrayList<>();
 		doc.getDefinitionsOfType(UnionTypeDefinition.class).forEach((i) -> {
@@ -28,7 +28,7 @@ public class UnionTypeTranslator implements Translator {
 		populate(ctx, ext);
 	}
 
-	private void populate(Context ctx, Collection<? extends UnionTypeDefinition> definitions) {
+	private void populate(GqlContext ctx, Collection<? extends UnionTypeDefinition> definitions) {
 		definitions.forEach((definition) -> {
 			ctx.getUnionTypes().computeIfAbsent(definition.getName(), GqlStructure::new);
 			definition.getMemberTypes().stream()

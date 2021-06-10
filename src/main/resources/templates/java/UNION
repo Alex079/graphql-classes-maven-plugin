@@ -1,6 +1,7 @@
 //CHECKSTYLE:OFF
 package ${typesPackage};
 
+<#if annotationVersion?has_content>@javax.annotation<#if annotationVersion!='1.8'>.processing</#if>.Generated(value = "com.github.alme.graphql.generator.GeneratorMojo", date = "${.now?iso_utc_ms}")</#if>
 @SuppressWarnings({"all", "PMD"})
 public interface ${name} { }
 //CHECKSTYLE:ON

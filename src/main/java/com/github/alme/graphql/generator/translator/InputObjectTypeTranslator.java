@@ -1,12 +1,13 @@
 package com.github.alme.graphql.generator.translator;
 
-import static com.github.alme.graphql.generator.translator.Util.fromInputValueDef;
 import static java.util.stream.Collectors.toSet;
+
+import static com.github.alme.graphql.generator.translator.Util.fromInputValueDef;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.github.alme.graphql.generator.dto.Context;
+import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 
 import graphql.language.Document;
@@ -16,7 +17,7 @@ import graphql.language.InputObjectTypeExtensionDefinition;
 public class InputObjectTypeTranslator implements Translator {
 
 	@Override
-	public void translate(Document doc, Context ctx) {
+	public void translate(Document doc, GqlContext ctx) {
 		Collection<InputObjectTypeDefinition> main = new ArrayList<>();
 		Collection<InputObjectTypeExtensionDefinition> ext = new ArrayList<>();
 		doc.getDefinitionsOfType(InputObjectTypeDefinition.class).forEach((i) -> {
@@ -31,7 +32,7 @@ public class InputObjectTypeTranslator implements Translator {
 		populate(ctx, ext);
 	}
 
-	private void populate(Context ctx, Collection<? extends InputObjectTypeDefinition> definitions) {
+	private void populate(GqlContext ctx, Collection<? extends InputObjectTypeDefinition> definitions) {
 		definitions.forEach((definition) ->
 			ctx.getObjectTypes()
 				.computeIfAbsent(definition.getName(), GqlStructure::new)

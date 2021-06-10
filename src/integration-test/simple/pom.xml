@@ -91,6 +91,7 @@
 						<configuration>
 							<packageName>it.jackson</packageName>
 							<jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation>
+							<generatedAnnotationVersion>${java.specification.version}</generatedAnnotationVersion>
 						</configuration>
 					</execution>
 				</executions>
