@@ -15,7 +15,11 @@ type Location {
 	shelf: Int!
 }
 
-interface TrackedFromTo {
+interface Locatable {
+	from: Location!
+}
+
+interface TrackedFromTo implements Locatable{
 	from: Location!
 	toAddress: Address!
 }
@@ -25,7 +29,7 @@ interface TimedFromTo {
 	toDate: DateTime!
 }
 
-type Track implements TrackedFromTo TimedFromTo {
+type Track implements TrackedFromTo TimedFromTo Locatable {
 	id: ID!
 	itemId: ID!
 	from: Location!
