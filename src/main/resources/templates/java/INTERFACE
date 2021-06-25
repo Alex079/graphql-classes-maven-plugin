@@ -8,6 +8,9 @@ import ${i}.*;
 <#if annotationVersion?has_content>@javax.annotation<#if annotationVersion!='1.8'>.processing</#if>.Generated(value = "com.github.alme.graphql.generator.GeneratorMojo", date = "${.now?iso_utc_ms}")</#if>
 @SuppressWarnings({"all", "PMD"})
 public interface ${name}
+<#if 0 < members?size>
+extends ${members?join(", ")}
+</#if>
 {
 	<#list fields as f>
 	${f.type.full} get${f.name?cap_first}();

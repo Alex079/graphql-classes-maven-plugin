@@ -7,6 +7,7 @@ import static java.util.Collections.singletonList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import static graphql.language.FieldDefinition.newFieldDefinition;
@@ -20,6 +21,7 @@ import java.util.Collection;
 
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlField;
+import com.github.alme.graphql.generator.dto.GqlStructure;
 import com.github.alme.graphql.generator.dto.GqlType;
 
 import org.apache.maven.plugin.logging.Log;
@@ -88,6 +90,8 @@ class InterfaceTypeTranslatorTest {
 					assertEquals(GqlType.Flag.NAMED, type.getNested().getNested().getNested().getFlag());
 					assertEquals("Type2", type.getNested().getNested().getNested().getName());
 					break;
+				default:
+					fail();
 			}
 		});
 	}
@@ -104,10 +108,10 @@ class InterfaceTypeTranslatorTest {
 				.build(),
 			newInterfaceTypeExtensionDefinition()
 				.name("Interface1")
-				.definitions(singletonList(newFieldDefinition()
+				.definition(newFieldDefinition()
 					.name("field2")
 					.type(newNonNullType(newListType(newNonNullType(newTypeName("Type2").build()).build()).build()).build())
-					.build()))
+					.build())
 				.build()));
 		GqlContext ctx = new GqlContext(log, emptyMap());
 
@@ -131,6 +135,69 @@ class InterfaceTypeTranslatorTest {
 					assertEquals(GqlType.Flag.NAMED, type.getNested().getNested().getNested().getFlag());
 					assertEquals("Type2", type.getNested().getNested().getNested().getName());
 					break;
+				default:
+					fail();
+			}
+		});
+	}
+
+	@Test
+	void translateInterfaceImplementation() {
+		when(doc.getDefinitionsOfType(InterfaceTypeDefinition.class)).thenReturn(asList(
+			newInterfaceTypeDefinition()
+				.name("Interface1")
+				.definition(newFieldDefinition()
+					.name("field1")
+					.type(newTypeName("Type1").build())
+					.build())
+				.build(),
+			newInterfaceTypeDefinition()
+				.name("Interface2")
+				.implementz(newTypeName("Interface1").build())
+				.definition(newFieldDefinition()
+					.name("field1")
+					.type(newTypeName("Type1").build())
+					.build())
+				.definition(newFieldDefinition()
+					.name("field2")
+					.type(newNonNullType(newListType(newNonNullType(newTypeName("Type2").build()).build()).build()).build())
+					.build())
+				.build()));
+		GqlContext ctx = new GqlContext(log, emptyMap());
+
+		translator.translate(doc, ctx);
+
+		assertEquals(2, ctx.getInterfaceTypes().size());
+		assertTrue(ctx.getInterfaceTypes().containsKey("Interface1"));
+		assertTrue(ctx.getInterfaceTypes().containsKey("Interface2"));
+		GqlStructure interface1 = ctx.getInterfaceTypes().get("Interface1");
+		GqlStructure interface2 = ctx.getInterfaceTypes().get("Interface2");
+		assertEquals(1, interface1.getFields().size());
+		assertEquals(0, interface1.getMembers().size());
+		assertEquals(2, interface2.getFields().size());
+		assertEquals(1, interface2.getMembers().size());
+		interface1.getFields().forEach(field -> {
+			assertEquals("field1", field.getName());
+			GqlType type = field.getType();
+			assertEquals(GqlType.Flag.NAMED, type.getFlag());
+			assertEquals("Type1", type.getName());
+		});
+		interface2.getFields().forEach(field -> {
+			GqlType type = field.getType();
+			switch (field.getName()) {
+				case "field1":
+					assertEquals(GqlType.Flag.NAMED, type.getFlag());
+					assertEquals("Type1", type.getName());
+					break;
+				case "field2":
+					assertEquals(GqlType.Flag.MANDATORY, type.getFlag());
+					assertEquals(GqlType.Flag.LIST, type.getNested().getFlag());
+					assertEquals(GqlType.Flag.MANDATORY, type.getNested().getNested().getFlag());
+					assertEquals(GqlType.Flag.NAMED, type.getNested().getNested().getNested().getFlag());
+					assertEquals("Type2", type.getNested().getNested().getNested().getName());
+					break;
+				default:
+					fail();
 			}
 		});
 	}
