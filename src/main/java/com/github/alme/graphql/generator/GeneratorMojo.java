@@ -173,14 +173,6 @@ public class GeneratorMojo extends AbstractMojo {
 		return sourceFiles;
 	}
 
-	private GqlConfiguration.GqlConfigurationBuilder getDefaultConfigurationBuilder() {
-		return GqlConfiguration.builder()
-			.importPackage("java.util")
-			.scalar("Int", "Integer")
-			.scalar("Float", "Double")
-			.scalar("ID", "String");
-	}
-
 	@Override
 	public void execute() throws MojoExecutionException {
 		File directory = getSourceDirectory();
@@ -195,7 +187,11 @@ public class GeneratorMojo extends AbstractMojo {
 		getLog().info(format("Output directory: [%s].", outputRoot));
 
 		String typesPackageName = packageName + TYPES_SUBPACKAGE;
-		GqlConfiguration configuration = getDefaultConfigurationBuilder()
+		GqlConfiguration configuration = GqlConfiguration.builder()
+			.importPackage("java.util")
+			.scalar("Int", "Integer")
+			.scalar("Float", "Double")
+			.scalar("ID", "String")
 			.basePackageName(packageName)
 			.typesPackageName(typesPackageName)
 			.basePackagePath(Paths.get(outputRoot, packageName.replace(SUBPACKAGE_SEPARATOR, File.separator)))
