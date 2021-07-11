@@ -8,7 +8,7 @@ This is a maven 3 plugin for generating boilerplate Java classes from GraphQL ty
 
 - Uses only GraphQL SDL files as input
 - Runs with or without POM configuration
-- Can be used on both server and client side
+- Can be used on both client and server side (types generated on server side can be used as return types for data fetchers or resolvers)
 - Generates only classes necessary to represent types and operations
 - Generated code has no dependencies by default
 
