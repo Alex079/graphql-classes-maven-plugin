@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlOperation;
+import com.github.alme.graphql.generator.io.utils.FileSystem;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -16,7 +17,9 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModelException;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class GqlWriter {
 
 	private static final String OPERATION_INTERFACE_TEMPLATE = "OPERATION_INTERFACE";
@@ -43,13 +46,11 @@ public class GqlWriter {
 		CFG.setFallbackOnNullLoopVariable(false);
 	}
 
-	public void write(GqlContext context, GqlConfiguration configuration) throws MojoExecutionException {
-		try {
-			Files.createDirectories(configuration.getTypesPackagePath());
-		} catch (IOException e) {
-			throw new MojoExecutionException(String.format(LOG_CANNOT_CREATE, configuration.getTypesPackagePath()), e);
-		}
+	private final FileSystem fileSystem;
 
+	public void write(GqlContext context, GqlConfiguration configuration) throws MojoExecutionException {
+
+		this.fileSystem.createDirectories(configuration.getTypesPackagePath());
 		try {
 			CFG.setSharedVariable(BASE_PACKAGE_KEY, configuration.getBasePackageName());
 			CFG.setSharedVariable(TYPES_PACKAGE_KEY, configuration.getTypesPackageName());
@@ -70,7 +71,7 @@ public class GqlWriter {
 		context.getStructures().forEach((category, structures) ->
 			structures.forEach((name, type) -> {
 				Path path = configuration.getTypesPackagePath().resolve(name + FILE_EXTENSION);
-				try (Writer writer = Files.newBufferedWriter(path)) {
+				try (Writer writer = this.fileSystem.getWriter(path)) {
 					CFG.getTemplate(category.name()).process(type, writer);
 				} catch (TemplateException | IOException e) {
 					context.getLog().error(String.format(LOG_CANNOT_CREATE, name), e);
@@ -92,7 +93,7 @@ public class GqlWriter {
 					return;
 				}
 				Path path = configuration.getBasePackagePath().resolve(interfaceName + FILE_EXTENSION);
-				try (Writer writer = Files.newBufferedWriter(path)) {
+				try (Writer writer = this.fileSystem.getWriter(path)) {
 					CFG.getTemplate(OPERATION_INTERFACE_TEMPLATE).process(null, writer);
 				} catch (TemplateException | IOException e) {
 					context.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
@@ -112,7 +113,7 @@ public class GqlWriter {
 				return;
 			}
 			Path path = configuration.getBasePackagePath().resolve(className + FILE_EXTENSION);
-			try (Writer writer = Files.newBufferedWriter(path)) {
+			try (Writer writer = this.fileSystem.getWriter(path)) {
 				CFG.getTemplate(OPERATION_TEMPLATE).process(operation, writer);
 			} catch (TemplateException | IOException e) {
 				context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
