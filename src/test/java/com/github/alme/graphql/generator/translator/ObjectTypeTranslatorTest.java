@@ -1,32 +1,30 @@
 package com.github.alme.graphql.generator.translator;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
 import static graphql.language.FieldDefinition.newFieldDefinition;
 import static graphql.language.InputValueDefinition.newInputValueDefinition;
 import static graphql.language.ListType.newListType;
 import static graphql.language.ObjectTypeDefinition.newObjectTypeDefinition;
 import static graphql.language.ObjectTypeExtensionDefinition.newObjectTypeExtensionDefinition;
 import static graphql.language.TypeName.newTypeName;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.Collection;
-
-import com.github.alme.graphql.generator.dto.GqlContext;
-import com.github.alme.graphql.generator.dto.GqlField;
-import com.github.alme.graphql.generator.dto.GqlType;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.github.alme.graphql.generator.dto.GqlContext;
+import com.github.alme.graphql.generator.dto.GqlField;
+import com.github.alme.graphql.generator.dto.GqlType;
 
 import graphql.language.Document;
 import graphql.language.ObjectTypeDefinition;
@@ -55,21 +53,21 @@ class ObjectTypeTranslatorTest {
 	@Test
 	void translateOneObjectTypeWithTwoFields() {
 		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(singletonList(
-			newObjectTypeDefinition()
-				.name("Object1")
-				.fieldDefinition(newFieldDefinition()
-					.name("field1")
-					.type(newTypeName("Type1").build())
-					.inputValueDefinition(newInputValueDefinition()
-						.name("p1")
-						.type(newTypeName("Type2").build())
-						.build())
-					.build())
-				.fieldDefinition(newFieldDefinition()
-					.name("field2")
-					.type(newListType(newTypeName("Type3").build()).build())
-					.build())
-				.build()));
+				newObjectTypeDefinition()
+						.name("Object1")
+						.fieldDefinition(newFieldDefinition()
+								.name("field1")
+								.type(newTypeName("Type1").build())
+								.inputValueDefinition(newInputValueDefinition()
+										.name("p1")
+										.type(newTypeName("Type2").build())
+										.build())
+								.build())
+						.fieldDefinition(newFieldDefinition()
+								.name("field2")
+								.type(newListType(newTypeName("Type3").build()).build())
+								.build())
+						.build()));
 		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);
@@ -94,26 +92,42 @@ class ObjectTypeTranslatorTest {
 	}
 
 	@Test
+	void translateOneObjectTypeWithNoFields() {
+		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(singletonList(
+				newObjectTypeDefinition()
+						.name("Object1")
+						.build()));
+		GqlContext ctx = new GqlContext(log, emptyMap());
+
+		translator.translate(doc, ctx);
+
+		assertEquals(1, ctx.getObjectTypes().size());
+		assertTrue(ctx.getObjectTypes().containsKey("Object1"));
+		Collection<GqlField> fields = ctx.getObjectTypes().get("Object1").getFields();
+		assertEquals(0, fields.size());
+	}
+
+	@Test
 	void translateOneObjectTypeWithTwoFieldsWithExtension() {
 		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(asList(
-			newObjectTypeDefinition()
-				.name("Object1")
-				.fieldDefinition(newFieldDefinition()
-					.name("field2")
-					.type(newListType(newTypeName("Type3").build()).build())
-					.build())
-				.build(),
-			newObjectTypeExtensionDefinition()
-				.name("Object1")
-				.fieldDefinition(newFieldDefinition()
-					.name("field1")
-					.type(newTypeName("Type1").build())
-					.inputValueDefinition(newInputValueDefinition()
-						.name("p1")
-						.type(newTypeName("Type2").build())
-						.build())
-					.build())
-				.build()));
+				newObjectTypeDefinition()
+						.name("Object1")
+						.fieldDefinition(newFieldDefinition()
+								.name("field2")
+								.type(newListType(newTypeName("Type3").build()).build())
+								.build())
+						.build(),
+				newObjectTypeExtensionDefinition()
+						.name("Object1")
+						.fieldDefinition(newFieldDefinition()
+								.name("field1")
+								.type(newTypeName("Type1").build())
+								.inputValueDefinition(newInputValueDefinition()
+										.name("p1")
+										.type(newTypeName("Type2").build())
+										.build())
+								.build())
+						.build()));
 		GqlContext ctx = new GqlContext(log, emptyMap());
 
 		translator.translate(doc, ctx);

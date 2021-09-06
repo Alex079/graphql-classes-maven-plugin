@@ -15,6 +15,7 @@ import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.io.GqlReader;
 import com.github.alme.graphql.generator.io.GqlWriter;
+import com.github.alme.graphql.generator.io.utils.FileSystem;
 
 import org.apache.maven.model.FileSet;
 import org.apache.maven.plugin.AbstractMojo;
@@ -207,7 +208,7 @@ public class GeneratorMojo extends AbstractMojo {
 		GqlContext context = new GqlContext(getLog(), configuration.getScalars());
 		new GqlReader().read(context, sourceFiles);
 		getLog().debug(format("Current context: %s.", context));
-		new GqlWriter().write(context, configuration);
+		new GqlWriter(new FileSystem()).write(context, configuration);
 		getLog().info("Generation is done.");
 
 		project.addCompileSourceRoot(outputRoot);
