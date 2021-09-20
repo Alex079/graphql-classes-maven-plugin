@@ -1,21 +1,27 @@
 package com.github.alme.graphql.generator.io;
 
-import static graphql.language.FieldDefinition.newFieldDefinition;
-import static graphql.language.InputValueDefinition.newInputValueDefinition;
-import static graphql.language.ListType.newListType;
-import static graphql.language.ObjectTypeDefinition.newObjectTypeDefinition;
-import static graphql.language.TypeName.newTypeName;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+import static graphql.language.FieldDefinition.newFieldDefinition;
+import static graphql.language.InputValueDefinition.newInputValueDefinition;
+import static graphql.language.ListType.newListType;
+import static graphql.language.ObjectTypeDefinition.newObjectTypeDefinition;
+import static graphql.language.TypeName.newTypeName;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Paths;
+
+import com.github.alme.graphql.generator.dto.GqlConfiguration;
+import com.github.alme.graphql.generator.dto.GqlContext;
+import com.github.alme.graphql.generator.io.utils.FileSystem;
+import com.github.alme.graphql.generator.translator.ObjectTypeTranslator;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -24,11 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.github.alme.graphql.generator.dto.GqlConfiguration;
-import com.github.alme.graphql.generator.dto.GqlContext;
-import com.github.alme.graphql.generator.io.utils.FileSystem;
-import com.github.alme.graphql.generator.translator.ObjectTypeTranslator;
 
 import graphql.language.Document;
 import graphql.language.ObjectTypeDefinition;
@@ -61,9 +62,9 @@ class TestGqlWriter {
 		given_a_context_containing_an_object_without_fields();
 		given_the_minimum_set_of_configurations();
 		when_the_write_is_invoked();
-		then_the_generated_class_does_not_override_the_toString_method();
-		then_the_generated_class_does_not_override_the_equals_method();
-		then_the_generated_class_does_not_override_the_hashCode_method();
+		then_the_generated_class_overrides_the_toString_method();
+		then_the_generated_class_overrides_the_equals_method();
+		then_the_generated_class_overrides_the_hashCode_method();
 	}
 
 	@Test
@@ -71,9 +72,9 @@ class TestGqlWriter {
 		given_a_context_containing_an_object_with_two_fields();
 		given_the_minimum_set_of_configurations();
 		when_the_write_is_invoked();
-		then_the_generated_class_does_overrides_the_toString_method();
-		then_the_generated_class_does_overrides_the_equals_method();
-		then_the_generated_class_does_overrides_the_hashCode_method();
+		then_the_generated_class_overrides_the_toString_method();
+		then_the_generated_class_overrides_the_equals_method();
+		then_the_generated_class_overrides_the_hashCode_method();
 	}
 
 	private void given_a_context_containing_an_object_with_two_fields() {
@@ -120,27 +121,15 @@ class TestGqlWriter {
 
 	}
 
-	private void then_the_generated_class_does_not_override_the_toString_method() {
-		assertFalse(testWriter.toString().contains("public String toString()"));
-	}
-
-	private void then_the_generated_class_does_not_override_the_equals_method() {
-		assertFalse(testWriter.toString().contains("public boolean equals(Object o)"));
-	}
-
-	private void then_the_generated_class_does_not_override_the_hashCode_method() {
-		assertFalse(testWriter.toString().contains("public int hashCode()"));
-	}
-
-	private void then_the_generated_class_does_overrides_the_toString_method() {
+	private void then_the_generated_class_overrides_the_toString_method() {
 		assertTrue(testWriter.toString().contains("public String toString()"));
 	}
 
-	private void then_the_generated_class_does_overrides_the_equals_method() {
+	private void then_the_generated_class_overrides_the_equals_method() {
 		assertTrue(testWriter.toString().contains("public boolean equals(Object o)"));
 	}
 
-	private void then_the_generated_class_does_overrides_the_hashCode_method() {
+	private void then_the_generated_class_overrides_the_hashCode_method() {
 		assertTrue(testWriter.toString().contains("public int hashCode()"));
 	}
 }

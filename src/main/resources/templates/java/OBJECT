@@ -43,7 +43,6 @@ implements ${members?join(", ")}
 
 	</#list>
 
-	<#if fields?has_content>
 	@Override
 	public String toString() {
 		return new StringBuilder().append("{")
@@ -58,9 +57,9 @@ implements ${members?join(", ")}
 		if (this == o) return true;
 		if (!(o instanceof ${name})) return false;
 		${name} other = (${name}) o;
-		return
+		return true
 		<#list fields as f>
-			Objects.equals(this.get${f.name?cap_first}(), other.get${f.name?cap_first}())<#sep> &&</#sep>
+			&& Objects.equals(this.get${f.name?cap_first}(), other.get${f.name?cap_first}())
 		</#list>
 		;
 	}
@@ -73,7 +72,6 @@ implements ${members?join(", ")}
 		</#list>
 		);
 	}
-	</#if>
 
 }
 //CHECKSTYLE:ON

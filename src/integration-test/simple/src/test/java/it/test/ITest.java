@@ -46,10 +46,25 @@ class ITest {
     }
 
     @Test
+    void testEmptyType() {
+        it.gson.types.EmptyType emptyType1WithGson = new it.gson.types.EmptyType();
+        it.gson.types.EmptyType emptyType2WithGson = new it.gson.types.EmptyType();
+        System.out.printf("Comparing %s to %s%n", emptyType1WithGson, emptyType2WithGson);
+        Assertions.assertEquals(emptyType1WithGson, emptyType2WithGson);
+        System.out.println();
+
+        it.jackson.types.EmptyType emptyType1WithJackson = new it.jackson.types.EmptyType();
+        it.jackson.types.EmptyType emptyType2WithJackson = new it.jackson.types.EmptyType();
+        System.out.printf("Comparing %s to %s%n", emptyType1WithJackson, emptyType2WithJackson);
+        Assertions.assertEquals(emptyType1WithJackson, emptyType2WithJackson);
+        System.out.println();
+    }
+
+    @Test
     void testUnnamedQuery() throws JsonProcessingException {
         Map<?, ?> g = testGson(new it.gson.UnnamedQuery().getVariables());
         Map<?, ?> j = testJackson(new it.jackson.UnnamedQuery().getVariables());
-        Assertions.assertIterableEquals(g.entrySet(), j.entrySet());
+        Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
     @Test

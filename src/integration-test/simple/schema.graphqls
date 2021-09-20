@@ -15,6 +15,10 @@ type Location {
 	shelf: Int!
 }
 
+type EmptyType {
+	# it must define fields but it doesn't and still can work
+}
+
 interface Locatable {
 	from: Location!
 }
