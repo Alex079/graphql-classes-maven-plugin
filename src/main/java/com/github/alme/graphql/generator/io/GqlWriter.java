@@ -2,7 +2,6 @@ package com.github.alme.graphql.generator.io;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
@@ -35,7 +34,7 @@ public class GqlWriter {
 	private static final String BASE_PACKAGE_KEY = "basePackage";
 	private static final String TYPES_PACKAGE_KEY = "typesPackage";
 	private static final String LOG_CANNOT_CREATE = "Cannot create [%s] due to error.";
-	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_30);
+	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_31);
 
 	static {
 		CFG.setClassLoaderForTemplateLoading(GqlWriter.class.getClassLoader(), "/templates/java");
