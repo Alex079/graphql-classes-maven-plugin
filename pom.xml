@@ -3,7 +3,7 @@
 
 	<groupId>com.github.alex079</groupId>
 	<artifactId>graphql-classes-maven-plugin</artifactId>
-	<version>1.6.2-SNAPSHOT</version>
+	<version>1.6.1-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>GraphQL client-side java classes generator</name>
