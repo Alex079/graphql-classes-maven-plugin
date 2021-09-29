@@ -48,6 +48,14 @@ public final class Util {
 		return null;
 	}
 
+//	public static Collection<GqlSelection> createFullSelection(GqlContext ctx, String typeName) {
+//		Collection<GqlSelection> result = new ArrayList<>();
+//		ctx.getObjectTypes().get(typeName).getFields().stream().map(field -> {
+//			return
+//		});
+//		return result;
+//	}
+
 	public static Collection<GqlSelection> translateSelection(
 		SelectionSet selectionSet,
 		Collection<FragmentDefinition> allFragments,
@@ -58,7 +66,7 @@ public final class Util {
 		Collection<GqlSelection> result = new ArrayList<>();
 		result.addAll(
 			selectionSet.getSelectionsOfType(Field.class).stream()
-				.map((field) -> {
+				.map(field -> {
 					GqlType type = guessTypeOfField(field, ctx, typeName);
 					GqlSelection selection = new GqlSelection(field.getAlias() == null ? field.getName() : field.getAlias(), type);
 					if (field.getSelectionSet() != null) {
@@ -70,19 +78,19 @@ public final class Util {
 				.collect(toList()));
 		result.addAll(
 			selectionSet.getSelectionsOfType(InlineFragment.class).stream()
-				.map((fragment) -> translateSelection(fragment.getSelectionSet(),
+				.map(fragment -> translateSelection(fragment.getSelectionSet(),
 					allFragments, requiredFragments, ctx, fragment.getTypeCondition().getName()))
 				.flatMap(Collection::stream)
 				.collect(toList()));
 		result.addAll(
 			selectionSet.getSelectionsOfType(FragmentSpread.class).stream()
 				.map(FragmentSpread::getName)
-				.map((fragmentName) -> allFragments.stream()
-					.filter((candidate) -> matchesByNameAndType(candidate, fragmentName, typeName, ctx)).findAny())
+				.map(fragmentName -> allFragments.stream()
+					.filter(candidate -> matchesByNameAndType(candidate, fragmentName, typeName, ctx)).findAny())
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.peek(requiredFragments::add)
-				.map((fragment) -> translateSelection(fragment.getSelectionSet(),
+				.map(fragment -> translateSelection(fragment.getSelectionSet(),
 					allFragments, requiredFragments, ctx, fragment.getTypeCondition().getName()))
 				.flatMap(Collection::stream)
 				.collect(toList()));
@@ -99,7 +107,7 @@ public final class Util {
 				.map(GqlStructure::getFields)
 				.map(Collection::stream)
 				.orElseGet(Stream::empty))
-			.filter((candidate) -> Objects.equals(field.getName(), candidate.getName()))
+			.filter(candidate -> Objects.equals(field.getName(), candidate.getName()))
 			.map(GqlField::getType)
 			.findAny()
 			.orElse(GqlType.named("String"));
@@ -117,7 +125,7 @@ public final class Util {
 		candidateTypes.add(candidateType);
 		Set<String> selectionTypes = new HashSet<>();
 		selectionTypes.add(selectionType);
-		ctx.getObjectTypes().values().forEach((typeStructure) -> {
+		ctx.getObjectTypes().values().forEach(typeStructure -> {
 			if (typeStructure.getMembers().contains(candidateType)) {
 				candidateTypes.add(typeStructure.getName());
 			}
@@ -137,15 +145,15 @@ public final class Util {
 	}
 
 	public static Function<FieldDefinition, GqlField> fromFieldDef(GqlContext ctx) {
-		return (v) -> new GqlField(v.getName(), translateType(v.getType(), ctx));
+		return v -> new GqlField(v.getName(), translateType(v.getType(), ctx));
 	}
 
 	public static Function<InputValueDefinition, GqlField> fromInputValueDef(GqlContext ctx) {
-		return (v) -> new GqlField(v.getName(), translateType(v.getType(), ctx));
+		return v -> new GqlField(v.getName(), translateType(v.getType(), ctx));
 	}
 
 	public static Function<VariableDefinition, GqlField> fromVariableDef(GqlContext ctx) {
-		return (v) -> new GqlField(v.getName(), translateType(v.getType(), ctx));
+		return v -> new GqlField(v.getName(), translateType(v.getType(), ctx));
 	}
 
 }

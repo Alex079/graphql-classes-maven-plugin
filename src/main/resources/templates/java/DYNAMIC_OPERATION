@@ -1,0 +1,79 @@
+//CHECKSTYLE:OFF
+package ${dynamicOperationsPackage};
+
+import ${schemaTypesPackage}.*;
+
+<#list importPackages as i>
+import ${i}.*;
+</#list>
+
+${generatedAnnotation!}
+@SuppressWarnings({"all", "PMD"})
+public class ${className}
+implements ${operationsPackage}.${interfaceName}
+{
+
+	private final String document;
+
+	@Override
+	public String getDocument() {
+		return document;
+	}
+
+	@Override
+	public String getOperationName() {
+		return null;
+	}
+
+	public ${className}(java.util.function.Consumer<QuerySelectionBuilder> selection) {
+		QuerySelectionBuilder builder = new QuerySelectionBuilder();
+		selection.accept(builder);
+		this.document = "${interfaceName?lower_case}" + builder.build();
+	}
+
+	public static class QuerySelectionBuilder {
+		private QuerySelectionBuilder() {}
+		private final StringBuilder documentBuilder = new StringBuilder(" {");
+		public QuerySelectionBuilder withItemsInDelivery(PaymentType paidWith, java.util.function.Consumer<ItemSelectionBuilder> selection) {
+			documentBuilder.append(" itemsInDelivery");
+			ItemSelectionBuilder builder = new ItemSelectionBuilder();
+			selection.accept(builder);
+			documentBuilder.append(builder.build());
+			return this;
+		}
+		private  String build() {
+			return documentBuilder.append(" }").toString();
+		}
+	}
+
+	public static class ItemSelectionBuilder {
+		private ItemSelectionBuilder() {}
+		private final StringBuilder documentBuilder = new StringBuilder(" {");
+		public ItemSelectionBuilder withId() {
+			documentBuilder.append(" id");
+			return this;
+		}
+		public ItemSelectionBuilder withPrice() {
+			documentBuilder.append(" price");
+			return this;
+		}
+		public ItemSelectionBuilder withQuantity() {
+			documentBuilder.append(" quantity");
+			return this;
+		}
+		private String build() {
+			return documentBuilder.append(" }").toString();
+		}
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder().append("{")
+			.append(" document = ").append(getDocument())
+			.append(" resultClass = ").append(${typeName}.class.getName())
+			.append(" }")
+			.toString();
+	}
+
+}
+//CHECKSTYLE:ON

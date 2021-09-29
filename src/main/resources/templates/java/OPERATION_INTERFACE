@@ -1,14 +1,11 @@
 //CHECKSTYLE:OFF
-package ${basePackage};
+package ${operationsPackage};
 
-<#if annotationVersion?has_content>@javax.annotation<#if annotationVersion!='1.8'>.processing</#if>.Generated(value = "com.github.alme.graphql.generator.GeneratorMojo", date = "${.now?iso_utc_ms}")</#if>
+${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
-public interface ${interfaceName}<Variables, Result>
+public interface ${interfaceName}
 {
 	String getDocument();
-	String getOperation();
-	Variables getVariables();
-	java.util.Map<String, Object> getVariablesAsMap();
-	Class<Result> getResultClass();
+	String getOperationName();
 }
 //CHECKSTYLE:ON

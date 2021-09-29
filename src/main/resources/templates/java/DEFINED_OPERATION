@@ -1,0 +1,51 @@
+<#import "import/selectionTemplate" as selectionClass/>
+<#import "import/variablesTemplate" as variablesClass/>
+//CHECKSTYLE:OFF
+package ${definedOperationsPackage};
+
+import ${schemaTypesPackage}.*;
+
+<#list importPackages as i>
+import ${i}.*;
+</#list>
+
+${generatedAnnotation!}
+@SuppressWarnings({"all", "PMD"})
+public class ${className}
+implements ${operationsPackage}.${interfaceName}
+{
+
+	private static final String DOCUMENT = <#if text?has_content>"${text?j_string}"<#else>null</#if>;
+	private static final String OPERATION_NAME = <#if text?has_content>"${text?j_string}"<#else>null</#if>;
+
+	@Override
+	public String getDocument() {
+		return DOCUMENT;
+	}
+
+	@Override
+	public String getOperationName() {
+		return OPERATION_NAME;
+	}
+
+	<#if 0 < variables?size>
+		<@variablesClass.addVariables className='Variables' fields=variables indent='\t'/>
+	</#if>
+
+	<@selectionClass.addSelection className='Result' typeName=typeName selectedFields=selections indent='\t'/>
+
+	@Override
+	public String toString() {
+		return new StringBuilder().append("{")
+			.append(" document = ").append(getDocument())
+			.append(", operation = ").append(getOperationName())
+			<#if 0 < variables?size>
+			.append(", variablesClass = ").append(Variables.class.getName())
+			</#if>
+			.append(", resultClass = ").append(Result.class.getName())
+			.append(" }")
+			.toString();
+	}
+
+}
+//CHECKSTYLE:ON

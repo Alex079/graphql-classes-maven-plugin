@@ -1,0 +1,46 @@
+<#import "classMemberTemplates" as classMembers/>
+<#macro addSelection className typeName selectedFields indent>
+	<#lt/>${indent}/**
+	<#lt/>${indent} * This class contains selected properties of {@link ${schemaTypesPackage}.${typeName}}
+	<#lt/>${indent} */
+	<#lt/>${indent}public static class ${className}
+	<#lt/>${indent}{
+	<#list selectedFields as field>
+		<#if field.selections?has_content>
+			<@classMembers.addField fieldName=field.name fieldTypeName=field.type.getCustom(field.name?cap_first) indent=indent+'\t'/>
+			<@classMembers.addGetter fieldName=field.name fieldTypeName=field.type.getCustom(field.name?cap_first) indent=indent+'\t'/>
+			<#if !dtoBuilder>
+				<@classMembers.addSetter className=className fieldName=field.name fieldType=field.type fieldTypeName=field.type.getCustom(field.name?cap_first) indent=indent+'\t'/>
+			</#if>
+			<@addSelection className=field.name?cap_first typeName=field.type.inner selectedFields=field.selections indent=indent+'\t'/>
+		<#else>
+			<@classMembers.addField fieldName=field.name fieldTypeName=field.type.full indent=indent+'\t'/>
+			<@classMembers.addGetter fieldName=field.name fieldTypeName=field.type.full indent=indent+'\t'/>
+			<#if !dtoBuilder>
+				<@classMembers.addSetter className=className fieldName=field.name fieldType=field.type fieldTypeName=field.type.full indent=indent+'\t'/>
+			</#if>
+		</#if>
+	</#list>
+	<@classMembers.addEquals className=className fields=selectedFields indent=indent+'\t'/>
+	<@classMembers.addHashCode fields=selectedFields indent=indent+'\t'/>
+	<@classMembers.addToString fields=selectedFields indent=indent+'\t'/>
+	<#if dtoBuilder>
+		<@classMembers.addConstructor className=className fields=selectedFields indent=indent+'\t'/>
+		<@classMembers.addBuilderMethod indent=indent+'\t'/>
+		<#lt/>${indent}	public static class Builder
+		<#lt/>${indent}	{
+		<#lt/>${indent}		private Builder() {}
+		<#list selectedFields as field>
+			<#if field.selections?has_content>
+				<@classMembers.addField fieldName=field.name fieldTypeName=field.type.getCustom(field.name?cap_first) indent=indent+'\t\t'/>
+				<@classMembers.addSetter className='Builder' fieldName=field.name fieldType=field.type fieldTypeName=field.type.getCustom(field.name?cap_first) indent=indent+'\t\t'/>
+			<#else>
+				<@classMembers.addField fieldName=field.name fieldTypeName=field.type.full indent=indent+'\t\t'/>
+				<@classMembers.addSetter className='Builder' fieldName=field.name fieldType=field.type fieldTypeName=field.type.full indent=indent+'\t\t'/>
+			</#if>
+		</#list>
+		<@classMembers.addBuildMethod resultClassName=className fields=selectedFields indent=indent+'\t\t'/>
+		<#lt/>${indent}	}
+	</#if>
+	<#lt/>${indent}}
+</#macro>

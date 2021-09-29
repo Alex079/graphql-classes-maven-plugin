@@ -1,0 +1,117 @@
+<#macro addNullCheck fieldType indent>
+	<#switch fieldType.flag>
+		<#case 'MANDATORY'>
+			<#lt/>${indent}.map(Objects::requireNonNull)
+			<@addNullCheck fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#case 'LIST'>
+			<#lt/>${indent}.filter(Objects::nonNull)
+			<#lt/>${indent}.flatMap(Collection::stream)
+			<@addNullCheck fieldType=fieldType.nested indent=indent/>
+		<#break/>
+	</#switch>
+</#macro>
+
+<#macro addField fieldName fieldTypeName indent>
+	<#if jsonProperty?has_content>
+		<#lt/>${indent}@${jsonProperty}("${fieldName}")
+	</#if>
+	<#lt/>${indent}private ${fieldTypeName} ${fieldName}<#if jsonProperty?has_content>__</#if> = null;
+</#macro>
+
+<#macro addGetter fieldName fieldTypeName indent>
+	<#lt/>${indent}public ${fieldTypeName} get${fieldName?cap_first}() {
+	<#lt/>${indent}	return this.${fieldName}<#if jsonProperty?has_content>__</#if>;
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addSetter className fieldName fieldType fieldTypeName indent>
+	<#lt/>${indent}public ${methodChaining?then(className,"void")} set${fieldName?cap_first}(${fieldTypeName} v) {
+	<#lt/>${indent}	java.util.stream.Stream.of(v)
+	<@addNullCheck fieldType=fieldType indent=indent+'\t\t'/>
+	<#lt/>${indent}		.forEach($ -> {});
+	<#lt/>${indent}	this.${fieldName}<#if jsonProperty?has_content>__</#if> = v;
+	<#if methodChaining>
+		<#lt/>${indent}	return this;
+	</#if>
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addEquals className fields indent>
+	<#lt/>${indent}@Override
+	<#lt/>${indent}public boolean equals(Object o) {
+	<#lt/>${indent}	if (this == o) return true;
+	<#lt/>${indent}	if (!(o instanceof ${className})) return false;
+	<#list fields>
+		<#lt/>${indent}	${className} other = (${className}) o;
+		<#lt/>${indent}	return
+		<#items as field>
+			<#lt/>${indent}		Objects.equals(this.get${field.name?cap_first}(), other.get${field.name?cap_first}())<#sep> &&</#sep>
+		</#items>
+		<#lt/>${indent}	;
+	<#else>
+		<#lt/>${indent}	return true;
+	</#list>
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addHashCode fields indent>
+	<#lt/>${indent}@Override
+	<#lt/>${indent}public int hashCode() {
+	<#lt/>${indent}	return Objects.hash(
+	<#list fields as field>
+		<#lt/>${indent}		get${field.name?cap_first}()<#sep>,</#sep>
+	</#list>
+	<#lt/>${indent}	);
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addToString fields indent>
+	<#lt/>${indent}@Override
+	<#lt/>${indent}public String toString() {
+	<#lt/>${indent}	return new StringBuilder().append("{")
+	<#list fields as field>
+		<#lt/>${indent}		.append(" ${field.name} = ").append(get${field.name?cap_first}())<#sep>.append(",")</#sep>
+	</#list>
+	<#lt/>${indent}		.append(" }")
+	<#lt/>${indent}		.toString();
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addConstructor className fields indent>
+	<#lt/>${indent}private ${className}(
+	<#list fields as field>
+		<#lt/>${indent}	${field.selections?has_content?then(field.type.getCustom(field.name?cap_first),field.type.full)} ${field.name}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
+	</#list>
+	<#lt/>${indent}) {
+	<#list fields as field>
+		<#lt/>${indent}	this.${field.name}<#if jsonProperty?has_content>__</#if> = ${field.name}<#if jsonProperty?has_content>__</#if>;
+	</#list>
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addBuilderMethod indent>
+	<#lt/>${indent}public static Builder builder() {
+	<#lt/>${indent}	return new Builder();
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addBuildMethod resultClassName fields indent>
+	<#lt/>${indent}public ${resultClassName} build() {
+	<#lt/>${indent}	return new ${resultClassName}(
+	<#list fields as field>
+		<#lt/>${indent}		${field.name}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
+	</#list>
+	<#lt/>${indent}	);
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addAsMapMethod fields indent>
+	<#lt/>${indent}public Map<String, Object> asMap() {
+	<#lt/>${indent}	Map<String, Object> result = new HashMap<>();
+	<#list fields as field>
+		<#lt/>${indent}	result.put("${field.name}", get${field.name?cap_first}());
+	</#list>
+	<#lt/>${indent}	return Collections.unmodifiableMap(result);
+	<#lt/>${indent}}
+</#macro>

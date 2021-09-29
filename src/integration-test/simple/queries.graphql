@@ -5,7 +5,9 @@ query itemsInDeliveryByPayment($paidWith: PaymentType!) {
 	}
 }
 
-query trackingInfo($itemId: ID!) {
+query trackingInfo($itemId: ID! = """
+									3
+									""") {
 	trackingInfo(itemId: $itemId) {
 		...SameNameFragment
 		toAddress
@@ -16,7 +18,7 @@ query trackingInfo($itemId: ID!) {
 	}
 }
 
-query trackingInfoRelayConnection($itemId: ID! $first: Int $after: String) {
+query trackingInfoRelayConnection($itemId: ID! = "10" $first: Int $after: String) {
 	trackingInfoConnection(itemId: $itemId after: $after first: $first) {
 		edges {
 			cursor

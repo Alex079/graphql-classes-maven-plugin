@@ -1,0 +1,29 @@
+<#import "classMemberTemplates" as classMembers/>
+<#macro addVariables className fields indent>
+	<#lt/>${indent}public static class ${className}
+	<#lt/>${indent}{
+	<#list fields as field>
+		<@classMembers.addField fieldName=field.name fieldTypeName=field.type.full indent=indent+'\t'/>
+		<@classMembers.addGetter fieldName=field.name fieldTypeName=field.type.full indent=indent+'\t'/>
+		<#if !dtoBuilder>
+			<@classMembers.addSetter className=className fieldName=field.name fieldType=field.type fieldTypeName=field.type.full indent=indent+'\t'/>
+		</#if>
+	</#list>
+	<@classMembers.addAsMapMethod fields=fields indent=indent+'\t'/>
+	<@classMembers.addEquals className=className fields=fields indent=indent+'\t'/>
+	<@classMembers.addHashCode fields=fields indent=indent+'\t'/>
+	<@classMembers.addToString fields=fields indent=indent+'\t'/>
+	<#if dtoBuilder>
+		<@classMembers.addConstructor className=className fields=fields indent=indent+'\t'/>
+		<@classMembers.addBuilderMethod indent=indent+'\t'/>
+		<#lt/>${indent}	public static class Builder
+		<#lt/>${indent}	{
+		<#list fields as field>
+			<@classMembers.addField fieldName=field.name fieldTypeName=field.type.full indent=indent+'\t\t'/>
+			<@classMembers.addSetter className='Builder' fieldName=field.name fieldType=field.type fieldTypeName=field.type.full indent=indent+'\t\t'/>
+		</#list>
+		<@classMembers.addBuildMethod resultClassName=className fields=fields indent=indent+'\t\t'/>
+		<#lt/>${indent}	}
+	</#if>
+	<#lt/>${indent}}
+</#macro>

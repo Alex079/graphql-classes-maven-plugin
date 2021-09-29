@@ -3,6 +3,7 @@ package it.test;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +27,7 @@ class ITest {
     private static final ObjectMapper J = new ObjectMapper().registerModule(new SimpleModule()
             .addSerializer(new JacksonDateTimeSerializer())
             .addDeserializer(OffsetDateTime.class, new JacksonDateTimeDeserializer()))
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
@@ -62,37 +64,37 @@ class ITest {
 
     @Test
     void testUnnamedQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(new it.gson.UnnamedQuery().getVariables());
-        Map<?, ?> j = testJackson(new it.jackson.UnnamedQuery().getVariables());
+        Map<?, ?> g = testGson(new it.gson.operations.defined.UnnamedQuery.Result());
+        Map<?, ?> j = testJackson(new it.jackson.operations.defined.UnnamedQuery.Result());
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
     @Test
     void testTrackingInfoQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(new it.gson.TrackingInfoQuery().getVariables()
+        Map<?, ?> g = testGson(new it.gson.operations.defined.TrackingInfoQuery.Variables()
                 .setItemId("ID"));
-        Map<?, ?> j = testJackson(new it.jackson.TrackingInfoQuery().getVariables()
+        Map<?, ?> j = testJackson(new it.jackson.operations.defined.TrackingInfoQuery.Variables()
                 .setItemId("ID"));
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
     @Test
     void testItemsInDeliveryByPaymentQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(new it.gson.ItemsInDeliveryByPaymentQuery().getVariables()
+        Map<?, ?> g = testGson(new it.gson.operations.defined.ItemsInDeliveryByPaymentQuery.Variables()
                 .setPaidWith(it.gson.types.PaymentType.CASH));
-        Map<?, ?> j = testJackson(new it.jackson.ItemsInDeliveryByPaymentQuery().getVariables()
+        Map<?, ?> j = testJackson(new it.jackson.operations.defined.ItemsInDeliveryByPaymentQuery.Variables()
                 .setPaidWith(it.jackson.types.PaymentType.CASH));
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
     @Test
     void testDeliveredMutation() throws JsonProcessingException {
-        Map<?, ?> g = testGson(new it.gson.DeliveredMutation().getVariables()
+        Map<?, ?> g = testGson(new it.gson.operations.defined.DeliveredMutation.Variables()
                 .setItem(new it.gson.types.SoldItem()
                         .setItem("Item")
                         .setPaidWith(it.gson.types.PaymentType.CASH)
                         .setTrack("Track")));
-        Map<?, ?> j = testJackson(new it.jackson.DeliveredMutation().getVariables()
+        Map<?, ?> j = testJackson(new it.jackson.operations.defined.DeliveredMutation.Variables()
                 .setItem(new it.jackson.types.SoldItem()
                         .setItem("Item")
                         .setPaidWith(it.jackson.types.PaymentType.CASH)

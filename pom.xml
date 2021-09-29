@@ -20,19 +20,20 @@
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.6.1</version>
+			<version>3.6.2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.20</version>
+			<version>1.18.22</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-tools-api</artifactId>
-			<version>3.6.1</version>
+			<version>3.6.2</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.graphql-java</groupId>
@@ -42,7 +43,7 @@
 		<dependency>
 			<groupId>com.graphql-java-kickstart</groupId>
 			<artifactId>graphql-java-tools</artifactId>
-			<version>11.1.2</version>
+			<version>12.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
@@ -52,19 +53,19 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>5.8.0</version>
+			<version>5.8.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.21.0</version>
+			<version>3.22.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>3.12.4</version>
+			<version>4.2.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -82,7 +83,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-plugin-plugin</artifactId>
-				<version>3.6.1</version>
+				<version>3.6.2</version>
 				<configuration>
 					<goalPrefix>graphql-classes</goalPrefix>
 					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
@@ -115,6 +116,7 @@
 				<executions>
 					<execution>
 						<id>integration-test-generate-with-pom</id>
+						<phase>integration-test</phase>
 						<goals>
 							<goal>install</goal>
 							<goal>run</goal>
@@ -144,6 +146,7 @@
 								<argument>-Dgql.sourceIncludes=*.graphql,*.graphqls,,,</argument>
 								<argument>-Dgql.outputDirectory=output</argument>
 								<argument>-Dgql.scalarMap=S1=String,S2=Integer,,,Address=String,DateTime=java.time.OffsetDateTime</argument>
+								<argument>-Dgql.operationWrapperTypes=DEFINED,DYNAMIC</argument>
 								<argument>-e</argument>
 								<argument>-Dmaven.repo.local=${project.build.directory}/local-repo</argument>
 							</arguments>
@@ -160,8 +163,9 @@
 							<executable>sh</executable>
 							<arguments>
 								<argument>-c</argument>
-								<argument>mkdir -p output-classes ; javac -d output-classes output/gql/generated/*.java output/gql/generated/types/*.java</argument>
+								<argument>mkdir -p output-classes ; javac -d output-classes output/gql/generated/*/*.java output/gql/generated/*/*/*.java</argument>
 							</arguments>
+							<outputFile>${project.build.directory}/integration-test/cmd/compile.log</outputFile>
 						</configuration>
 					</execution>
 				</executions>
