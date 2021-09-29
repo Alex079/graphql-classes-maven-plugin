@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 
 import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
-import com.github.alme.graphql.generator.io.utils.FileSystem;
 import com.github.alme.graphql.generator.translator.ObjectTypeTranslator;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -43,7 +42,7 @@ class TestGqlWriter {
 	private Log log;
 
 	@Mock
-	private FileSystem fileSystem;
+	private WriterFactory writerFactory;
 
 	private final ObjectTypeTranslator translator = new ObjectTypeTranslator();
 	private GqlContext ctx;
@@ -115,10 +114,9 @@ class TestGqlWriter {
 	}
 
 	private void when_the_write_is_invoked() throws IOException, MojoExecutionException {
-		doReturn(testWriter).when(fileSystem).getWriter(any());
-		GqlWriter gqlWriter = new GqlWriter(this.fileSystem);
+		doReturn(testWriter).when(writerFactory).getWriter(any());
+		GqlWriter gqlWriter = new GqlWriter(writerFactory);
 		gqlWriter.write(ctx, gqlConfiguration);
-
 	}
 
 	private void then_the_generated_class_overrides_the_toString_method() {

@@ -1,4 +1,4 @@
-package com.github.alme.graphql.generator.io.utils;
+package com.github.alme.graphql.generator.io;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -7,12 +7,11 @@ import java.nio.file.Path;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
-public class FileSystem {
+public class WriterFactory {
 
 	private static final String LOG_CANNOT_CREATE = "Cannot create [%s] due to error.";
 
-
-	public void createDirectories(Path path) throws MojoExecutionException {
+	public WriterFactory(Path path) throws MojoExecutionException {
 		try {
 			Files.createDirectories(path);
 		} catch (IOException e) {
