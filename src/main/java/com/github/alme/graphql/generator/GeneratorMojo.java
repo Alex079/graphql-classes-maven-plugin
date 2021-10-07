@@ -212,6 +212,7 @@ public class GeneratorMojo extends AbstractMojo {
 		getLog().info("Generation is done.");
 
 		project.addCompileSourceRoot(outputRoot);
+		project.addTestCompileSourceRoot(outputRoot);
 	}
 
 }
