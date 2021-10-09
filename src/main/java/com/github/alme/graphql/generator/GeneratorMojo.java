@@ -134,7 +134,9 @@ public class GeneratorMojo extends AbstractMojo {
 		new GqlWriter(writerFactory).write(context, configuration);
 		getLog().info("Generation is done.");
 
-		project.addCompileSourceRoot(configuration.getOutputRoot().toString());
+		String outputRoot = configuration.getOutputRoot().toString();
+		project.addCompileSourceRoot(outputRoot);
+		project.addTestCompileSourceRoot(outputRoot);
 	}
 
 }
