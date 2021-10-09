@@ -21,5 +21,4 @@ public class EnumWriter implements StructureWriter {
         });
     }
 
-
 }

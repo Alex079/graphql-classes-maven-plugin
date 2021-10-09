@@ -10,6 +10,7 @@ import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlOperation;
 import com.github.alme.graphql.generator.writer.EnumWriter;
 import com.github.alme.graphql.generator.writer.InterfaceWriter;
+import com.github.alme.graphql.generator.writer.ObjectWriter;
 import com.github.alme.graphql.generator.writer.UnionWriter;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -71,6 +72,7 @@ public class GqlWriter {
 		new EnumWriter().write(context, configuration);
 		new InterfaceWriter().write(context, configuration);
 		new UnionWriter().write(context, configuration);
+		new ObjectWriter().write(context, configuration);
 //		context.getStructures().forEach((category, structures) ->
 //			structures.forEach((name, type) -> {
 //				Path path = configuration.getTypesPackagePath().resolve(name + FILE_EXTENSION);

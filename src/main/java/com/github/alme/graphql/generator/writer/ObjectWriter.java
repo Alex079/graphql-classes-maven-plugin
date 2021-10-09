@@ -11,7 +11,12 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.AssignExpr;
+import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.expr.ThisExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ReturnStmt;
 
 public class ObjectWriter implements StructureWriter {
 
@@ -20,7 +25,7 @@ public class ObjectWriter implements StructureWriter {
         context.getObjectTypes().forEach((objectName, objectType) -> {
             CompilationUnit compilationUnit = new CompilationUnit(configuration.getTypesPackageName());
             addImports(compilationUnit, configuration);
-            ClassOrInterfaceDeclaration declaration = compilationUnit.addInterface(objectType.getName());
+            ClassOrInterfaceDeclaration declaration = compilationUnit.addClass(objectType.getName());
             addClassAnnotations(declaration, configuration);
             objectType.getMembers().forEach(declaration::addImplementedType);
             String fieldAnnotation = configuration.getJsonPropertyAnnotation();
@@ -37,12 +42,16 @@ public class ObjectWriter implements StructureWriter {
                     .addMethod(Util.getter(gqlField.getName()), Modifier.Keyword.PUBLIC)
                     .setType(gqlField.getType().getFull())
                     .createBody()
-                    .addStatement("return " + fieldName);
+                    .addStatement(new ReturnStmt(fieldName));
                 MethodDeclaration setter = declaration
                     .addMethod(Util.setter(gqlField.getName()))
                     .addParameter(gqlField.getType().getFull(), "v");
+                BlockStmt setterBody = setter
+                    .createBody()
+                    .addStatement(new AssignExpr(new NameExpr(fieldName), new NameExpr("v"), AssignExpr.Operator.ASSIGN));
                 if (configuration.isUseChainedAccessors()) {
                     setter.setType(objectName);
+                    setterBody.addStatement(new ReturnStmt(new ThisExpr()));
                 }
             });
             writeFile(compilationUnit.toString(), configuration.getTypesPackagePath(), objectName, context.getLog());
