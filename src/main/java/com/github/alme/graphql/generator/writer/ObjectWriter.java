@@ -2,10 +2,10 @@ package com.github.alme.graphql.generator.writer;
 
 import static com.github.alme.graphql.generator.writer.Util.addClassAnnotations;
 import static com.github.alme.graphql.generator.writer.Util.addImports;
-import static com.github.alme.graphql.generator.writer.Util.writeFile;
 
 import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
+import com.github.alme.graphql.generator.io.WriterFactory;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -18,7 +18,12 @@ import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class ObjectWriter implements StructureWriter {
+
+    private final WriterFactory writerFactory;
 
     @Override
     public void write(GqlContext context, GqlConfiguration configuration) {
@@ -44,7 +49,7 @@ public class ObjectWriter implements StructureWriter {
                     .createBody()
                     .addStatement(new ReturnStmt(fieldName));
                 MethodDeclaration setter = declaration
-                    .addMethod(Util.setter(gqlField.getName()))
+                    .addMethod(Util.setter(gqlField.getName()), Modifier.Keyword.PUBLIC)
                     .addParameter(gqlField.getType().getFull(), "v");
                 BlockStmt setterBody = setter
                     .createBody()
@@ -54,7 +59,7 @@ public class ObjectWriter implements StructureWriter {
                     setterBody.addStatement(new ReturnStmt(new ThisExpr()));
                 }
             });
-            writeFile(compilationUnit.toString(), configuration.getTypesPackagePath(), objectName, context.getLog());
+            writerFactory.writeCompilationUnit(compilationUnit, configuration.getTypesPackagePath(), objectName);
         });
     }
 

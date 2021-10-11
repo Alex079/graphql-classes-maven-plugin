@@ -69,10 +69,10 @@ public class GqlWriter {
 	}
 
 	private void dumpTypeClasses(GqlContext context, GqlConfiguration configuration) {
-		new EnumWriter().write(context, configuration);
-		new InterfaceWriter().write(context, configuration);
-		new UnionWriter().write(context, configuration);
-		new ObjectWriter().write(context, configuration);
+		new EnumWriter(writerFactory).write(context, configuration);
+		new InterfaceWriter(writerFactory).write(context, configuration);
+		new UnionWriter(writerFactory).write(context, configuration);
+		new ObjectWriter(writerFactory).write(context, configuration);
 //		context.getStructures().forEach((category, structures) ->
 //			structures.forEach((name, type) -> {
 //				Path path = configuration.getTypesPackagePath().resolve(name + FILE_EXTENSION);

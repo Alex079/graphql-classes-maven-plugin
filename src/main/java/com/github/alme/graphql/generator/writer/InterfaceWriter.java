@@ -2,15 +2,20 @@ package com.github.alme.graphql.generator.writer;
 
 import static com.github.alme.graphql.generator.writer.Util.addClassAnnotations;
 import static com.github.alme.graphql.generator.writer.Util.addImports;
-import static com.github.alme.graphql.generator.writer.Util.writeFile;
 
 import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
+import com.github.alme.graphql.generator.io.WriterFactory;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class InterfaceWriter implements StructureWriter {
+
+    private final WriterFactory writerFactory;
 
     @Override
     public void write(GqlContext context, GqlConfiguration configuration) {
@@ -21,7 +26,9 @@ public class InterfaceWriter implements StructureWriter {
             addClassAnnotations(declaration, configuration);
             interfaceType.getMembers().forEach(declaration::addExtendedType);
             interfaceType.getFields().forEach(gqlField -> {
-                addGetter(declaration, gqlField)
+                declaration
+                    .addMethod(Util.getter(gqlField.getName()))
+                    .setType(gqlField.getType().getFull())
                     .removeBody();
                 MethodDeclaration setter = declaration
                     .addMethod(Util.setter(gqlField.getName()))
@@ -31,14 +38,8 @@ public class InterfaceWriter implements StructureWriter {
                     setter.setType(interfaceName);
                 }
             });
-            writeFile(compilationUnit.toString(), configuration.getTypesPackagePath(), interfaceName, context.getLog());
+            writerFactory.writeCompilationUnit(compilationUnit, configuration.getTypesPackagePath(), interfaceName);
         });
-    }
-
-    private MethodDeclaration addGetter(ClassOrInterfaceDeclaration declaration, com.github.alme.graphql.generator.dto.GqlField gqlField) {
-        return declaration
-            .addMethod(Util.getter(gqlField.getName()))
-            .setType(gqlField.getType().getFull());
     }
 
 }

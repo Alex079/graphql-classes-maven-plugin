@@ -1,14 +1,19 @@
 package com.github.alme.graphql.generator.writer;
 
 import static com.github.alme.graphql.generator.writer.Util.addClassAnnotations;
-import static com.github.alme.graphql.generator.writer.Util.writeFile;
 
 import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
+import com.github.alme.graphql.generator.io.WriterFactory;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.EnumDeclaration;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class EnumWriter implements StructureWriter {
+
+    private final WriterFactory writerFactory;
 
     @Override
     public void write(GqlContext context, GqlConfiguration configuration) {
@@ -17,7 +22,7 @@ public class EnumWriter implements StructureWriter {
             EnumDeclaration declaration = compilationUnit.addEnum(enumType.getName());
             addClassAnnotations(declaration, configuration);
             enumType.getMembers().forEach(declaration::addEnumConstant);
-            writeFile(compilationUnit.toString(), configuration.getTypesPackagePath(), enumName, context.getLog());
+            writerFactory.writeCompilationUnit(compilationUnit, configuration.getTypesPackagePath(), enumName);
         });
     }
 
