@@ -56,7 +56,9 @@ implements ${members?join(", ")}
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof ${name})) return false;
+		<#if 0 < fields?size>
 		${name} other = (${name}) o;
+		</#if>
 		return true
 		<#list fields as f>
 			&& Objects.equals(this.get${f.name?cap_first}(), other.get${f.name?cap_first}())
