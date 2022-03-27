@@ -1,4 +1,4 @@
-<#import "import/objectTemplate" as objectClass/>
+<#import "import/classMemberTemplates" as classMembers/>
 //CHECKSTYLE:OFF
 package ${schemaTypesPackage};
 
@@ -8,5 +8,33 @@ import ${i}.*;
 
 ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
-<@objectClass.addObject className=name interfaceNames=members fields=fields indent=''/>
+public class ${name}
+<#if 0 < members?size>
+implements ${members?join(", ")}
+</#if>
+{
+	<#list fields as field>
+		<@classMembers.addField field=field indent='\t'/>
+		<@classMembers.addGetter field=field indent='\t'/>
+		<#if !dtoBuilder>
+			<@classMembers.addSetter className=name field=field indent='\t'/>
+		</#if>
+	</#list>
+	<@classMembers.addEquals className=name fields=fields indent='\t'/>
+	<@classMembers.addHashCode fields=fields indent='\t'/>
+	<@classMembers.addToString fields=fields indent='\t'/>
+	<#if dtoBuilder>
+		<@classMembers.addConstructor className=name fields=fields indent='\t'/>
+		<@classMembers.addBuilderMethod indent='\t'/>
+		<#lt/>	public static class Builder
+		<#lt/>	{
+		<#lt/>		private Builder() { }
+		<#list fields as field>
+			<@classMembers.addField field=field indent='\t\t'/>
+			<@classMembers.addSetter className='Builder' field=field indent='\t\t'/>
+		</#list>
+		<@classMembers.addBuildMethod resultClassName=name fields=fields indent='\t\t'/>
+		<#lt/>	}
+	</#if>
+}
 //CHECKSTYLE:ON

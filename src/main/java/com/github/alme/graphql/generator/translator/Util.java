@@ -29,10 +29,10 @@ import graphql.language.SelectionSet;
 import graphql.language.Type;
 import graphql.language.TypeName;
 import graphql.language.VariableDefinition;
+import lombok.experimental.UtilityClass;
 
-public final class Util {
-
-	private Util() {}
+@UtilityClass
+public class Util {
 
 	public static GqlType translateType(Type<?> type, GqlContext ctx) {
 		if (type instanceof NonNullType) {

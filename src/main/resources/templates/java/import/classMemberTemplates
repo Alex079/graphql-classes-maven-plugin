@@ -1,36 +1,36 @@
 <#macro addNullCheck fieldType indent>
 	<#switch fieldType.flag>
 		<#case 'MANDATORY'>
-			<#lt/>${indent}.map(Objects::requireNonNull)
+			<#lt/>${indent}.map(java.util.Objects::requireNonNull)
 			<@addNullCheck fieldType=fieldType.nested indent=indent/>
 		<#break/>
 		<#case 'LIST'>
-			<#lt/>${indent}.filter(Objects::nonNull)
-			<#lt/>${indent}.flatMap(Collection::stream)
+			<#lt/>${indent}.filter(java.util.Objects::nonNull)
+			<#lt/>${indent}.flatMap(java.util.Collection::stream)
 			<@addNullCheck fieldType=fieldType.nested indent=indent/>
 		<#break/>
 	</#switch>
 </#macro>
 
-<#macro addField fieldName fieldTypeName indent>
+<#macro addField field indent fieldTypePrefix='' fieldTypeSuffix=''>
 	<#if jsonProperty?has_content>
-		<#lt/>${indent}@${jsonProperty}("${fieldName}")
+		<#lt/>${indent}@${jsonProperty}("${field.name}")
 	</#if>
-	<#lt/>${indent}private ${fieldTypeName} ${fieldName}<#if jsonProperty?has_content>__</#if> = null;
+	<#lt/>${indent}private ${field.selections?has_content?then(field.type.getCustom(fieldTypePrefix+field.type.inner+fieldTypeSuffix),field.type.full)} ${field.name}<#if jsonProperty?has_content>__</#if> = null;
 </#macro>
 
-<#macro addGetter fieldName fieldTypeName indent>
-	<#lt/>${indent}public ${fieldTypeName} get${fieldName?cap_first}() {
-	<#lt/>${indent}	return this.${fieldName}<#if jsonProperty?has_content>__</#if>;
+<#macro addGetter field indent fieldTypePrefix='' fieldTypeSuffix=''>
+	<#lt/>${indent}public ${field.selections?has_content?then(field.type.getCustom(fieldTypePrefix+field.type.inner+fieldTypeSuffix),field.type.full)} get${field.name?cap_first}() {
+	<#lt/>${indent}	return this.${field.name}<#if jsonProperty?has_content>__</#if>;
 	<#lt/>${indent}}
 </#macro>
 
-<#macro addSetter className fieldName fieldType fieldTypeName indent>
-	<#lt/>${indent}public ${methodChaining?then(className,"void")} set${fieldName?cap_first}(${fieldTypeName} v) {
+<#macro addSetter className field indent fieldTypePrefix='' fieldTypeSuffix=''>
+	<#lt/>${indent}public ${methodChaining?then(className,"void")} set${field.name?cap_first}(${field.selections?has_content?then(field.type.getCustom(fieldTypePrefix+field.type.inner+fieldTypeSuffix),field.type.full)} v) {
 	<#lt/>${indent}	java.util.stream.Stream.of(v)
-	<@addNullCheck fieldType=fieldType indent=indent+'\t\t'/>
+	<@addNullCheck fieldType=field.type indent=indent+'\t\t'/>
 	<#lt/>${indent}		.forEach($ -> {});
-	<#lt/>${indent}	this.${fieldName}<#if jsonProperty?has_content>__</#if> = v;
+	<#lt/>${indent}	this.${field.name}<#if jsonProperty?has_content>__</#if> = v;
 	<#if methodChaining>
 		<#lt/>${indent}	return this;
 	</#if>
@@ -46,7 +46,7 @@
 		<#lt/>${indent}	${className} other = (${className}) o;
 		<#lt/>${indent}	return
 		<#items as field>
-			<#lt/>${indent}		Objects.equals(this.get${field.name?cap_first}(), other.get${field.name?cap_first}())<#sep> &&</#sep>
+			<#lt/>${indent}		java.util.Objects.equals(this.get${field.name?cap_first}(), other.get${field.name?cap_first}())<#sep> &&</#sep>
 		</#items>
 		<#lt/>${indent}	;
 	<#else>
@@ -58,7 +58,7 @@
 <#macro addHashCode fields indent>
 	<#lt/>${indent}@Override
 	<#lt/>${indent}public int hashCode() {
-	<#lt/>${indent}	return Objects.hash(
+	<#lt/>${indent}	return java.util.Objects.hash(
 	<#list fields as field>
 		<#lt/>${indent}		get${field.name?cap_first}()<#sep>,</#sep>
 	</#list>
@@ -78,10 +78,10 @@
 	<#lt/>${indent}}
 </#macro>
 
-<#macro addConstructor className fields indent>
+<#macro addConstructor className fields indent fieldTypePrefix='' fieldTypeSuffix=''>
 	<#lt/>${indent}private ${className}(
 	<#list fields as field>
-		<#lt/>${indent}	${field.selections?has_content?then(field.type.getCustom(field.name?cap_first),field.type.full)} ${field.name}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
+		<#lt/>${indent}	${field.selections?has_content?then(field.type.getCustom(fieldTypePrefix+field.type.inner+fieldTypeSuffix),field.type.full)} ${field.name}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
 	</#list>
 	<#lt/>${indent}) {
 	<#list fields as field>
@@ -107,11 +107,11 @@
 </#macro>
 
 <#macro addAsMapMethod fields indent>
-	<#lt/>${indent}public Map<String, Object> asMap() {
-	<#lt/>${indent}	Map<String, Object> result = new HashMap<>();
+	<#lt/>${indent}public java.util.Map<String, Object> asMap() {
+	<#lt/>${indent}	java.util.Map<String, Object> result = new java.util.HashMap<>();
 	<#list fields as field>
 		<#lt/>${indent}	result.put("${field.name}", get${field.name?cap_first}());
 	</#list>
-	<#lt/>${indent}	return Collections.unmodifiableMap(result);
+	<#lt/>${indent}	return java.util.Collections.unmodifiableMap(result);
 	<#lt/>${indent}}
 </#macro>

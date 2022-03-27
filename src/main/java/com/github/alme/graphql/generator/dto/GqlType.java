@@ -38,7 +38,7 @@ public class GqlType {
 			case MANDATORY:
 				return nested.getFull();
 			case LIST:
-				return String.format("List<%s>", nested.getFull());
+				return String.format("java.util.List<%s>", nested.getFull());
 			case NAMED:
 			default:
 				return name;
@@ -50,7 +50,7 @@ public class GqlType {
 			case MANDATORY:
 				return nested.getCustom(customType);
 			case LIST:
-				return String.format("List<%s>", nested.getCustom(customType));
+				return String.format("java.util.List<%s>", nested.getCustom(customType));
 			case NAMED:
 			default:
 				return customType;

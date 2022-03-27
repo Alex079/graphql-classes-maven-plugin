@@ -13,9 +13,7 @@ public class ImportPackagesParameterApplier implements ParameterApplier {
 
 	@Override
 	public void apply(GqlConfigurationBuilder builder) {
-		builder
-			.importPackage("java.util")
-			.importPackages(importPackages);
+		builder.importPackages(importPackages);
 	}
 
 }

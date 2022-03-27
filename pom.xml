@@ -110,7 +110,7 @@
 					<showErrors>true</showErrors>
 					<goals>
 						<goal>clean</goal>
-						<goal>test</goal>
+						<goal>verify</goal>
 					</goals>
 				</configuration>
 				<executions>
@@ -163,7 +163,7 @@
 							<executable>sh</executable>
 							<arguments>
 								<argument>-c</argument>
-								<argument>mkdir -p output-classes ; javac -d output-classes output/gql/generated/*/*.java output/gql/generated/*/*/*.java</argument>
+								<argument>mkdir -p output-classes ; javac -d output-classes output/gql/generated/**/*.java</argument>
 							</arguments>
 							<outputFile>${project.build.directory}/integration-test/cmd/compile.log</outputFile>
 						</configuration>

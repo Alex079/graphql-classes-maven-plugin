@@ -49,8 +49,8 @@ class ITest {
 
     @Test
     void testEmptyType() {
-        it.gson.types.EmptyType emptyType1WithGson = new it.gson.types.EmptyType();
-        it.gson.types.EmptyType emptyType2WithGson = new it.gson.types.EmptyType();
+        it.gson.types.EmptyType emptyType1WithGson = it.gson.types.EmptyType.builder().build();
+        it.gson.types.EmptyType emptyType2WithGson = it.gson.types.EmptyType.builder().build();
         System.out.printf("Comparing %s to %s%n", emptyType1WithGson, emptyType2WithGson);
         Assertions.assertEquals(emptyType1WithGson, emptyType2WithGson);
         System.out.println();
@@ -64,41 +64,45 @@ class ITest {
 
     @Test
     void testUnnamedQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(new it.gson.operations.defined.UnnamedQuery.Result());
-        Map<?, ?> j = testJackson(new it.jackson.operations.defined.UnnamedQuery.Result());
+        Map<?, ?> g = testGson(it.gson.operations.defined.UnnamedQueryResult.builder().build());
+        Map<?, ?> j = testJackson(new it.jackson.operations.defined.UnnamedQueryResult());
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
     @Test
     void testTrackingInfoQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(new it.gson.operations.defined.TrackingInfoQuery.Variables()
-                .setItemId("ID"));
-        Map<?, ?> j = testJackson(new it.jackson.operations.defined.TrackingInfoQuery.Variables()
-                .setItemId("ID"));
+        Map<?, ?> g = testGson(it.gson.operations.defined.TrackingInfoQueryVariables.builder()
+            .setItemId("ID")
+            .build());
+        Map<?, ?> j = testJackson(new it.jackson.operations.defined.TrackingInfoQueryVariables()
+            .setItemId("ID"));
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
     @Test
     void testItemsInDeliveryByPaymentQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(new it.gson.operations.defined.ItemsInDeliveryByPaymentQuery.Variables()
-                .setPaidWith(it.gson.types.PaymentType.CASH));
-        Map<?, ?> j = testJackson(new it.jackson.operations.defined.ItemsInDeliveryByPaymentQuery.Variables()
-                .setPaidWith(it.jackson.types.PaymentType.CASH));
+        Map<?, ?> g = testGson(it.gson.operations.defined.ItemsInDeliveryByPaymentQueryVariables.builder()
+            .setPaidWith(it.gson.types.PaymentType.CASH)
+            .build());
+        Map<?, ?> j = testJackson(new it.jackson.operations.defined.ItemsInDeliveryByPaymentQueryVariables()
+            .setPaidWith(it.jackson.types.PaymentType.CASH));
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
     @Test
     void testDeliveredMutation() throws JsonProcessingException {
-        Map<?, ?> g = testGson(new it.gson.operations.defined.DeliveredMutation.Variables()
-                .setItem(new it.gson.types.SoldItem()
-                        .setItem("Item")
-                        .setPaidWith(it.gson.types.PaymentType.CASH)
-                        .setTrack("Track")));
-        Map<?, ?> j = testJackson(new it.jackson.operations.defined.DeliveredMutation.Variables()
-                .setItem(new it.jackson.types.SoldItem()
-                        .setItem("Item")
-                        .setPaidWith(it.jackson.types.PaymentType.CASH)
-                        .setTrack("Track")));
+        Map<?, ?> g = testGson(it.gson.operations.defined.DeliveredMutationVariables.builder()
+            .setItem(it.gson.types.SoldItem.builder()
+                .setItem("Item")
+                .setPaidWith(it.gson.types.PaymentType.CASH)
+                .setTrack("Track")
+                .build())
+            .build());
+        Map<?, ?> j = testJackson(new it.jackson.operations.defined.DeliveredMutationVariables()
+            .setItem(new it.jackson.types.SoldItem()
+                .setItem("Item")
+                .setPaidWith(it.jackson.types.PaymentType.CASH)
+                .setTrack("Track")));
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 

@@ -1,14 +1,11 @@
 package com.github.alme.graphql.generator.parameters;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.github.alme.graphql.generator.dto.GqlConfiguration.GqlConfigurationBuilder;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import lombok.RequiredArgsConstructor;
@@ -27,7 +24,7 @@ public class OutputDirectoryParameterApplier implements ParameterApplier {
 	private static final String SUBPACKAGE_SEPARATOR = ".";
 
 	@Override
-	public void apply(GqlConfigurationBuilder builder) throws MojoExecutionException {
+	public void apply(GqlConfigurationBuilder builder) {
 		String schemaTypesPackageName = packageName + TYPES_SUBPACKAGE;
 		String operationsPackageName = packageName + OPERATIONS_SUBPACKAGE;
 		String staticOperationsPackageName = packageName + DEFINED_OPERATIONS_SUBPACKAGE;
@@ -37,13 +34,6 @@ public class OutputDirectoryParameterApplier implements ParameterApplier {
 		Path operationsPackagePath = outputRoot.resolve(operationsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
 		Path staticOperationsPackagePath = outputRoot.resolve(staticOperationsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
 		Path dynamicOperationsPackagePath = outputRoot.resolve(dynamicOperationsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
-		try {
-			Files.createDirectories(schemaTypesPackagePath);
-			Files.createDirectories(staticOperationsPackagePath);
-			Files.createDirectories(dynamicOperationsPackagePath);
-		} catch (IOException e) {
-			throw new MojoExecutionException("Cannot create output folders.", e);
-		}
 		builder
 			.outputRoot(outputRoot)
 			.schemaTypesPackageName(schemaTypesPackageName)

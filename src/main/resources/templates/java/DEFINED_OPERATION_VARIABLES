@@ -1,0 +1,40 @@
+<#import "import/classMemberTemplates" as classMembers/>
+//CHECKSTYLE:OFF
+package ${definedOperationsPackage};
+
+import ${schemaTypesPackage}.*;
+
+<#list importPackages as i>
+import ${i}.*;
+</#list>
+
+${generatedAnnotation!}
+@SuppressWarnings({"all", "PMD"})
+public class ${className}
+{
+	<#list variables as field>
+		<@classMembers.addField field=field indent='\t'/>
+		<@classMembers.addGetter field=field indent='\t'/>
+		<#if !dtoBuilder>
+			<@classMembers.addSetter className=className field=field indent='\t'/>
+		</#if>
+	</#list>
+	<@classMembers.addAsMapMethod fields=variables indent='\t'/>
+	<@classMembers.addEquals className=className fields=variables indent='\t'/>
+	<@classMembers.addHashCode fields=variables indent='\t'/>
+	<@classMembers.addToString fields=variables indent='\t'/>
+	<#if dtoBuilder>
+		<@classMembers.addConstructor className=className fields=variables indent='\t'/>
+		<@classMembers.addBuilderMethod indent='\t'/>
+		<#lt/>	public static class Builder
+		<#lt/>	{
+		<#lt/>		private Builder() { }
+		<#list variables as field>
+			<@classMembers.addField field=field indent='\t\t'/>
+			<@classMembers.addSetter className='Builder' field=field indent='\t\t'/>
+		</#list>
+		<@classMembers.addBuildMethod resultClassName=className fields=variables indent='\t\t'/>
+		<#lt/>	}
+	</#if>
+}
+//CHECKSTYLE:ON
