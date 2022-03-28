@@ -19,7 +19,6 @@ public class OutputDirectoryParameterApplier implements ParameterApplier {
 
 	private static final String TYPES_SUBPACKAGE = ".types";
 	private static final String OPERATIONS_SUBPACKAGE = ".operations";
-	private static final String DEFINED_OPERATIONS_SUBPACKAGE = OPERATIONS_SUBPACKAGE + ".defined";
 	private static final String DYNAMIC_OPERATIONS_SUBPACKAGE = OPERATIONS_SUBPACKAGE + ".dynamic";
 	private static final String SUBPACKAGE_SEPARATOR = ".";
 
@@ -27,22 +26,18 @@ public class OutputDirectoryParameterApplier implements ParameterApplier {
 	public void apply(GqlConfigurationBuilder builder) {
 		String schemaTypesPackageName = packageName + TYPES_SUBPACKAGE;
 		String operationsPackageName = packageName + OPERATIONS_SUBPACKAGE;
-		String staticOperationsPackageName = packageName + DEFINED_OPERATIONS_SUBPACKAGE;
 		String dynamicOperationsPackageName = packageName + DYNAMIC_OPERATIONS_SUBPACKAGE;
 		Path outputRoot = getOutputDirectory(outputDirectory);
 		Path schemaTypesPackagePath = outputRoot.resolve(schemaTypesPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
 		Path operationsPackagePath = outputRoot.resolve(operationsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
-		Path staticOperationsPackagePath = outputRoot.resolve(staticOperationsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
 		Path dynamicOperationsPackagePath = outputRoot.resolve(dynamicOperationsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
 		builder
 			.outputRoot(outputRoot)
 			.schemaTypesPackageName(schemaTypesPackageName)
 			.operationsPackageName(operationsPackageName)
-			.definedOperationsPackageName(staticOperationsPackageName)
 			.dynamicOperationsPackageName(dynamicOperationsPackageName)
 			.schemaTypesPackagePath(schemaTypesPackagePath)
 			.operationsPackagePath(operationsPackagePath)
-			.definedOperationsPackagePath(staticOperationsPackagePath)
 			.dynamicOperationsPackagePath(dynamicOperationsPackagePath);
 	}
 

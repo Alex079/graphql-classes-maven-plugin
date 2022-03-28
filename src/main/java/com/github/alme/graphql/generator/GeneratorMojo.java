@@ -12,11 +12,10 @@ import com.github.alme.graphql.generator.io.GqlReader;
 import com.github.alme.graphql.generator.io.GqlWriter;
 import com.github.alme.graphql.generator.io.ReaderFactory;
 import com.github.alme.graphql.generator.io.WriterFactory;
-import com.github.alme.graphql.generator.parameters.GeneratedAnnotationParameterApplier;
 import com.github.alme.graphql.generator.parameters.DataObjectEnhancementTypeParameterApplier;
-import com.github.alme.graphql.generator.parameters.ImportPackagesParameterApplier;
-import com.github.alme.graphql.generator.parameters.OutputDirectoryParameterApplier;
+import com.github.alme.graphql.generator.parameters.GeneratedAnnotationParameterApplier;
 import com.github.alme.graphql.generator.parameters.OperationWrapperTypeParameterApplier;
+import com.github.alme.graphql.generator.parameters.OutputDirectoryParameterApplier;
 import com.github.alme.graphql.generator.parameters.ScalarMapParameterApplier;
 import com.github.alme.graphql.generator.parameters.SourceParameterApplier;
 
@@ -119,10 +118,10 @@ public class GeneratorMojo extends AbstractMojo {
 			.accept(new SourceParameterApplier(project, source, sourceDirectoryAlternative, sourceIncludesAlternative, sourceExcludesAlternative))
 			.accept(new OutputDirectoryParameterApplier(project, outputDirectory, packageName))
 			.accept(new ScalarMapParameterApplier(scalarMap, scalarMapAlternative))
-			.accept(new ImportPackagesParameterApplier(importPackages))
 			.accept(new DataObjectEnhancementTypeParameterApplier(dataObjectEnhancementType))
 			.accept(new OperationWrapperTypeParameterApplier(operationWrapperTypes))
 			.accept(new GeneratedAnnotationParameterApplier(generatedAnnotationVersion))
+			.importPackages(importPackages)
 			.jsonPropertyAnnotation(jsonPropertyAnnotation)
 			.build();
 

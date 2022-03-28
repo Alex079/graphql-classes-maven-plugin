@@ -28,12 +28,10 @@ public class GqlConfiguration {
 	String generatedAnnotation;
 	String schemaTypesPackageName;
 	String operationsPackageName;
-	String definedOperationsPackageName;
 	String dynamicOperationsPackageName;
 	Path outputRoot;
 	Path schemaTypesPackagePath;
 	Path operationsPackagePath;
-	Path definedOperationsPackagePath;
 	Path dynamicOperationsPackagePath;
 
 	public static class GqlConfigurationBuilder {

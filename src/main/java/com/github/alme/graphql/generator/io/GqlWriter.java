@@ -1,7 +1,6 @@
 package com.github.alme.graphql.generator.io;
 
 import static java.util.Collections.singletonMap;
-import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -16,6 +15,7 @@ import com.github.alme.graphql.generator.dto.GqlStructure;
 import com.github.alme.graphql.generator.dto.Structure;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -45,7 +45,6 @@ public class GqlWriter {
 	private static final String SCHEMA_TYPES_PACKAGE_KEY = "schemaTypesPackage";
 	private static final String OPERATIONS_PACKAGE_KEY = "operationsPackage";
 	private static final String CURRENT_PACKAGE_KEY = "currentPackage";
-	private static final String DEFINED_OPERATIONS_PACKAGE_KEY = "definedOperationsPackage";
 	private static final String DYNAMIC_OPERATIONS_PACKAGE_KEY = "dynamicOperationsPackage";
 	private static final String LOG_CANNOT_CREATE = "Cannot create [%s].";
 	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_31);
@@ -67,7 +66,6 @@ public class GqlWriter {
 		try {
 			CFG.setSharedVariable(SCHEMA_TYPES_PACKAGE_KEY, configuration.getSchemaTypesPackageName());
 			CFG.setSharedVariable(OPERATIONS_PACKAGE_KEY, configuration.getOperationsPackageName());
-			CFG.setSharedVariable(DEFINED_OPERATIONS_PACKAGE_KEY, configuration.getDefinedOperationsPackageName());
 			CFG.setSharedVariable(DYNAMIC_OPERATIONS_PACKAGE_KEY, configuration.getDynamicOperationsPackageName());
 			CFG.setSharedVariable(JSON_PROPERTY_KEY, configuration.getJsonPropertyAnnotation());
 			CFG.setSharedVariable(METHOD_CHAINING_KEY, configuration.isGenerateMethodChaining());
@@ -77,140 +75,136 @@ public class GqlWriter {
 		} catch (TemplateModelException e) {
 			throw new MojoExecutionException("Cannot set shared variables.", e);
 		}
+		Log log = context.getLog();
 		context.getStructures().forEach((category, structures) ->
-			structures.forEach((name, type) -> makeStructure(context, configuration, category, name, type))
+			structures.forEach((name, type) -> makeStructure(log, configuration, category, name, type))
 		);
 		boolean generateDefinedOperations = configuration.isGenerateDefinedOperations();
 		boolean generateDynamicOperations = configuration.isGenerateDynamicOperations();
 		if (generateDefinedOperations || generateDynamicOperations) {
-			context.getDefinedOperations().values().stream()
-				.map(GqlOperation::getOperation)
+			context.getSchema().keySet().stream()
 				.map(GqlWriter::firstUpper)
-				.collect(toSet())
-				.forEach(interfaceName -> makeOperationInterface(context, configuration, interfaceName));
+				.forEach(interfaceName -> makeOperationInterface(log, configuration, interfaceName));
 		}
 		if (generateDefinedOperations) {
-			context.getDefinedOperations().forEach((name, operation) -> {
-				makeDefinedOperation(context, configuration, name, operation);
-				makeDefinedOperationVariables(context, configuration, name, operation);
-				makeDefinedOperationResult(context, configuration, name, operation);
-			});
+			context.getDefinedOperations().forEach((name, operation) -> makeDefinedOperation(log, configuration, name, operation));
 		}
-		if (generateDynamicOperations) {
-			context.getSchema().forEach((operation, typeName) -> makeDynamicOperation(context, configuration, operation, typeName));
-		}
+//		if (generateDynamicOperations) {
+//			context.getSchema().forEach((operation, typeName) -> makeDynamicOperation(log, configuration, operation, typeName));
+//		}
 		CFG.clearSharedVariables();
 	}
 
-	private void makeStructure(GqlContext context, GqlConfiguration configuration, Structure category, String name, GqlStructure type) {
+	private void makeStructure(Log log, GqlConfiguration configuration, Structure category, String name, GqlStructure type) {
 		Path path = configuration.getSchemaTypesPackagePath().resolve(name + FILE_EXTENSION);
 		try (Writer writer = writerFactory.getWriter(path)) {
 			CFG.getTemplate(category.name()).process(type, writer);
 		} catch (TemplateException | IOException e) {
-			context.getLog().error(String.format(LOG_CANNOT_CREATE, name), e);
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
 		}
 	}
 
-	private void makeOperationInterface(GqlContext context, GqlConfiguration configuration, String interfaceName) {
+	private void makeOperationInterface(Log log, GqlConfiguration configuration, String interfaceName) {
 		Path path = configuration.getOperationsPackagePath().resolve(interfaceName + FILE_EXTENSION);
 		try (Writer writer = writerFactory.getWriter(path)) {
 			CFG.getTemplate(OPERATION_INTERFACE_TEMPLATE).process(singletonMap(INTERFACE_NAME_KEY, interfaceName), writer);
 		} catch (TemplateException | IOException e) {
-			context.getLog().error(String.format(LOG_CANNOT_CREATE, interfaceName), e);
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
 		}
 	}
 
-	private void makeDefinedOperation(GqlContext context, GqlConfiguration configuration, String name, GqlOperation operation) {
+	private void makeDefinedOperation(Log log, GqlConfiguration configuration, String name, GqlOperation operation) {
 		String interfaceName = firstUpper(operation.getOperation());
 		String className = (name == null ? UNNAMED_OPERATION : firstUpper(name)) + interfaceName;
+		String currentPackageName = configuration.getOperationsPackageName()+"."+firstLower(className);
+		Path currentPackagePath = configuration.getOperationsPackagePath().resolve(firstLower(className));
+		Path path = currentPackagePath.resolve(className + FILE_EXTENSION);
 		try {
 			CFG.setSharedVariable(CLASS_NAME_KEY, className);
 			CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
+			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, currentPackageName);
 		} catch (TemplateModelException e) {
-			context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
 			return;
 		}
-		Path path = configuration.getDefinedOperationsPackagePath().resolve(className + FILE_EXTENSION);
 		try (Writer writer = writerFactory.getWriter(path)) {
 			CFG.getTemplate(DEFINED_OPERATION_TEMPLATE).process(operation, writer);
 		} catch (TemplateException | IOException e) {
-			context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
+			return;
+		}
+		if (!operation.getVariables().isEmpty()) {
+			makeDefinedOperationVariables(log, currentPackagePath, currentPackageName, name, operation);
+		}
+		if (!operation.getSelections().isEmpty()) {
+			makeDefinedOperationSelections(log, currentPackagePath, currentPackageName,
+				(name == null ? UNNAMED_OPERATION : firstUpper(name)) + firstUpper(operation.getOperation()) + "Result",
+				operation.getSelections());
 		}
 	}
 
-	private void makeDefinedOperationVariables(GqlContext context, GqlConfiguration configuration, String name, GqlOperation operation) {
+	private void makeDefinedOperationVariables(Log log, Path packagePath, String packageName, String name, GqlOperation operation) {
 		String interfaceName = firstUpper(operation.getOperation());
 		String className = (name == null ? UNNAMED_OPERATION : firstUpper(name)) + interfaceName + "Variables";
-		try {
-			CFG.setSharedVariable(CLASS_NAME_KEY, className);
-		} catch (TemplateModelException e) {
-			context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
-			return;
-		}
-		Path path = configuration.getDefinedOperationsPackagePath().resolve(className + FILE_EXTENSION);
-		try (Writer writer = writerFactory.getWriter(path)) {
-			CFG.getTemplate(DEFINED_OPERATION_VARIABLES_TEMPLATE).process(operation, writer);
-		} catch (TemplateException | IOException e) {
-			context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
-		}
-	}
-
-	private void makeDefinedOperationResult(GqlContext context, GqlConfiguration configuration, String name, GqlOperation operation) {
-		if (operation.getSelections() == null || operation.getSelections().isEmpty()) {
-			return;
-		}
-		makeDefinedOperationSelections(context,
-			configuration.getDefinedOperationsPackagePath(),
-			configuration.getDefinedOperationsPackageName(),
-			(name == null ? UNNAMED_OPERATION : firstUpper(name)) + firstUpper(operation.getOperation()) + "Result",
-			operation.getSelections());
-	}
-
-	private void makeDefinedOperationSelections(GqlContext context, Path packagePath, String packageName, String className, Collection<GqlSelection> selections) {
+		Path path = packagePath.resolve(className + FILE_EXTENSION);
 		try {
 			CFG.setSharedVariable(CLASS_NAME_KEY, className);
 			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, packageName);
 		} catch (TemplateModelException e) {
-			context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
 			return;
 		}
+		try (Writer writer = writerFactory.getWriter(path)) {
+			CFG.getTemplate(DEFINED_OPERATION_VARIABLES_TEMPLATE).process(operation, writer);
+		} catch (TemplateException | IOException e) {
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
+		}
+	}
+
+	private void makeDefinedOperationSelections(Log log, Path packagePath, String packageName, String className, Collection<GqlSelection> selections) {
 		Path path = packagePath.resolve(className + FILE_EXTENSION);
+		try {
+			CFG.setSharedVariable(CLASS_NAME_KEY, className);
+			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, packageName);
+		} catch (TemplateModelException e) {
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
+			return;
+		}
 		try (Writer writer = writerFactory.getWriter(path)) {
 			CFG.getTemplate(DEFINED_OPERATION_RESULT_TEMPLATE).process(singletonMap("selections", selections), writer);
 		} catch (TemplateException | IOException e) {
-			context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
 		}
 		selections.forEach(selection -> {
 			if (selection.getSelections() == null || selection.getSelections().isEmpty()) {
 				return;
 			}
-			String innerPackageName = firstLower(className);
-			makeDefinedOperationSelections(context,
-				packagePath.resolve(innerPackageName),
-				packageName + "." + innerPackageName,
+			makeDefinedOperationSelections(log,
+				packagePath.resolve(selection.getName()),
+				packageName + "." + selection.getName(),
 				selection.getType().getInner() + "Selection",
 				selection.getSelections());
 		});
 	}
 
-	private void makeDynamicOperation(GqlContext context, GqlConfiguration configuration, String operation, String typeName) {
-		String interfaceName = firstUpper(operation);
-		String className = DYNAMIC_OPERATION + interfaceName;
-		try {
-			CFG.setSharedVariable(CLASS_NAME_KEY, className);
-			CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
-			CFG.setSharedVariable(TYPE_NAME_KEY, typeName);
-		} catch (TemplateModelException e) {
-			context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
-			return;
-		}
-		Path path = configuration.getDynamicOperationsPackagePath().resolve(className + FILE_EXTENSION);
-		try (Writer writer = writerFactory.getWriter(path)) {
-			CFG.getTemplate(DYNAMIC_OPERATION_TEMPLATE).process(context, writer);
-		} catch (TemplateException | IOException e) {
-			context.getLog().error(String.format(LOG_CANNOT_CREATE, className), e);
-		}
-	}
+//	private void makeDynamicOperation(Log log, GqlConfiguration configuration, String operation, String typeName) {
+//		String interfaceName = firstUpper(operation);
+//		String className = DYNAMIC_OPERATION + interfaceName;
+//		try {
+//			CFG.setSharedVariable(CLASS_NAME_KEY, className);
+//			CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
+//			CFG.setSharedVariable(TYPE_NAME_KEY, typeName);
+//		} catch (TemplateModelException e) {
+//			log.error(String.format(LOG_CANNOT_CREATE, className), e);
+//			return;
+//		}
+//		Path path = configuration.getDynamicOperationsPackagePath().resolve(className + FILE_EXTENSION);
+//		try (Writer writer = writerFactory.getWriter(path)) {
+//			CFG.getTemplate(DYNAMIC_OPERATION_TEMPLATE).process(null, writer);
+//		} catch (TemplateException | IOException e) {
+//			log.error(String.format(LOG_CANNOT_CREATE, className), e);
+//		}
+//	}
 
 	private static String firstUpper(String s) {
 		return s.substring(0, 1).toUpperCase() + s.substring(1);

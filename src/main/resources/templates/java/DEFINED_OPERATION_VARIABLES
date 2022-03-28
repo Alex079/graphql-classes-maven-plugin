@@ -1,6 +1,6 @@
 <#import "import/classMemberTemplates" as classMembers/>
 //CHECKSTYLE:OFF
-package ${definedOperationsPackage};
+package ${currentPackage};
 
 import ${schemaTypesPackage}.*;
 
