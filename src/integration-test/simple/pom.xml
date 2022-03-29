@@ -76,7 +76,7 @@
 					<importPackages>
 						<value>java.math</value>
 					</importPackages>
-					<operationWrapperTypes>DEFINED,DYNAMIC</operationWrapperTypes>
+					<operationWrappers>DEFINED,DYNAMIC</operationWrappers>
 				</configuration>
 				<executions>
 					<execution>
@@ -87,7 +87,7 @@
 						<configuration>
 							<packageName>it.gson</packageName>
 							<jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>
-							<dataObjectEnhancementType>BUILDER</dataObjectEnhancementType>
+							<dataObjectEnhancement>BUILDER</dataObjectEnhancement>
 						</configuration>
 					</execution>
 					<execution>
@@ -99,7 +99,7 @@
 							<packageName>it.jackson</packageName>
 							<jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation>
 							<generatedAnnotationVersion>${java.specification.version}</generatedAnnotationVersion>
-							<dataObjectEnhancementType>METHOD_CHAINING</dataObjectEnhancementType>
+							<dataObjectEnhancement>METHOD_CHAINING</dataObjectEnhancement>
 						</configuration>
 					</execution>
 				</executions>

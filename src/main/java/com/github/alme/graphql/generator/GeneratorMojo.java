@@ -100,11 +100,11 @@ public class GeneratorMojo extends AbstractMojo {
 	@Parameter(property = "gql.generatedAnnotationVersion")
 	private String generatedAnnotationVersion;
 
-	@Parameter(property = "gql.dataObjectEnhancementType")
-	private GqlConfiguration.DataObjectEnhancementType dataObjectEnhancementType;
+	@Parameter(property = "gql.dataObjectEnhancement")
+	private GqlConfiguration.DataObjectEnhancementType dataObjectEnhancement;
 
-	@Parameter(property = "gql.operationWrapperTypes")
-	private Set<GqlConfiguration.OperationWrapperType> operationWrapperTypes;
+	@Parameter(property = "gql.operationWrappers")
+	private Set<GqlConfiguration.OperationWrapperType> operationWrappers;
 
 	/**
 	 * A maven project to add newly generated sources into
@@ -118,8 +118,8 @@ public class GeneratorMojo extends AbstractMojo {
 			.accept(new SourceParameterApplier(project, source, sourceDirectoryAlternative, sourceIncludesAlternative, sourceExcludesAlternative))
 			.accept(new OutputDirectoryParameterApplier(project, outputDirectory, packageName))
 			.accept(new ScalarMapParameterApplier(scalarMap, scalarMapAlternative))
-			.accept(new DataObjectEnhancementTypeParameterApplier(dataObjectEnhancementType))
-			.accept(new OperationWrapperTypeParameterApplier(operationWrapperTypes))
+			.accept(new DataObjectEnhancementTypeParameterApplier(dataObjectEnhancement))
+			.accept(new OperationWrapperTypeParameterApplier(operationWrappers))
 			.accept(new GeneratedAnnotationParameterApplier(generatedAnnotationVersion))
 			.importPackages(importPackages)
 			.jsonPropertyAnnotation(jsonPropertyAnnotation)

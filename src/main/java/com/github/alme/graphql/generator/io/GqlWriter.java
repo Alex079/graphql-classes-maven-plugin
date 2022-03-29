@@ -45,7 +45,6 @@ public class GqlWriter {
 	private static final String SCHEMA_TYPES_PACKAGE_KEY = "schemaTypesPackage";
 	private static final String OPERATIONS_PACKAGE_KEY = "operationsPackage";
 	private static final String CURRENT_PACKAGE_KEY = "currentPackage";
-	private static final String DYNAMIC_OPERATIONS_PACKAGE_KEY = "dynamicOperationsPackage";
 	private static final String LOG_CANNOT_CREATE = "Cannot create [%s].";
 	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_31);
 
@@ -66,7 +65,6 @@ public class GqlWriter {
 		try {
 			CFG.setSharedVariable(SCHEMA_TYPES_PACKAGE_KEY, configuration.getSchemaTypesPackageName());
 			CFG.setSharedVariable(OPERATIONS_PACKAGE_KEY, configuration.getOperationsPackageName());
-			CFG.setSharedVariable(DYNAMIC_OPERATIONS_PACKAGE_KEY, configuration.getDynamicOperationsPackageName());
 			CFG.setSharedVariable(JSON_PROPERTY_KEY, configuration.getJsonPropertyAnnotation());
 			CFG.setSharedVariable(METHOD_CHAINING_KEY, configuration.isGenerateMethodChaining());
 			CFG.setSharedVariable(DTO_BUILDER_KEY, configuration.isGenerateDtoBuilder());

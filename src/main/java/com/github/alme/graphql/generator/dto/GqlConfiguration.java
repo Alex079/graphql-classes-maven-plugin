@@ -28,11 +28,9 @@ public class GqlConfiguration {
 	String generatedAnnotation;
 	String schemaTypesPackageName;
 	String operationsPackageName;
-	String dynamicOperationsPackageName;
 	Path outputRoot;
 	Path schemaTypesPackagePath;
 	Path operationsPackagePath;
-	Path dynamicOperationsPackagePath;
 
 	public static class GqlConfigurationBuilder {
 		public GqlConfigurationBuilder accept(ParameterApplier parameterApplier) throws MojoExecutionException {

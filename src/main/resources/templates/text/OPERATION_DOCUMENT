@@ -28,19 +28,33 @@
 
 <#macro dir v><#list v> <#items as i>@${i.name}<@arg i.arguments/><#sep> </#items></#list></#macro>
 
-<#macro selection sel>
-<#switch sel.class.simpleName>
-<#case 'Field'><#if sel.alias??>${sel.alias}: </#if>${sel.name}<@arg sel.arguments/><@dir sel.directives/><#if sel.selectionSet??><@selection_set sel.selectionSet/></#if><#break>
-<#case 'InlineFragment'>...on ${sel.typeCondition.name}<@dir sel.directives/><@selection_set sel.selectionSet/><#break>
-<#case 'FragmentSpread'>...${sel.name}<@dir sel.directives/><#break>
-</#switch>
+<#macro selection sel indent>
+	<#switch sel.class.simpleName>
+		<#case 'Field'>
+			<#lt/>${indent}<#if sel.alias??>${sel.alias}: </#if>${sel.name}<@arg sel.arguments/><@dir sel.directives/><#if sel.selectionSet??><@selection_set sel=sel.selectionSet indent=indent/></#if>
+		<#break>
+		<#case 'InlineFragment'>
+			<#lt/>${indent}...on ${sel.typeCondition.name}<@dir sel.directives/><@selection_set sel=sel.selectionSet indent=indent/>
+		<#break>
+		<#case 'FragmentSpread'>
+			<#lt/>${indent}...${sel.name}<@dir sel.directives/>
+		<#break>
+	</#switch>
 </#macro>
 
-<#macro selection_set sel><#if 0 < sel.selections?size> {<#list sel.selections as s><@selection s/><#sep> </#list>}</#if></#macro>
+<#macro selection_set sel indent>
+	<#if 0 < sel.selections?size>
+		<#lt/> {
+		<#list sel.selections as s>
+			<@selection sel=s indent=indent+'\t'/>
+		</#list>
+		<#lt/>${indent}}<#rt/>
+	</#if>
+</#macro>
 
 <#list operations as o>
-${o.operation?lower_case} <#if o.name??>${o.name}</#if><@var o.variableDefinitions/><@dir o.directives/><@selection_set o.selectionSet/>
+${o.operation?lower_case} <#if o.name??>${o.name}</#if><@var o.variableDefinitions/><@dir o.directives/><@selection_set sel=o.selectionSet indent=''/>
 </#list>
 <#list fragments as f>
-fragment ${f.name} on ${f.typeCondition.name}<@dir f.directives/><@selection_set f.selectionSet/>
+fragment ${f.name} on ${f.typeCondition.name}<@dir f.directives/><@selection_set sel=f.selectionSet indent=''/>
 </#list>

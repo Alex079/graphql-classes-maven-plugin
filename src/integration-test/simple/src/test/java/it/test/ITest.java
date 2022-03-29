@@ -64,41 +64,41 @@ class ITest {
 
     @Test
     void testUnnamedQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(it.gson.operations.unnamedQuery.UnnamedQueryResult.builder().build());
-        Map<?, ?> j = testJackson(new it.jackson.operations.unnamedQuery.UnnamedQueryResult());
+        Map<?, ?> g = testGson(it.gson.unnamedQuery.UnnamedQueryResult.builder().build());
+        Map<?, ?> j = testJackson(new it.jackson.unnamedQuery.UnnamedQueryResult());
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
     @Test
     void testTrackingInfoQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(it.gson.operations.trackingInfoQuery.TrackingInfoQueryVariables.builder()
+        Map<?, ?> g = testGson(it.gson.trackingInfoQuery.TrackingInfoQueryVariables.builder()
             .setItemId("ID")
             .build());
-        Map<?, ?> j = testJackson(new it.jackson.operations.trackingInfoQuery.TrackingInfoQueryVariables()
+        Map<?, ?> j = testJackson(new it.jackson.trackingInfoQuery.TrackingInfoQueryVariables()
             .setItemId("ID"));
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
     @Test
     void testItemsInDeliveryByPaymentQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(it.gson.operations.itemsInDeliveryByPaymentQuery.ItemsInDeliveryByPaymentQueryVariables.builder()
+        Map<?, ?> g = testGson(it.gson.itemsInDeliveryByPaymentQuery.ItemsInDeliveryByPaymentQueryVariables.builder()
             .setPaidWith(it.gson.types.PaymentType.CASH)
             .build());
-        Map<?, ?> j = testJackson(new it.jackson.operations.itemsInDeliveryByPaymentQuery.ItemsInDeliveryByPaymentQueryVariables()
+        Map<?, ?> j = testJackson(new it.jackson.itemsInDeliveryByPaymentQuery.ItemsInDeliveryByPaymentQueryVariables()
             .setPaidWith(it.jackson.types.PaymentType.CASH));
         Assertions.assertEquals(g.entrySet(), j.entrySet());
     }
 
     @Test
     void testDeliveredMutation() throws JsonProcessingException {
-        Map<?, ?> g = testGson(it.gson.operations.deliveredMutation.DeliveredMutationVariables.builder()
+        Map<?, ?> g = testGson(it.gson.deliveredMutation.DeliveredMutationVariables.builder()
             .setItem(it.gson.types.SoldItem.builder()
                 .setItem("Item")
                 .setPaidWith(it.gson.types.PaymentType.CASH)
                 .setTrack("Track")
                 .build())
             .build());
-        Map<?, ?> j = testJackson(new it.jackson.operations.deliveredMutation.DeliveredMutationVariables()
+        Map<?, ?> j = testJackson(new it.jackson.deliveredMutation.DeliveredMutationVariables()
             .setItem(new it.jackson.types.SoldItem()
                 .setItem("Item")
                 .setPaidWith(it.jackson.types.PaymentType.CASH)

@@ -18,7 +18,10 @@ query trackingInfo($itemId: ID! = """
 	}
 }
 
-query trackingInfoRelayConnection($itemId: ID! = "10" $first: Int $after: String) {
+query trackingInfoRelayConnection($itemId: ID! = """
+													10
+													20
+												 """ $first: Int $after: String) {
 	trackingInfoConnection(itemId: $itemId after: $after first: $first) {
 		edges {
 			cursor

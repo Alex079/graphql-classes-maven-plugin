@@ -124,7 +124,7 @@ class OperationTranslatorTest {
 			.extractingByKey("getValues")
 			.isNotNull()
 			.satisfies(operation -> {
-				assertThat(operation.getText()).contains("query getValues {f}");
+				assertThat(operation.getText()).containsIgnoringWhitespaces("query getValues {f}");
 				assertThat(operation.getName()).isEqualTo("getValues");
 				assertThat(operation.getOperation()).isEqualTo("query");
 				assertThat(operation.getTypeName()).isEqualTo("Query");
@@ -191,11 +191,9 @@ class OperationTranslatorTest {
 			.isNotNull()
 			.satisfies(operation -> {
 				assertThat(operation.getText())
-					.contains(
+					.containsIgnoringWhitespaces(
 						"query getValues {a {...part} b {...on Type2 {f2}}}",
-						"fragment part on Type1 @CustomDirective(arg: true) {field1: f1}")
-					.doesNotContain(
-						"fragment part on Type2");
+						"fragment part on Type1 @CustomDirective(arg: true) {field1: f1}");
 				assertThat(operation.getName()).isEqualTo("getValues");
 				assertThat(operation.getOperation()).isEqualTo("query");
 				assertThat(operation.getTypeName()).isEqualTo("Query");
@@ -239,7 +237,7 @@ class OperationTranslatorTest {
 			.extractingByKey("setValues")
 			.isNotNull()
 			.satisfies(operation -> {
-				assertThat(operation.getText()).contains("mutation setValues($v: InputType = 1) {a(v: $v)}");
+				assertThat(operation.getText()).containsIgnoringWhitespaces("mutation setValues($v: InputType = 1) {a(v: $v)}");
 				assertThat(operation.getName()).isEqualTo("setValues");
 				assertThat(operation.getOperation()).isEqualTo("mutation");
 				assertThat(operation.getTypeName()).isEqualTo("Mutation");
