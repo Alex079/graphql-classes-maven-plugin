@@ -128,9 +128,6 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>3.0.0</version>
-				<configuration>
-					<workingDirectory>${project.build.directory}/integration-test/cmd</workingDirectory>
-				</configuration>
 				<executions>
 					<execution>
 						<id>integration-test-generate-without-pom</id>
@@ -146,10 +143,11 @@
 								<argument>-Dgql.sourceIncludes=*.graphql,*.graphqls,,,</argument>
 								<argument>-Dgql.outputDirectory=output</argument>
 								<argument>-Dgql.scalarMap=S1=String,S2=Integer,,,Address=String,DateTime=java.time.OffsetDateTime</argument>
-								<argument>-Dgql.operationWrapperTypes=DEFINED,DYNAMIC</argument>
+								<argument>-Dgql.generatedOutputTypes=DEFINED_OPERATIONS</argument>
 								<argument>-e</argument>
 								<argument>-Dmaven.repo.local=${project.build.directory}/local-repo</argument>
 							</arguments>
+							<workingDirectory>${project.build.directory}/integration-test/cmd</workingDirectory>
 							<outputFile>${project.build.directory}/integration-test/cmd/generate.log</outputFile>
 						</configuration>
 					</execution>
@@ -163,8 +161,9 @@
 							<executable>sh</executable>
 							<arguments>
 								<argument>-c</argument>
-								<argument>mkdir -p output-classes ; javac -d output-classes output/gql/generated/**/*.java</argument>
+								<argument>mkdir ../output-classes ; javac -d ../output-classes gql/generated/*/*.java</argument>
 							</arguments>
+							<workingDirectory>${project.build.directory}/integration-test/cmd/output</workingDirectory>
 							<outputFile>${project.build.directory}/integration-test/cmd/compile.log</outputFile>
 						</configuration>
 					</execution>

@@ -14,8 +14,9 @@ import com.github.alme.graphql.generator.io.ReaderFactory;
 import com.github.alme.graphql.generator.io.WriterFactory;
 import com.github.alme.graphql.generator.parameters.DataObjectEnhancementTypeParameterApplier;
 import com.github.alme.graphql.generator.parameters.GeneratedAnnotationParameterApplier;
-import com.github.alme.graphql.generator.parameters.OperationWrapperTypeParameterApplier;
+import com.github.alme.graphql.generator.parameters.OutputTypesParameterApplier;
 import com.github.alme.graphql.generator.parameters.OutputDirectoryParameterApplier;
+import com.github.alme.graphql.generator.parameters.ParserOptionsParameterApplier;
 import com.github.alme.graphql.generator.parameters.ScalarMapParameterApplier;
 import com.github.alme.graphql.generator.parameters.SourceParameterApplier;
 
@@ -103,8 +104,11 @@ public class GeneratorMojo extends AbstractMojo {
 	@Parameter(property = "gql.dataObjectEnhancement")
 	private GqlConfiguration.DataObjectEnhancementType dataObjectEnhancement;
 
-	@Parameter(property = "gql.operationWrappers")
-	private Set<GqlConfiguration.OperationWrapperType> operationWrappers;
+	@Parameter(property = "gql.generatedOutputTypes")
+	private Set<GqlConfiguration.GeneratedOutputType> generatedOutputTypes;
+
+	@Parameter(property = "gql.parserMaxTokens")
+	private Integer parserMaxTokens;
 
 	/**
 	 * A maven project to add newly generated sources into
@@ -119,8 +123,9 @@ public class GeneratorMojo extends AbstractMojo {
 			.accept(new OutputDirectoryParameterApplier(project, outputDirectory, packageName))
 			.accept(new ScalarMapParameterApplier(scalarMap, scalarMapAlternative))
 			.accept(new DataObjectEnhancementTypeParameterApplier(dataObjectEnhancement))
-			.accept(new OperationWrapperTypeParameterApplier(operationWrappers))
+			.accept(new OutputTypesParameterApplier(generatedOutputTypes))
 			.accept(new GeneratedAnnotationParameterApplier(generatedAnnotationVersion))
+			.accept(new ParserOptionsParameterApplier(parserMaxTokens))
 			.importPackages(importPackages)
 			.jsonPropertyAnnotation(jsonPropertyAnnotation)
 			.build();
@@ -131,7 +136,7 @@ public class GeneratorMojo extends AbstractMojo {
 		ReaderFactory readerFactory = new ReaderFactory(configuration.getSourceFiles(), getLog());
 		WriterFactory writerFactory = new WriterFactory();
 
-		new GqlReader(readerFactory).read(context);
+		new GqlReader(readerFactory).read(context, configuration);
 		getLog().debug(format("Current context: %s.", context));
 
 		new GqlWriter(writerFactory).write(context, configuration);

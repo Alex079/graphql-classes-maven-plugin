@@ -78,9 +78,9 @@ class InputObjectTypeTranslatorTest {
 
 		translator.translate(doc, ctx);
 
-		assertEquals(1, ctx.getObjectTypes().size());
-		assertTrue(ctx.getObjectTypes().containsKey("Input1"));
-		Collection<GqlField> input1 = ctx.getObjectTypes().get("Input1").getFields();
+		assertEquals(1, ctx.getInputObjectTypes().size());
+		assertTrue(ctx.getInputObjectTypes().containsKey("Input1"));
+		Collection<GqlField> input1 = ctx.getInputObjectTypes().get("Input1").getFields();
 		assertEquals(2, input1.size());
 		input1.forEach(gqlField -> {
 			switch (gqlField.getName()) {
@@ -123,9 +123,9 @@ class InputObjectTypeTranslatorTest {
 
 		translator.translate(doc, ctx);
 
-		assertEquals(1, ctx.getObjectTypes().size());
-		assertTrue(ctx.getObjectTypes().containsKey("Input1"));
-		Collection<GqlField> input1 = ctx.getObjectTypes().get("Input1").getFields();
+		assertEquals(1, ctx.getInputObjectTypes().size());
+		assertTrue(ctx.getInputObjectTypes().containsKey("Input1"));
+		Collection<GqlField> input1 = ctx.getInputObjectTypes().get("Input1").getFields();
 		assertEquals(2, input1.size());
 		input1.forEach(gqlField -> {
 			switch (gqlField.getName()) {

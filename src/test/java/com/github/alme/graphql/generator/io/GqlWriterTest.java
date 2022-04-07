@@ -35,6 +35,7 @@ import graphql.language.ObjectTypeDefinition;
 
 @ExtendWith(MockitoExtension.class)
 class GqlWriterTest {
+
 	@Mock
 	private Document doc;
 
@@ -110,6 +111,7 @@ class GqlWriterTest {
 		gqlConfiguration = GqlConfiguration.builder()
 				.schemaTypesPackageName("com.company.test")
 				.schemaTypesPackagePath(Paths.get("target/generated"))
+				.generateSchemaOtherTypes(true)
 				.build();
 	}
 

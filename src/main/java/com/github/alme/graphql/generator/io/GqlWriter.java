@@ -74,9 +74,19 @@ public class GqlWriter {
 			throw new MojoExecutionException("Cannot set shared variables.", e);
 		}
 		Log log = context.getLog();
-		context.getStructures().forEach((category, structures) ->
-			structures.forEach((name, type) -> makeStructure(log, configuration, category, name, type))
-		);
+		boolean generateSchemaInputTypes = configuration.isGenerateSchemaInputTypes();
+		boolean generateSchemaOtherTypes = configuration.isGenerateSchemaOtherTypes();
+		if (generateSchemaInputTypes) {
+			context.getInputObjectTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.OBJECT, name, type));
+		}
+		if (generateSchemaInputTypes || generateSchemaOtherTypes) {
+			context.getEnumTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.ENUM, name, type));
+		}
+		if (generateSchemaOtherTypes) {
+			context.getInterfaceTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.INTERFACE, name, type));
+			context.getUnionTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.UNION, name, type));
+			context.getObjectTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.OBJECT, name, type));
+		}
 		boolean generateDefinedOperations = configuration.isGenerateDefinedOperations();
 		boolean generateDynamicOperations = configuration.isGenerateDynamicOperations();
 		if (generateDefinedOperations || generateDynamicOperations) {
@@ -88,7 +98,7 @@ public class GqlWriter {
 			context.getDefinedOperations().forEach((name, operation) -> makeDefinedOperation(log, configuration, name, operation));
 		}
 //		if (generateDynamicOperations) {
-//			context.getSchema().forEach((operation, typeName) -> makeDynamicOperation(log, configuration, operation, typeName));
+//			context.getSchema().forEach((operation, typeName) -> makeDynamicOperation(context, configuration, operation, typeName));
 //		}
 		CFG.clearSharedVariables();
 	}
@@ -185,22 +195,25 @@ public class GqlWriter {
 		});
 	}
 
-//	private void makeDynamicOperation(Log log, GqlConfiguration configuration, String operation, String typeName) {
+//	private void makeDynamicOperation(GqlContext context, GqlConfiguration configuration, String operation, String typeName) {
 //		String interfaceName = firstUpper(operation);
 //		String className = DYNAMIC_OPERATION + interfaceName;
+//		String currentPackageName = configuration.getOperationsPackageName()+"."+firstLower(className);
+//		Path currentPackagePath = configuration.getOperationsPackagePath().resolve(firstLower(className));
+//		Path path = currentPackagePath.resolve(className + FILE_EXTENSION);
 //		try {
 //			CFG.setSharedVariable(CLASS_NAME_KEY, className);
 //			CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
 //			CFG.setSharedVariable(TYPE_NAME_KEY, typeName);
+//			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, currentPackageName);
 //		} catch (TemplateModelException e) {
-//			log.error(String.format(LOG_CANNOT_CREATE, className), e);
+//			context.getLog().error(String.format(LOG_CANNOT_CREATE, path), e);
 //			return;
 //		}
-//		Path path = configuration.getDynamicOperationsPackagePath().resolve(className + FILE_EXTENSION);
 //		try (Writer writer = writerFactory.getWriter(path)) {
-//			CFG.getTemplate(DYNAMIC_OPERATION_TEMPLATE).process(null, writer);
+//			CFG.getTemplate(DYNAMIC_OPERATION_TEMPLATE).process(context, writer);
 //		} catch (TemplateException | IOException e) {
-//			log.error(String.format(LOG_CANNOT_CREATE, className), e);
+//			context.getLog().error(String.format(LOG_CANNOT_CREATE, path), e);
 //		}
 //	}
 

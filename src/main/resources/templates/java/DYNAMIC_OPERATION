@@ -1,5 +1,5 @@
 //CHECKSTYLE:OFF
-package ${dynamicOperationsPackage};
+package ${currentPackage};
 
 import ${schemaTypesPackage}.*;
 
@@ -34,14 +34,18 @@ implements ${operationsPackage}.${interfaceName}
 	public static class QuerySelectionBuilder {
 		private QuerySelectionBuilder() {}
 		private final StringBuilder documentBuilder = new StringBuilder(" {");
-		public QuerySelectionBuilder withItemsInDelivery(PaymentType paidWith, java.util.function.Consumer<ItemSelectionBuilder> selection) {
+		public QuerySelectionBuilder withPaidWith(it.jackson.types.PaymentType paidWith) {
+			documentBuilder.append(" paidWith");
+			return this;
+		}
+		public QuerySelectionBuilder withItemsInDelivery(java.util.function.Consumer<ItemSelectionBuilder> selection) {
 			documentBuilder.append(" itemsInDelivery");
 			ItemSelectionBuilder builder = new ItemSelectionBuilder();
 			selection.accept(builder);
 			documentBuilder.append(builder.build());
 			return this;
 		}
-		private  String build() {
+		private String build() {
 			return documentBuilder.append(" }").toString();
 		}
 	}
@@ -70,7 +74,6 @@ implements ${operationsPackage}.${interfaceName}
 	public String toString() {
 		return new StringBuilder().append("{")
 			.append(" document = ").append(getDocument())
-			.append(" resultClass = ").append(${typeName}.class.getName())
 			.append(" }")
 			.toString();
 	}

@@ -36,6 +36,10 @@ public class GqlContext {
 		return getStructures(Structure.OBJECT);
 	}
 
+	public Map<String, GqlStructure> getInputObjectTypes() {
+		return getStructures(Structure.INPUT_OBJECT);
+	}
+
 	public Map<String, GqlStructure> getUnionTypes() {
 		return getStructures(Structure.UNION);
 	}

@@ -9,6 +9,7 @@ import com.github.alme.graphql.generator.parameters.ParameterApplier;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
+import graphql.parser.ParserOptions;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
@@ -24,6 +25,8 @@ public class GqlConfiguration {
 	boolean generateDtoBuilder;
 	boolean generateDefinedOperations;
 	boolean generateDynamicOperations;
+	boolean generateSchemaInputTypes;
+	boolean generateSchemaOtherTypes;
 	String jsonPropertyAnnotation;
 	String generatedAnnotation;
 	String schemaTypesPackageName;
@@ -31,6 +34,7 @@ public class GqlConfiguration {
 	Path outputRoot;
 	Path schemaTypesPackagePath;
 	Path operationsPackagePath;
+	ParserOptions parserOptions;
 
 	public static class GqlConfigurationBuilder {
 		public GqlConfigurationBuilder accept(ParameterApplier parameterApplier) throws MojoExecutionException {
@@ -39,12 +43,15 @@ public class GqlConfiguration {
 		}
 	}
 
-	public enum OperationWrapperType {
-		DEFINED, DYNAMIC
+	public enum GeneratedOutputType {
+		SCHEMA_TYPES,
+		DEFINED_OPERATIONS,
+		DYNAMIC_OPERATIONS,
 	}
 
 	public enum DataObjectEnhancementType {
-		METHOD_CHAINING, BUILDER
+		METHOD_CHAINING,
+		BUILDER,
 	}
 
 }
