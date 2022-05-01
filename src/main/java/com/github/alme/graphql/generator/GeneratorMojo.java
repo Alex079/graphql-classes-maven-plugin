@@ -101,9 +101,22 @@ public class GeneratorMojo extends AbstractMojo {
 	@Parameter(property = "gql.generatedAnnotationVersion")
 	private String generatedAnnotationVersion;
 
+	/**
+	 * The type of data object enhancement.
+	 * Can be empty or take one of the following values:
+	 * METHOD_CHAINING (data object setters will return 'this' instead of 'void'),
+	 * BUILDER (data objects will use builder pattern)
+	 */
 	@Parameter(property = "gql.dataObjectEnhancement")
 	private GqlConfiguration.DataObjectEnhancementType dataObjectEnhancement;
 
+	/**
+	 * A set of output types
+	 * Can be empty or take values from the following list:
+	 * SCHEMA_TYPES (all the types defined in GraphQL schema files),
+	 * DEFINED_OPERATIONS (all the operations defined in input files),
+	 * DYNAMIC_OPERATIONS (one operation per schema entry allowing to construct operations at runtime)
+	 */
 	@Parameter(property = "gql.generatedOutputTypes")
 	private Set<GqlConfiguration.GeneratedOutputType> generatedOutputTypes;
 
