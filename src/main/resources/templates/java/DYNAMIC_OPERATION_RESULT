@@ -1,0 +1,39 @@
+<#import "import/classMemberTemplates" as classMembers/>
+//CHECKSTYLE:OFF
+package ${currentPackage};
+
+import ${schemaTypesPackage}.*;
+
+<#list importPackages as i>
+import ${i}.*;
+</#list>
+
+${generatedAnnotation!}
+@SuppressWarnings({"all", "PMD"})
+public class ${className}
+{
+	<#list selections as field>
+		<@classMembers.addField field=field indent='\t'/>
+		<@classMembers.addGetter field=field indent='\t'/>
+		<#if !dtoBuilder>
+			<@classMembers.addSetter className=className field=field indent='\t'/>
+		</#if>
+	</#list>
+	<@classMembers.addEquals className=className fields=selections indent='\t'/>
+	<@classMembers.addHashCode fields=selections indent='\t'/>
+	<@classMembers.addToString fields=selections indent='\t'/>
+	<#if dtoBuilder>
+		<@classMembers.addConstructor className=className fields=selections indent='\t'/>
+		<@classMembers.addBuilderMethod indent='\t'/>
+		<#lt/>	public static class Builder
+		<#lt/>	{
+		<#lt/>		private Builder() { }
+		<#list selections as field>
+			<@classMembers.addField field=field indent='\t\t'/>
+			<@classMembers.addSetter className='Builder' field=field indent='\t\t'/>
+		</#list>
+		<@classMembers.addBuildMethod resultClassName=className fields=selections indent='\t\t'/>
+		<#lt/>	}
+	</#if>
+}
+//CHECKSTYLE:ON

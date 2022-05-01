@@ -48,13 +48,54 @@ public class Util {
 		return null;
 	}
 
-//	public static Collection<GqlSelection> createFullSelection(GqlContext ctx, String typeName) {
-//		Collection<GqlSelection> result = new ArrayList<>();
-//		ctx.getObjectTypes().get(typeName).getFields().stream().map(field -> {
-//			return
-//		});
-//		return result;
-//	}
+	public static Collection<GqlSelection> createFullSelection(GqlContext ctx, String typeName) {
+		Collection<GqlSelection> result = new ArrayList<>();
+		Optional.ofNullable(ctx.getObjectTypes().get(typeName))
+			.ifPresent(objectType -> objectType.getFields().stream()
+				.map(field -> {
+					GqlType type = field.getType();
+					return new GqlSelection(field.getName(), type, "")
+						.addSelections(createFullSelection(ctx, type.getInner()));
+				})
+				.forEach(result::add)
+			);
+		Optional.ofNullable(ctx.getInterfaceTypes().get(typeName))
+			.ifPresent(interfaceType -> {
+				Set<String> uniqueNames = new HashSet<>();
+				interfaceType.getFields().stream()
+					.map(field -> {
+						String name = field.getName();
+						uniqueNames.add(name);
+						GqlType type = field.getType();
+						return new GqlSelection(name, type, "")
+							.addSelections(createFullSelection(ctx, type.getInner()));
+					})
+					.forEach(result::add);
+				ctx.getObjectTypes().values().stream()
+					.filter(objectType -> objectType.getMembers().contains(interfaceType.getName()))
+					.flatMap(objectType -> objectType.getFields().stream()
+						.filter(field -> !uniqueNames.contains(field.getName()))
+						.map(field -> {
+							GqlType type = field.getType();
+							return new GqlSelection(field.getName(), type, objectType.getName()).addSelections(createFullSelection(ctx, type.getInner()));
+						})
+					)
+					.forEach(result::add);
+			});
+		Optional.ofNullable(ctx.getUnionTypes().get(typeName))
+			.ifPresent(unionType -> {
+				ctx.getObjectTypes().values().stream()
+					.filter(objectType -> objectType.getMembers().contains(unionType.getName()))
+					.flatMap(objectType -> objectType.getFields().stream()
+						.map(field -> {
+							GqlType type = field.getType();
+							return new GqlSelection(field.getName(), type, objectType.getName()).addSelections(createFullSelection(ctx, type.getInner()));
+						})
+					)
+					.forEach(result::add);
+			});
+		return result;
+	}
 
 	public static Collection<GqlSelection> translateSelection(
 		SelectionSet selectionSet,
@@ -68,7 +109,7 @@ public class Util {
 			selectionSet.getSelectionsOfType(Field.class).stream()
 				.map(field -> {
 					GqlType type = guessTypeOfField(field, ctx, typeName);
-					GqlSelection selection = new GqlSelection(field.getAlias() == null ? field.getName() : field.getAlias(), type);
+					GqlSelection selection = new GqlSelection(field.getAlias() == null ? field.getName() : field.getAlias(), type, "");
 					if (field.getSelectionSet() != null) {
 						selection.addSelections(translateSelection(field.getSelectionSet(),
 							allFragments, requiredFragments, ctx, type.getInner()));
@@ -86,7 +127,9 @@ public class Util {
 			selectionSet.getSelectionsOfType(FragmentSpread.class).stream()
 				.map(FragmentSpread::getName)
 				.map(fragmentName -> allFragments.stream()
-					.filter(candidate -> matchesByNameAndType(candidate, fragmentName, typeName, ctx)).findAny())
+					.filter(candidate -> Objects.equals(candidate.getName(), fragmentName))
+					.filter(candidate -> matchesByType(candidate.getTypeCondition().getName(), typeName, ctx))
+					.findAny())
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.peek(requiredFragments::add)
@@ -97,13 +140,13 @@ public class Util {
 		return result;
 	}
 
-	private static GqlType guessTypeOfField(Field field, GqlContext ctx, String containerType) {
+	private static GqlType guessTypeOfField(Field field, GqlContext ctx, String containerTypeName) {
 		return Stream.concat(
-			Optional.ofNullable(ctx.getObjectTypes().get(containerType))
+			Optional.ofNullable(ctx.getObjectTypes().get(containerTypeName))
 				.map(GqlStructure::getFields)
 				.map(Collection::stream)
 				.orElseGet(Stream::empty),
-			Optional.ofNullable(ctx.getInterfaceTypes().get(containerType))
+			Optional.ofNullable(ctx.getInterfaceTypes().get(containerTypeName))
 				.map(GqlStructure::getFields)
 				.map(Collection::stream)
 				.orElseGet(Stream::empty))
@@ -113,11 +156,7 @@ public class Util {
 			.orElse(GqlType.named("String"));
 	}
 
-	private static boolean matchesByNameAndType(FragmentDefinition candidate, String fragmentName, String selectionType, GqlContext ctx) {
-		if (!Objects.equals(fragmentName, candidate.getName())) {
-			return false;
-		}
-		String candidateType = candidate.getTypeCondition().getName();
+	private static boolean matchesByType(String candidateType, String selectionType, GqlContext ctx) {
 		if (Objects.equals(selectionType, candidateType)) {
 			return true;
 		}
@@ -133,14 +172,6 @@ public class Util {
 				selectionTypes.add(typeStructure.getName());
 			}
 		});
-		/*
-		 Given matching fragment name and not matching selection type and fragment condition type,
-		 'selectionType' is likely to be an interface or a union,
-		 'candidateType' is likely to be an object.
-		 In this case 'selectionTypes' is likely to contain more elements than 'candidateTypes'.
-		 'disjoint' method will iterate over the second collection if the first collection is a 'Set',
-		 therefore it is slightly better to invoke 'disjoint(selectionTypes, candidateTypes)'.
-		*/
 		return !Collections.disjoint(selectionTypes, candidateTypes);
 	}
 

@@ -12,25 +12,41 @@
 	</#switch>
 </#macro>
 
+<#function getFieldType field>
+	<#return field.selections?has_content?then(field.type.getCustom(currentPackage+'.'+field.name+'.'+field.type.inner+'Result'),field.type.full) />
+</#function>
+
+<#function getFieldName field>
+	<#return field.containerTypeName?has_content?then(field.containerTypeName?uncap_first+field.name?cap_first,field.name) />
+</#function>
+
+<#function getFieldAnnotation field>
+	<#if field.containerTypeName?has_content>
+		<#return field.containerTypeName?uncap_first+field.name?cap_first />
+	<#else>
+		<#return field.name />
+	</#if>
+</#function>
+
 <#macro addField field indent>
 	<#if jsonProperty?has_content>
-		<#lt/>${indent}@${jsonProperty}("${field.name}")
+		<#lt/>${indent}@${jsonProperty}("${getFieldAnnotation(field)}")
 	</#if>
-	<#lt/>${indent}private ${field.selections?has_content?then(field.type.getCustom(currentPackage+'.'+field.name+'.'+field.type.inner+'Selection'),field.type.full)} ${field.name}<#if jsonProperty?has_content>__</#if> = null;
+	<#lt/>${indent}private ${getFieldType(field)} ${getFieldName(field)}<#if jsonProperty?has_content>__</#if> = null;
 </#macro>
 
 <#macro addGetter field indent>
-	<#lt/>${indent}public ${field.selections?has_content?then(field.type.getCustom(currentPackage+'.'+field.name+'.'+field.type.inner+'Selection'),field.type.full)} get${field.name?cap_first}() {
-	<#lt/>${indent}	return this.${field.name}<#if jsonProperty?has_content>__</#if>;
+	<#lt/>${indent}public ${getFieldType(field)} get${getFieldName(field)?cap_first}() {
+	<#lt/>${indent}	return this.${getFieldName(field)}<#if jsonProperty?has_content>__</#if>;
 	<#lt/>${indent}}
 </#macro>
 
 <#macro addSetter className field indent>
-	<#lt/>${indent}public ${methodChaining?then(className,"void")} set${field.name?cap_first}(${field.selections?has_content?then(field.type.getCustom(currentPackage+'.'+field.name+'.'+field.type.inner+'Selection'),field.type.full)} v) {
+	<#lt/>${indent}public ${methodChaining?then(className,"void")} set${getFieldName(field)?cap_first}(${getFieldType(field)} v) {
 	<#lt/>${indent}	java.util.stream.Stream.of(v)
 	<@addNullCheck fieldType=field.type indent=indent+'\t\t'/>
 	<#lt/>${indent}		.forEach($ -> {});
-	<#lt/>${indent}	this.${field.name}<#if jsonProperty?has_content>__</#if> = v;
+	<#lt/>${indent}	this.${getFieldName(field)}<#if jsonProperty?has_content>__</#if> = v;
 	<#if methodChaining>
 		<#lt/>${indent}	return this;
 	</#if>
@@ -46,7 +62,7 @@
 		<#lt/>${indent}	${className} other = (${className}) o;
 		<#lt/>${indent}	return
 		<#items as field>
-			<#lt/>${indent}		java.util.Objects.equals(this.get${field.name?cap_first}(), other.get${field.name?cap_first}())<#sep> &&</#sep>
+			<#lt/>${indent}		java.util.Objects.equals(this.get${getFieldName(field)?cap_first}(), other.get${getFieldName(field)?cap_first}())<#sep> &&</#sep>
 		</#items>
 		<#lt/>${indent}	;
 	<#else>
@@ -60,7 +76,7 @@
 	<#lt/>${indent}public int hashCode() {
 	<#lt/>${indent}	return java.util.Objects.hash(
 	<#list fields as field>
-		<#lt/>${indent}		get${field.name?cap_first}()<#sep>,</#sep>
+		<#lt/>${indent}		get${getFieldName(field)?cap_first}()<#sep>,</#sep>
 	</#list>
 	<#lt/>${indent}	);
 	<#lt/>${indent}}
@@ -71,7 +87,7 @@
 	<#lt/>${indent}public String toString() {
 	<#lt/>${indent}	return new StringBuilder().append("{")
 	<#list fields as field>
-		<#lt/>${indent}		.append(" ${field.name} = ").append(get${field.name?cap_first}())<#sep>.append(",")</#sep>
+		<#lt/>${indent}		.append(" ${getFieldName(field)} = ").append(get${getFieldName(field)?cap_first}())<#sep>.append(",")</#sep>
 	</#list>
 	<#lt/>${indent}		.append(" }")
 	<#lt/>${indent}		.toString();
@@ -81,11 +97,11 @@
 <#macro addConstructor className fields indent>
 	<#lt/>${indent}private ${className}(
 	<#list fields as field>
-		<#lt/>${indent}	${field.selections?has_content?then(field.type.getCustom(currentPackage+'.'+field.name+'.'+field.type.inner+'Selection'),field.type.full)} ${field.name}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
+		<#lt/>${indent}	${getFieldType(field)} ${getFieldName(field)}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
 	</#list>
 	<#lt/>${indent}) {
 	<#list fields as field>
-		<#lt/>${indent}	this.${field.name}<#if jsonProperty?has_content>__</#if> = ${field.name}<#if jsonProperty?has_content>__</#if>;
+		<#lt/>${indent}	this.${getFieldName(field)}<#if jsonProperty?has_content>__</#if> = ${getFieldName(field)}<#if jsonProperty?has_content>__</#if>;
 	</#list>
 	<#lt/>${indent}}
 </#macro>
@@ -100,7 +116,7 @@
 	<#lt/>${indent}public ${resultClassName} build() {
 	<#lt/>${indent}	return new ${resultClassName}(
 	<#list fields as field>
-		<#lt/>${indent}		${field.name}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
+		<#lt/>${indent}		${getFieldName(field)}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
 	</#list>
 	<#lt/>${indent}	);
 	<#lt/>${indent}}

@@ -1,6 +1,7 @@
 package com.github.alme.graphql.generator.io;
 
 import static java.util.Collections.singletonMap;
+import static java.util.stream.Collectors.groupingBy;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -31,11 +32,12 @@ public class GqlWriter {
 	private static final String DEFINED_OPERATION_VARIABLES_TEMPLATE = "DEFINED_OPERATION_VARIABLES";
 	private static final String DEFINED_OPERATION_RESULT_TEMPLATE = "DEFINED_OPERATION_RESULT";
 	private static final String DYNAMIC_OPERATION_TEMPLATE = "DYNAMIC_OPERATION";
+	private static final String DYNAMIC_OPERATION_SELECTOR_TEMPLATE = "DYNAMIC_OPERATION_SELECTOR";
+	private static final String DYNAMIC_OPERATION_RESULT_TEMPLATE = "DYNAMIC_OPERATION_RESULT";
 	private static final String UNNAMED_OPERATION = "Unnamed";
 	private static final String DYNAMIC_OPERATION = "Dynamic";
 	private static final String INTERFACE_NAME_KEY = "interfaceName";
 	private static final String CLASS_NAME_KEY = "className";
-	private static final String TYPE_NAME_KEY = "typeName";
 	private static final String JSON_PROPERTY_KEY = "jsonProperty";
 	private static final String METHOD_CHAINING_KEY = "methodChaining";
 	private static final String DTO_BUILDER_KEY = "dtoBuilder";
@@ -97,9 +99,9 @@ public class GqlWriter {
 		if (generateDefinedOperations) {
 			context.getDefinedOperations().forEach((name, operation) -> makeDefinedOperation(log, configuration, name, operation));
 		}
-//		if (generateDynamicOperations) {
-//			context.getSchema().forEach((operation, typeName) -> makeDynamicOperation(context, configuration, operation, typeName));
-//		}
+		if (generateDynamicOperations) {
+			context.getDynamicOperations().forEach(operation -> makeDynamicOperation(log, configuration, operation));
+		}
 		CFG.clearSharedVariables();
 	}
 
@@ -142,16 +144,14 @@ public class GqlWriter {
 			return;
 		}
 		if (!operation.getVariables().isEmpty()) {
-			makeDefinedOperationVariables(log, currentPackagePath, currentPackageName, name, operation);
+			makeOperationVariables(log, currentPackagePath, currentPackageName, name, operation);
 		}
 		if (!operation.getSelections().isEmpty()) {
-			makeDefinedOperationSelections(log, currentPackagePath, currentPackageName,
-				(name == null ? UNNAMED_OPERATION : firstUpper(name)) + firstUpper(operation.getOperation()) + "Result",
-				operation.getSelections());
+			makeDefinedOperationSelections(log, currentPackagePath, currentPackageName, className, operation.getSelections());
 		}
 	}
 
-	private void makeDefinedOperationVariables(Log log, Path packagePath, String packageName, String name, GqlOperation operation) {
+	private void makeOperationVariables(Log log, Path packagePath, String packageName, String name, GqlOperation operation) {
 		String interfaceName = firstUpper(operation.getOperation());
 		String className = (name == null ? UNNAMED_OPERATION : firstUpper(name)) + interfaceName + "Variables";
 		Path path = packagePath.resolve(className + FILE_EXTENSION);
@@ -169,7 +169,8 @@ public class GqlWriter {
 		}
 	}
 
-	private void makeDefinedOperationSelections(Log log, Path packagePath, String packageName, String className, Collection<GqlSelection> selections) {
+	private void makeDefinedOperationSelections(Log log, Path packagePath, String packageName, String typeName, Collection<GqlSelection> selections) {
+		String className = typeName + "Result";
 		Path path = packagePath.resolve(className + FILE_EXTENSION);
 		try {
 			CFG.setSharedVariable(CLASS_NAME_KEY, className);
@@ -190,32 +191,92 @@ public class GqlWriter {
 			makeDefinedOperationSelections(log,
 				packagePath.resolve(selection.getName()),
 				packageName + "." + selection.getName(),
-				selection.getType().getInner() + "Selection",
+				selection.getType().getInner(),
 				selection.getSelections());
 		});
 	}
 
-//	private void makeDynamicOperation(GqlContext context, GqlConfiguration configuration, String operation, String typeName) {
-//		String interfaceName = firstUpper(operation);
-//		String className = DYNAMIC_OPERATION + interfaceName;
-//		String currentPackageName = configuration.getOperationsPackageName()+"."+firstLower(className);
-//		Path currentPackagePath = configuration.getOperationsPackagePath().resolve(firstLower(className));
-//		Path path = currentPackagePath.resolve(className + FILE_EXTENSION);
-//		try {
-//			CFG.setSharedVariable(CLASS_NAME_KEY, className);
-//			CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
-//			CFG.setSharedVariable(TYPE_NAME_KEY, typeName);
-//			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, currentPackageName);
-//		} catch (TemplateModelException e) {
-//			context.getLog().error(String.format(LOG_CANNOT_CREATE, path), e);
-//			return;
-//		}
-//		try (Writer writer = writerFactory.getWriter(path)) {
-//			CFG.getTemplate(DYNAMIC_OPERATION_TEMPLATE).process(context, writer);
-//		} catch (TemplateException | IOException e) {
-//			context.getLog().error(String.format(LOG_CANNOT_CREATE, path), e);
-//		}
-//	}
+	private void makeDynamicOperation(Log log, GqlConfiguration configuration, GqlOperation operation) {
+		String interfaceName = firstUpper(operation.getOperation());
+		String className = DYNAMIC_OPERATION + interfaceName;
+		String currentPackageName = configuration.getOperationsPackageName()+"."+operation.getOperation();
+		Path currentPackagePath = configuration.getOperationsPackagePath().resolve(operation.getOperation());
+		Path path = currentPackagePath.resolve(className + FILE_EXTENSION);
+		try {
+			CFG.setSharedVariable(CLASS_NAME_KEY, className);
+			CFG.setSharedVariable(INTERFACE_NAME_KEY, interfaceName);
+			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, currentPackageName);
+		} catch (TemplateModelException e) {
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
+			return;
+		}
+		try (Writer writer = writerFactory.getWriter(path)) {
+			CFG.getTemplate(DYNAMIC_OPERATION_TEMPLATE).process(operation, writer);
+		} catch (TemplateException | IOException e) {
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
+			return;
+		}
+		if (!operation.getSelections().isEmpty()) {
+			makeDynamicOperationSelector(log, currentPackagePath, currentPackageName, className, operation.getSelections());
+			makeDynamicOperationSelections(log, currentPackagePath, currentPackageName, className, operation.getSelections());
+		}
+	}
+
+	private void makeDynamicOperationSelector(Log log, Path packagePath, String packageName, String typeName, Collection<GqlSelection> selections) {
+		String className = typeName + "Selector";
+		Path path = packagePath.resolve(className + FILE_EXTENSION);
+		try {
+			CFG.setSharedVariable(CLASS_NAME_KEY, className);
+			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, packageName);
+		} catch (TemplateModelException e) {
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
+			return;
+		}
+		try (Writer writer = writerFactory.getWriter(path)) {
+			CFG.getTemplate(DYNAMIC_OPERATION_SELECTOR_TEMPLATE).process(
+				singletonMap("selections", selections.stream().collect(groupingBy(GqlSelection::getContainerTypeName))),
+				writer);
+		} catch (TemplateException | IOException e) {
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
+		}
+		selections.forEach(selection -> {
+			if (selection.getSelections() == null || selection.getSelections().isEmpty()) {
+				return;
+			}
+			makeDynamicOperationSelector(log,
+				packagePath.resolve(selection.getName()),
+				packageName + "." + selection.getName(),
+				selection.getType().getInner(),
+				selection.getSelections());
+		});
+	}
+
+	private void makeDynamicOperationSelections(Log log, Path packagePath, String packageName, String typeName, Collection<GqlSelection> selections) {
+		String className = typeName + "Result";
+		Path path = packagePath.resolve(className + FILE_EXTENSION);
+		try {
+			CFG.setSharedVariable(CLASS_NAME_KEY, className);
+			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, packageName);
+		} catch (TemplateModelException e) {
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
+			return;
+		}
+		try (Writer writer = writerFactory.getWriter(path)) {
+			CFG.getTemplate(DYNAMIC_OPERATION_RESULT_TEMPLATE).process(singletonMap("selections", selections), writer);
+		} catch (TemplateException | IOException e) {
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
+		}
+		selections.forEach(selection -> {
+			if (selection.getSelections() == null || selection.getSelections().isEmpty()) {
+				return;
+			}
+			makeDynamicOperationSelections(log,
+				packagePath.resolve(selection.getName()),
+				packageName + "." + selection.getName(),
+				selection.getType().getInner(),
+				selection.getSelections());
+		});
+	}
 
 	private static String firstUpper(String s) {
 		return s.substring(0, 1).toUpperCase() + s.substring(1);

@@ -31,7 +31,7 @@ public class SchemaTranslator implements Translator {
 		definitions.stream()
 			.map(SchemaDefinition::getOperationTypeDefinitions)
 			.flatMap(Collection::stream)
-			.forEach(def -> ctx.getSchema().put(def.getName(), def.getTypeName().getName()));
+			.forEach(definition -> ctx.getSchema().put(definition.getName(), definition.getTypeName().getName()));
 	}
 
 }

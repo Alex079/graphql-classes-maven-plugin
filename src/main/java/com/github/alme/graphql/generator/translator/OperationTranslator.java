@@ -2,6 +2,7 @@ package com.github.alme.graphql.generator.translator;
 
 import static java.util.stream.Collectors.toSet;
 
+import static com.github.alme.graphql.generator.translator.Util.createFullSelection;
 import static com.github.alme.graphql.generator.translator.Util.fromVariableDef;
 import static com.github.alme.graphql.generator.translator.Util.translateSelection;
 
@@ -47,7 +48,7 @@ public class OperationTranslator implements Translator {
 		Collection<OperationDefinition> operations = doc.getDefinitionsOfType(OperationDefinition.class);
 		Collection<FragmentDefinition> allFragments = doc.getDefinitionsOfType(FragmentDefinition.class);
 		populate(ctx, operations, allFragments);
-//		populateFromSchema(ctx);
+		populateFromSchema(ctx);
 	}
 
 	private void populate(GqlContext ctx, Collection<OperationDefinition> definitions, Collection<FragmentDefinition> allFragments) {
@@ -79,12 +80,12 @@ public class OperationTranslator implements Translator {
 		}
 	}
 
-//	private void populateFromSchema(GqlContext ctx) {
-//		ctx.getSchema().forEach((operation, typeName) ->
-//			ctx.getDynamicOperations().add(
-//				new GqlOperation(null, operation, typeName, null)
-//					.addSelections(createFullSelection(ctx, typeName)))
-//		);
-//	}
+	private void populateFromSchema(GqlContext ctx) {
+		ctx.getSchema().forEach((operation, typeName) ->
+			ctx.getDynamicOperations().add(
+				new GqlOperation(null, operation, typeName, null)
+					.addSelections(createFullSelection(ctx, typeName)))
+		);
+	}
 
 }

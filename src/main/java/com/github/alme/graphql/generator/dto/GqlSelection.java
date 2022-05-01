@@ -10,6 +10,7 @@ public class GqlSelection {
 
 	String name;
 	GqlType type;
+	String containerTypeName;
 	Collection<GqlSelection> selections = new HashSet<>();
 
 	public GqlSelection addSelections(Collection<GqlSelection> selections) {

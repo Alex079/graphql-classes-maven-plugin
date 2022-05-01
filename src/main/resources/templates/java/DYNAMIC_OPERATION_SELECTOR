@@ -1,0 +1,59 @@
+//CHECKSTYLE:OFF
+package ${currentPackage};
+
+<#list importPackages as i>
+import ${i}.*;
+</#list>
+
+${generatedAnnotation!}
+@SuppressWarnings({"all", "PMD"})
+public class ${className} {
+	private final StringBuilder documentBuilder;
+	public ${className}(StringBuilder documentBuilder) {
+		this.documentBuilder = documentBuilder;
+	}
+	<#list selections as typeName, fields>
+		<#if typeName?has_content>
+			public ${className} on${typeName}(java.util.function.Consumer<${typeName}> selectorFunction) {
+				documentBuilder.append(" ...on ${typeName} {");
+				selectorFunction.accept(new ${typeName}());
+				documentBuilder.append(" }");
+				return this;
+			}
+			public class ${typeName} {
+			<#list fields as field>
+				<#if field.selections?has_content>
+					public ${typeName} with${field.name?cap_first}(java.util.function.Consumer<${currentPackage}.${field.name}.${field.type.inner}Selector> selectorFunction) {
+						documentBuilder.append(" ${field.containerTypeName?uncap_first}${field.name?cap_first}: ${field.name} {");
+						selectorFunction.accept(new ${currentPackage}.${field.name}.${field.type.inner}Selector(documentBuilder));
+						documentBuilder.append(" }");
+						return this;
+					}
+				<#else>
+					public ${typeName} with${field.name?cap_first}() {
+						documentBuilder.append(" ${field.containerTypeName?uncap_first}${field.name?cap_first}: ${field.name}");
+						return this;
+					}
+				</#if>
+			</#list>
+			}
+		<#else>
+			<#list fields as field>
+				<#if field.selections?has_content>
+					public ${className} with${field.name?cap_first}(java.util.function.Consumer<${currentPackage}.${field.name}.${field.type.inner}Selector> selectorFunction) {
+						documentBuilder.append(" ${field.name} {");
+						selectorFunction.accept(new ${currentPackage}.${field.name}.${field.type.inner}Selector(documentBuilder));
+						documentBuilder.append(" }");
+						return this;
+					}
+				<#else>
+					public ${className} with${field.name?cap_first}() {
+						documentBuilder.append(" ${field.name}");
+						return this;
+					}
+				</#if>
+			</#list>
+		</#if>
+	</#list>
+}
+//CHECKSTYLE:ON

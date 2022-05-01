@@ -131,7 +131,7 @@ class OperationTranslatorTest {
 				assertThat(operation.getVariables()).isEmpty();
 				assertThat(operation.getSelections())
 					.hasSize(1)
-					.first().isEqualTo(new GqlSelection("f", GqlType.named("String")));
+					.first().isEqualTo(new GqlSelection("f", GqlType.named("String"), ""));
 			});
 	}
 
@@ -201,10 +201,10 @@ class OperationTranslatorTest {
 				assertThat(operation.getSelections())
 					.hasSize(2)
 					.containsExactlyInAnyOrder(
-						new GqlSelection("a", GqlType.named("Type1"))
-							.addSelections(singletonList(new GqlSelection("field1", GqlType.mandatory(GqlType.named("CustomType1"))))),
-						new GqlSelection("b", GqlType.named("Type2"))
-							.addSelections(singletonList(new GqlSelection("f2", GqlType.mandatory(GqlType.named("CustomType2")))))
+						new GqlSelection("a", GqlType.named("Type1"), "")
+							.addSelections(singletonList(new GqlSelection("field1", GqlType.mandatory(GqlType.named("CustomType1")), ""))),
+						new GqlSelection("b", GqlType.named("Type2"), "")
+							.addSelections(singletonList(new GqlSelection("f2", GqlType.mandatory(GqlType.named("CustomType2")), "")))
 					);
 			});
 	}
@@ -246,7 +246,7 @@ class OperationTranslatorTest {
 					.first().isEqualTo(new GqlField("v", GqlType.named("InputType")));
 				assertThat(operation.getSelections())
 					.hasSize(1)
-					.first().isEqualTo(new GqlSelection("a", GqlType.named("Type1")));
+					.first().isEqualTo(new GqlSelection("a", GqlType.named("Type1"), ""));
 			});
 	}
 
