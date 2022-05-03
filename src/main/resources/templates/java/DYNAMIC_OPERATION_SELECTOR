@@ -23,9 +23,9 @@ public class ${className} {
 			public class ${typeName} {
 			<#list fields as field>
 				<#if field.selections?has_content>
-					public ${typeName} with${field.name?cap_first}(java.util.function.Consumer<${currentPackage}.${field.name}.${field.type.inner}Selector> selectorFunction) {
+					public ${typeName} with${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> selectorFunction) {
 						documentBuilder.append(" ${field.containerTypeName?uncap_first}${field.name?cap_first}: ${field.name} {");
-						selectorFunction.accept(new ${currentPackage}.${field.name}.${field.type.inner}Selector(documentBuilder));
+						selectorFunction.accept(new ${field.type.inner}Selector(documentBuilder));
 						documentBuilder.append(" }");
 						return this;
 					}
@@ -40,9 +40,9 @@ public class ${className} {
 		<#else>
 			<#list fields as field>
 				<#if field.selections?has_content>
-					public ${className} with${field.name?cap_first}(java.util.function.Consumer<${currentPackage}.${field.name}.${field.type.inner}Selector> selectorFunction) {
+					public ${className} with${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> selectorFunction) {
 						documentBuilder.append(" ${field.name} {");
-						selectorFunction.accept(new ${currentPackage}.${field.name}.${field.type.inner}Selector(documentBuilder));
+						selectorFunction.accept(new ${field.type.inner}Selector(documentBuilder));
 						documentBuilder.append(" }");
 						return this;
 					}

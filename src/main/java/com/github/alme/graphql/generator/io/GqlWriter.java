@@ -46,6 +46,8 @@ public class GqlWriter {
 	private static final String FILE_EXTENSION = ".java";
 	private static final String SCHEMA_TYPES_PACKAGE_KEY = "schemaTypesPackage";
 	private static final String OPERATIONS_PACKAGE_KEY = "operationsPackage";
+	private static final String RESULTS_PACKAGE_KEY = "resultsPackage";
+	private static final String SELECTORS_PACKAGE_KEY = "selectorsPackage";
 	private static final String CURRENT_PACKAGE_KEY = "currentPackage";
 	private static final String LOG_CANNOT_CREATE = "Cannot create [%s].";
 	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_31);
@@ -67,6 +69,8 @@ public class GqlWriter {
 		try {
 			CFG.setSharedVariable(SCHEMA_TYPES_PACKAGE_KEY, configuration.getSchemaTypesPackageName());
 			CFG.setSharedVariable(OPERATIONS_PACKAGE_KEY, configuration.getOperationsPackageName());
+			CFG.setSharedVariable(RESULTS_PACKAGE_KEY, configuration.getResultsPackageName());
+			CFG.setSharedVariable(SELECTORS_PACKAGE_KEY, configuration.getSelectorsPackageName());
 			CFG.setSharedVariable(JSON_PROPERTY_KEY, configuration.getJsonPropertyAnnotation());
 			CFG.setSharedVariable(METHOD_CHAINING_KEY, configuration.isGenerateMethodChaining());
 			CFG.setSharedVariable(DTO_BUILDER_KEY, configuration.isGenerateDtoBuilder());
@@ -100,7 +104,12 @@ public class GqlWriter {
 			context.getDefinedOperations().forEach((name, operation) -> makeDefinedOperation(log, configuration, name, operation));
 		}
 		if (generateDynamicOperations) {
-			context.getDynamicOperations().forEach(operation -> makeDynamicOperation(log, configuration, operation));
+			context.getDynamicSelections().forEach((typeName, selections) -> {
+				makeDynamicOperationResult(log, configuration, typeName, selections);
+				makeDynamicOperationSelector(log, configuration, typeName, selections);
+			});
+			context.getDynamicOperations().forEach(operation ->
+				makeDynamicOperation(log, configuration, operation));
 		}
 		CFG.clearSharedVariables();
 	}
@@ -147,7 +156,7 @@ public class GqlWriter {
 			makeOperationVariables(log, currentPackagePath, currentPackageName, name, operation);
 		}
 		if (!operation.getSelections().isEmpty()) {
-			makeDefinedOperationSelections(log, currentPackagePath, currentPackageName, className, operation.getSelections());
+			makeDefinedOperationResult(log, currentPackagePath, currentPackageName, className, operation.getSelections());
 		}
 	}
 
@@ -169,7 +178,7 @@ public class GqlWriter {
 		}
 	}
 
-	private void makeDefinedOperationSelections(Log log, Path packagePath, String packageName, String typeName, Collection<GqlSelection> selections) {
+	private void makeDefinedOperationResult(Log log, Path packagePath, String packageName, String typeName, Collection<GqlSelection> selections) {
 		String className = typeName + "Result";
 		Path path = packagePath.resolve(className + FILE_EXTENSION);
 		try {
@@ -188,7 +197,7 @@ public class GqlWriter {
 			if (selection.getSelections() == null || selection.getSelections().isEmpty()) {
 				return;
 			}
-			makeDefinedOperationSelections(log,
+			makeDefinedOperationResult(log,
 				packagePath.resolve(selection.getName()),
 				packageName + "." + selection.getName(),
 				selection.getType().getInner(),
@@ -214,20 +223,17 @@ public class GqlWriter {
 			CFG.getTemplate(DYNAMIC_OPERATION_TEMPLATE).process(operation, writer);
 		} catch (TemplateException | IOException e) {
 			log.error(String.format(LOG_CANNOT_CREATE, path), e);
-			return;
-		}
-		if (!operation.getSelections().isEmpty()) {
-			makeDynamicOperationSelector(log, currentPackagePath, currentPackageName, className, operation.getSelections());
-			makeDynamicOperationSelections(log, currentPackagePath, currentPackageName, className, operation.getSelections());
 		}
 	}
 
-	private void makeDynamicOperationSelector(Log log, Path packagePath, String packageName, String typeName, Collection<GqlSelection> selections) {
+	private void makeDynamicOperationSelector(Log log, GqlConfiguration configuration, String typeName, Collection<GqlSelection> selections) {
+		String currentPackageName = configuration.getSelectorsPackageName();
+		Path currentPackagePath = configuration.getSelectorsPackagePath();
 		String className = typeName + "Selector";
-		Path path = packagePath.resolve(className + FILE_EXTENSION);
+		Path path = currentPackagePath.resolve(className + FILE_EXTENSION);
 		try {
 			CFG.setSharedVariable(CLASS_NAME_KEY, className);
-			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, packageName);
+			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, currentPackageName);
 		} catch (TemplateModelException e) {
 			log.error(String.format(LOG_CANNOT_CREATE, path), e);
 			return;
@@ -239,24 +245,16 @@ public class GqlWriter {
 		} catch (TemplateException | IOException e) {
 			log.error(String.format(LOG_CANNOT_CREATE, path), e);
 		}
-		selections.forEach(selection -> {
-			if (selection.getSelections() == null || selection.getSelections().isEmpty()) {
-				return;
-			}
-			makeDynamicOperationSelector(log,
-				packagePath.resolve(selection.getName()),
-				packageName + "." + selection.getName(),
-				selection.getType().getInner(),
-				selection.getSelections());
-		});
 	}
 
-	private void makeDynamicOperationSelections(Log log, Path packagePath, String packageName, String typeName, Collection<GqlSelection> selections) {
+	private void makeDynamicOperationResult(Log log, GqlConfiguration configuration, String typeName, Collection<GqlSelection> selections) {
+		String currentPackageName = configuration.getResultsPackageName();
+		Path currentPackagePath = configuration.getResultsPackagePath();
 		String className = typeName + "Result";
-		Path path = packagePath.resolve(className + FILE_EXTENSION);
+		Path path = currentPackagePath.resolve(className + FILE_EXTENSION);
 		try {
 			CFG.setSharedVariable(CLASS_NAME_KEY, className);
-			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, packageName);
+			CFG.setSharedVariable(CURRENT_PACKAGE_KEY, currentPackageName);
 		} catch (TemplateModelException e) {
 			log.error(String.format(LOG_CANNOT_CREATE, path), e);
 			return;
@@ -266,16 +264,6 @@ public class GqlWriter {
 		} catch (TemplateException | IOException e) {
 			log.error(String.format(LOG_CANNOT_CREATE, path), e);
 		}
-		selections.forEach(selection -> {
-			if (selection.getSelections() == null || selection.getSelections().isEmpty()) {
-				return;
-			}
-			makeDynamicOperationSelections(log,
-				packagePath.resolve(selection.getName()),
-				packageName + "." + selection.getName(),
-				selection.getType().getInner(),
-				selection.getSelections());
-		});
 	}
 
 	private static String firstUpper(String s) {

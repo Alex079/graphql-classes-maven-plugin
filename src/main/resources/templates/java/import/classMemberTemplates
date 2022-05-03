@@ -12,8 +12,8 @@
 	</#switch>
 </#macro>
 
-<#function getFieldType field>
-	<#return field.selections?has_content?then(field.type.getCustom(currentPackage+'.'+field.name+'.'+field.type.inner+'Result'),field.type.full) />
+<#function getFieldType field nested>
+	<#return field.selections?has_content?then(field.type.getCustom(currentPackage+nested?then('.'+field.name,'')+'.'+field.type.inner+'Result'),field.type.full) />
 </#function>
 
 <#function getFieldName field>
@@ -28,21 +28,21 @@
 	</#if>
 </#function>
 
-<#macro addField field indent>
+<#macro addField field indent nested>
 	<#if jsonProperty?has_content>
 		<#lt/>${indent}@${jsonProperty}("${getFieldAnnotation(field)}")
 	</#if>
-	<#lt/>${indent}private ${getFieldType(field)} ${getFieldName(field)}<#if jsonProperty?has_content>__</#if> = null;
+	<#lt/>${indent}private ${getFieldType(field,nested)} ${getFieldName(field)}<#if jsonProperty?has_content>__</#if> = null;
 </#macro>
 
-<#macro addGetter field indent>
-	<#lt/>${indent}public ${getFieldType(field)} get${getFieldName(field)?cap_first}() {
+<#macro addGetter field indent nested>
+	<#lt/>${indent}public ${getFieldType(field,nested)} get${getFieldName(field)?cap_first}() {
 	<#lt/>${indent}	return this.${getFieldName(field)}<#if jsonProperty?has_content>__</#if>;
 	<#lt/>${indent}}
 </#macro>
 
-<#macro addSetter className field indent>
-	<#lt/>${indent}public ${methodChaining?then(className,"void")} set${getFieldName(field)?cap_first}(${getFieldType(field)} v) {
+<#macro addSetter className field indent nested>
+	<#lt/>${indent}public ${methodChaining?then(className,"void")} set${getFieldName(field)?cap_first}(${getFieldType(field,nested)} v) {
 	<#lt/>${indent}	java.util.stream.Stream.of(v)
 	<@addNullCheck fieldType=field.type indent=indent+'\t\t'/>
 	<#lt/>${indent}		.forEach($ -> {});
@@ -94,10 +94,10 @@
 	<#lt/>${indent}}
 </#macro>
 
-<#macro addConstructor className fields indent>
+<#macro addConstructor className fields indent nested>
 	<#lt/>${indent}private ${className}(
 	<#list fields as field>
-		<#lt/>${indent}	${getFieldType(field)} ${getFieldName(field)}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
+		<#lt/>${indent}	${getFieldType(field,nested)} ${getFieldName(field)}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
 	</#list>
 	<#lt/>${indent}) {
 	<#list fields as field>

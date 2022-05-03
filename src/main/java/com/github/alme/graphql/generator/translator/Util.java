@@ -17,6 +17,7 @@ import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlSelection;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 import com.github.alme.graphql.generator.dto.GqlType;
+
 import graphql.language.Field;
 import graphql.language.FieldDefinition;
 import graphql.language.FragmentDefinition;
@@ -46,55 +47,6 @@ public class Util {
 			return GqlType.named(ctx.getScalars().getOrDefault(name, name));
 		}
 		return null;
-	}
-
-	public static Collection<GqlSelection> createFullSelection(GqlContext ctx, String typeName) {
-		Collection<GqlSelection> result = new ArrayList<>();
-		Optional.ofNullable(ctx.getObjectTypes().get(typeName))
-			.ifPresent(objectType -> objectType.getFields().stream()
-				.map(field -> {
-					GqlType type = field.getType();
-					return new GqlSelection(field.getName(), type, "")
-						.addSelections(createFullSelection(ctx, type.getInner()));
-				})
-				.forEach(result::add)
-			);
-		Optional.ofNullable(ctx.getInterfaceTypes().get(typeName))
-			.ifPresent(interfaceType -> {
-				Set<String> uniqueNames = new HashSet<>();
-				interfaceType.getFields().stream()
-					.map(field -> {
-						String name = field.getName();
-						uniqueNames.add(name);
-						GqlType type = field.getType();
-						return new GqlSelection(name, type, "")
-							.addSelections(createFullSelection(ctx, type.getInner()));
-					})
-					.forEach(result::add);
-				ctx.getObjectTypes().values().stream()
-					.filter(objectType -> objectType.getMembers().contains(interfaceType.getName()))
-					.flatMap(objectType -> objectType.getFields().stream()
-						.filter(field -> !uniqueNames.contains(field.getName()))
-						.map(field -> {
-							GqlType type = field.getType();
-							return new GqlSelection(field.getName(), type, objectType.getName()).addSelections(createFullSelection(ctx, type.getInner()));
-						})
-					)
-					.forEach(result::add);
-			});
-		Optional.ofNullable(ctx.getUnionTypes().get(typeName))
-			.ifPresent(unionType -> {
-				ctx.getObjectTypes().values().stream()
-					.filter(objectType -> objectType.getMembers().contains(unionType.getName()))
-					.flatMap(objectType -> objectType.getFields().stream()
-						.map(field -> {
-							GqlType type = field.getType();
-							return new GqlSelection(field.getName(), type, objectType.getName()).addSelections(createFullSelection(ctx, type.getInner()));
-						})
-					)
-					.forEach(result::add);
-			});
-		return result;
 	}
 
 	public static Collection<GqlSelection> translateSelection(

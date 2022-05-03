@@ -18,21 +18,31 @@ public class OutputDirectoryParameterApplier implements ParameterApplier {
 	private final String packageName;
 
 	private static final String TYPES_SUBPACKAGE = ".types";
+	private static final String RESULTS_SUBPACKAGE = ".results";
+	private static final String SELECTORS_SUBPACKAGE = ".selectors";
 	private static final String SUBPACKAGE_SEPARATOR = ".";
 
 	@Override
 	public void apply(GqlConfigurationBuilder builder) {
 		String schemaTypesPackageName = packageName + TYPES_SUBPACKAGE;
 		String operationsPackageName = packageName;
+		String resultsPackageName = packageName + RESULTS_SUBPACKAGE;
+		String selectorsPackageName = packageName + SELECTORS_SUBPACKAGE;
 		Path outputRoot = getOutputDirectory(outputDirectory);
 		Path schemaTypesPackagePath = outputRoot.resolve(schemaTypesPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
 		Path operationsPackagePath = outputRoot.resolve(operationsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
+		Path resultsPackagePath = outputRoot.resolve(resultsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
+		Path selectorsPackagePath = outputRoot.resolve(selectorsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
 		builder
 			.outputRoot(outputRoot)
 			.schemaTypesPackageName(schemaTypesPackageName)
 			.operationsPackageName(operationsPackageName)
+			.resultsPackageName(resultsPackageName)
+			.selectorsPackageName(selectorsPackageName)
 			.schemaTypesPackagePath(schemaTypesPackagePath)
-			.operationsPackagePath(operationsPackagePath);
+			.operationsPackagePath(operationsPackagePath)
+			.resultsPackagePath(resultsPackagePath)
+			.selectorsPackagePath(selectorsPackagePath);
 	}
 
 	private Path getOutputDirectory(File outputDirectory) {

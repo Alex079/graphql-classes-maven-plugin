@@ -60,7 +60,7 @@ class GqlReaderTest {
 		when(readerFactory.getReader()).thenReturn(new StringReader(MINIMAL_SCHEMA));
 		GqlContext context = new GqlContext(log, emptyMap());
 
-		reader.read(context, MINIMAL_CONFIG);
+		reader.read(context, GqlConfiguration.builder().generateSchemaOtherTypes(true).build());
 
 		assertThat(context.getObjectTypes())
 			.hasSize(1)

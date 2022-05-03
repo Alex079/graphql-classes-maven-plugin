@@ -19,6 +19,7 @@ public class GqlContext {
 	Map<Structure, Map<String, GqlStructure>> structures = new EnumMap<>(Structure.class);
 	Map<String, GqlOperation> definedOperations = new HashMap<>();
 	Collection<GqlOperation> dynamicOperations = new HashSet<>();
+	Map<String, Collection<GqlSelection>> dynamicSelections = new HashMap<>();
 
 	private Map<String, GqlStructure> getStructures(Structure category) {
 		return structures.computeIfAbsent(category, s -> new HashMap<>());

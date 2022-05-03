@@ -69,12 +69,34 @@ type Query {
 	trackingInfoConnection(itemId: ID! first: Int after: String): TrackConnection @connection(for:"Track")
 }
 
+type Group {
+	name: String
+	users: [User]
+}
+
+type Channel {
+	name: String
+	users: [User]
+}
+
+type User {
+	name: String
+	membership: [GrCh]
+}
+
+input UserInput {
+	name: String
+}
+
+union GrCh = Group | Channel
+
 interface I1 {id:ID}
 type T1 implements I1 {id:ID name:String}
 
 type Mutation {
 	delivered(item: SoldItem!): Track! @currentDate
-	test1: I1
+	test1(user: UserInput): GrCh
+	test2: I1
 }
 
 {

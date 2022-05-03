@@ -20,9 +20,9 @@ implements ${operationsPackage}.${interfaceName}
 		return document;
 	}
 
-	public ${className}(java.util.function.Consumer<${className}Selector> selectorFunction) {
+	public ${className}(java.util.function.Consumer<${selectorsPackage}.${interfaceName}Selector> selectorFunction) {
 		StringBuilder documentBuilder = new StringBuilder("${operation} {");
-		selectorFunction.accept(new ${className}Selector(documentBuilder));
+		selectorFunction.accept(new ${selectorsPackage}.${interfaceName}Selector(documentBuilder));
 		this.document = documentBuilder.append(" }").toString();
 	}
 

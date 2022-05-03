@@ -14,24 +14,24 @@ implements ${members?join(", ")}
 </#if>
 {
 	<#list fields as field>
-		<@classMembers.addField field=field indent='\t'/>
-		<@classMembers.addGetter field=field indent='\t'/>
+		<@classMembers.addField field=field indent='\t' nested=false/>
+		<@classMembers.addGetter field=field indent='\t' nested=false/>
 		<#if !dtoBuilder>
-			<@classMembers.addSetter className=name field=field indent='\t'/>
+			<@classMembers.addSetter className=name field=field indent='\t' nested=false/>
 		</#if>
 	</#list>
 	<@classMembers.addEquals className=name fields=fields indent='\t'/>
 	<@classMembers.addHashCode fields=fields indent='\t'/>
 	<@classMembers.addToString fields=fields indent='\t'/>
 	<#if dtoBuilder>
-		<@classMembers.addConstructor className=name fields=fields indent='\t'/>
+		<@classMembers.addConstructor className=name fields=fields indent='\t' nested=false/>
 		<@classMembers.addBuilderMethod indent='\t'/>
 		<#lt/>	public static class Builder
 		<#lt/>	{
 		<#lt/>		private Builder() { }
 		<#list fields as field>
-			<@classMembers.addField field=field indent='\t\t'/>
-			<@classMembers.addSetter className='Builder' field=field indent='\t\t'/>
+			<@classMembers.addField field=field indent='\t\t' nested=false/>
+			<@classMembers.addSetter className='Builder' field=field indent='\t\t' nested=false/>
 		</#list>
 		<@classMembers.addBuildMethod resultClassName=name fields=fields indent='\t\t'/>
 		<#lt/>	}

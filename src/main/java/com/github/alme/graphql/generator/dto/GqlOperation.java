@@ -3,9 +3,13 @@ package com.github.alme.graphql.generator.dto;
 import java.util.Collection;
 import java.util.HashSet;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.Value;
 
 @Value
+@EqualsAndHashCode(exclude = {"selections", "variables"})
+@ToString(exclude = {"selections", "variables"})
 public class GqlOperation {
 
 	String name;
@@ -16,12 +20,16 @@ public class GqlOperation {
 	Collection<GqlSelection> selections = new HashSet<>();
 
 	public GqlOperation addVariables(Collection<GqlField> variables) {
-		this.variables.addAll(variables);
+		if (variables != null) {
+			this.variables.addAll(variables);
+		}
 		return this;
 	}
 
 	public GqlOperation addSelections(Collection<GqlSelection> selections) {
-		this.selections.addAll(selections);
+		if (selections != null) {
+			this.selections.addAll(selections);
+		}
 		return this;
 	}
 

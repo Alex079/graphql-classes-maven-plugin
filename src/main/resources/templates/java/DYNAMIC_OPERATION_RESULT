@@ -13,24 +13,24 @@ ${generatedAnnotation!}
 public class ${className}
 {
 	<#list selections as field>
-		<@classMembers.addField field=field indent='\t'/>
-		<@classMembers.addGetter field=field indent='\t'/>
+		<@classMembers.addField field=field indent='\t' nested=false/>
+		<@classMembers.addGetter field=field indent='\t' nested=false/>
 		<#if !dtoBuilder>
-			<@classMembers.addSetter className=className field=field indent='\t'/>
+			<@classMembers.addSetter className=className field=field indent='\t' nested=false/>
 		</#if>
 	</#list>
 	<@classMembers.addEquals className=className fields=selections indent='\t'/>
 	<@classMembers.addHashCode fields=selections indent='\t'/>
 	<@classMembers.addToString fields=selections indent='\t'/>
 	<#if dtoBuilder>
-		<@classMembers.addConstructor className=className fields=selections indent='\t'/>
+		<@classMembers.addConstructor className=className fields=selections indent='\t' nested=false/>
 		<@classMembers.addBuilderMethod indent='\t'/>
 		<#lt/>	public static class Builder
 		<#lt/>	{
 		<#lt/>		private Builder() { }
 		<#list selections as field>
-			<@classMembers.addField field=field indent='\t\t'/>
-			<@classMembers.addSetter className='Builder' field=field indent='\t\t'/>
+			<@classMembers.addField field=field indent='\t\t' nested=false/>
+			<@classMembers.addSetter className='Builder' field=field indent='\t\t' nested=false/>
 		</#list>
 		<@classMembers.addBuildMethod resultClassName=className fields=selections indent='\t\t'/>
 		<#lt/>	}

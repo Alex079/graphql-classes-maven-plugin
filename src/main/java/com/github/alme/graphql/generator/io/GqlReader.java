@@ -7,6 +7,7 @@ import java.io.Reader;
 
 import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
+import com.github.alme.graphql.generator.translator.DynamicOperationTranslator;
 import com.github.alme.graphql.generator.translator.EnumTypeTranslator;
 import com.github.alme.graphql.generator.translator.InputObjectTypeTranslator;
 import com.github.alme.graphql.generator.translator.InterfaceTypeTranslator;
@@ -37,25 +38,46 @@ public class GqlReader {
 			Document doc = new Parser().parseDocument(reader, configuration.getParserOptions());
 			log.info(format(LOG_PARSER, doc.getDefinitions().size()));
 
-			new EnumTypeTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getEnumTypes().size(), "Enum type"));
+			boolean generateSchemaInputTypes = configuration.isGenerateSchemaInputTypes();
+			boolean generateSchemaOtherTypes = configuration.isGenerateSchemaOtherTypes();
 
-			new InterfaceTypeTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getInterfaceTypes().size(), "Interface type"));
+			if (generateSchemaInputTypes) {
+				new InputObjectTypeTranslator().translate(doc, context);
+				log.info(format(LOG_TRANSLATOR, context.getInputObjectTypes().size(), "Input Object type"));
+			}
 
-			new InputObjectTypeTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getInputObjectTypes().size(), "Input Object type"));
+			if (generateSchemaInputTypes || generateSchemaOtherTypes) {
+				new EnumTypeTranslator().translate(doc, context);
+				log.info(format(LOG_TRANSLATOR, context.getEnumTypes().size(), "Enum type"));
+			}
 
-			new ObjectTypeTranslator().translate(doc, context);
-			new RelayConnectionTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getObjectTypes().size(), "Object type"));
+			if (generateSchemaOtherTypes) {
+				new InterfaceTypeTranslator().translate(doc, context);
+				log.info(format(LOG_TRANSLATOR, context.getInterfaceTypes().size(), "Interface type"));
 
-			new UnionTypeTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getUnionTypes().size(), "Union type"));
+				new ObjectTypeTranslator().translate(doc, context);
+				new RelayConnectionTranslator().translate(doc, context);
+				log.info(format(LOG_TRANSLATOR, context.getObjectTypes().size(), "Object type"));
 
-			new SchemaTranslator().translate(doc, context);
-			new OperationTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getDefinedOperations().size(), "Operation"));
+				new UnionTypeTranslator().translate(doc, context);
+				log.info(format(LOG_TRANSLATOR, context.getUnionTypes().size(), "Union type"));
+			}
+
+			boolean generateDefinedOperations = configuration.isGenerateDefinedOperations();
+			boolean generateDynamicOperations = configuration.isGenerateDynamicOperations();
+
+			if (generateDefinedOperations || generateDynamicOperations) {
+				new SchemaTranslator().translate(doc, context);
+				log.info(format(LOG_TRANSLATOR, context.getSchema().size(), "Schema"));
+			}
+			if (generateDefinedOperations) {
+				new OperationTranslator().translate(doc, context);
+				log.info(format(LOG_TRANSLATOR, context.getDefinedOperations().size(), "Defined operation"));
+			}
+			if (generateDynamicOperations) {
+				new DynamicOperationTranslator().translate(doc, context);
+				log.info(format(LOG_TRANSLATOR, context.getDynamicOperations().size(), "Dynamic operation"));
+			}
 		}
 		catch (IOException e) {
 			log.error(e);
