@@ -50,7 +50,7 @@ public class GqlConfiguration {
 	public enum GeneratedOutputType {
 		SCHEMA_TYPES,
 		DEFINED_OPERATIONS,
-		DYNAMIC_OPERATIONS,
+//		DYNAMIC_OPERATIONS,
 	}
 
 	public enum DataObjectEnhancementType {

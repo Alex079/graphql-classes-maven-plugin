@@ -24,14 +24,14 @@ public class ${className} {
 			<#list fields as field>
 				<#if field.selections?has_content>
 					public ${typeName} with${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> selectorFunction) {
-						documentBuilder.append(" ${field.containerTypeName?uncap_first}${field.name?cap_first}: ${field.name} {");
+						documentBuilder.append(" ${field.fragmentTypeName?uncap_first}${field.name?cap_first}: ${field.name} {");
 						selectorFunction.accept(new ${field.type.inner}Selector(documentBuilder));
 						documentBuilder.append(" }");
 						return this;
 					}
 				<#else>
 					public ${typeName} with${field.name?cap_first}() {
-						documentBuilder.append(" ${field.containerTypeName?uncap_first}${field.name?cap_first}: ${field.name}");
+						documentBuilder.append(" ${field.fragmentTypeName?uncap_first}${field.name?cap_first}: ${field.name}");
 						return this;
 					}
 				</#if>

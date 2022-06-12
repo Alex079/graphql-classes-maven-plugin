@@ -16,12 +16,12 @@ public class OutputTypesParameterApplier implements ParameterApplier {
 	public void apply(GqlConfigurationBuilder builder) {
 		if (generatedOutputTypes != null) {
 			boolean definedOperations = generatedOutputTypes.contains(GeneratedOutputType.DEFINED_OPERATIONS);
-			boolean dynamicOperations = generatedOutputTypes.contains(GeneratedOutputType.DYNAMIC_OPERATIONS);
+			//boolean dynamicOperations = generatedOutputTypes.contains(GeneratedOutputType.DYNAMIC_OPERATIONS);
 			boolean schemaTypes = generatedOutputTypes.contains(GeneratedOutputType.SCHEMA_TYPES);
 			builder
 				.generateDefinedOperations(definedOperations)
-				.generateDynamicOperations(dynamicOperations)
-				.generateSchemaInputTypes(schemaTypes || definedOperations || dynamicOperations)
+				//.generateDynamicOperations(dynamicOperations)
+				.generateSchemaInputTypes(schemaTypes || definedOperations) //|| dynamicOperations)
 				.generateSchemaOtherTypes(schemaTypes);
 		}
 	}

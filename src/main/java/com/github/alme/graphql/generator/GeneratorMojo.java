@@ -114,8 +114,7 @@ public class GeneratorMojo extends AbstractMojo {
 	 * A set of output types
 	 * Can be empty or take values from the following list:
 	 * SCHEMA_TYPES (all the types defined in GraphQL schema files),
-	 * DEFINED_OPERATIONS (all the operations defined in input files),
-	 * DYNAMIC_OPERATIONS (one operation per schema entry allowing to construct operations at runtime)
+	 * DEFINED_OPERATIONS (all the operations defined in input files)
 	 */
 	@Parameter(property = "gql.generatedOutputTypes")
 	private Set<GqlConfiguration.GeneratedOutputType> generatedOutputTypes;

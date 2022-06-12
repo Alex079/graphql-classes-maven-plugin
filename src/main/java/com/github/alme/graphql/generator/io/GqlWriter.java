@@ -240,7 +240,7 @@ public class GqlWriter {
 		}
 		try (Writer writer = writerFactory.getWriter(path)) {
 			CFG.getTemplate(DYNAMIC_OPERATION_SELECTOR_TEMPLATE).process(
-				singletonMap("selections", selections.stream().collect(groupingBy(GqlSelection::getContainerTypeName))),
+				singletonMap("selections", selections.stream().collect(groupingBy(GqlSelection::getFragmentTypeName))),
 				writer);
 		} catch (TemplateException | IOException e) {
 			log.error(String.format(LOG_CANNOT_CREATE, path), e);

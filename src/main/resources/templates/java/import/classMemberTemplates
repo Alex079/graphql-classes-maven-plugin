@@ -13,16 +13,16 @@
 </#macro>
 
 <#function getFieldType field nested>
-	<#return field.selections?has_content?then(field.type.getCustom(currentPackage+nested?then('.'+field.name,'')+'.'+field.type.inner+'Result'),field.type.full) />
+	<#if field.selections?has_content>
+		<#return field.type.getCustom(currentPackage+nested?then('.'+field.name,'')+'.'+field.type.inner+'Result') />
+	<#else>
+		<#return field.type.full />
+	</#if>
 </#function>
 
 <#function getFieldName field>
-	<#return field.containerTypeName?has_content?then(field.containerTypeName?uncap_first+field.name?cap_first,field.name) />
-</#function>
-
-<#function getFieldAnnotation field>
-	<#if field.containerTypeName?has_content>
-		<#return field.containerTypeName?uncap_first+field.name?cap_first />
+	<#if field.fragmentTypeName?has_content>
+		<#return field.fragmentTypeName?uncap_first+field.name?cap_first />
 	<#else>
 		<#return field.name />
 	</#if>
@@ -30,7 +30,7 @@
 
 <#macro addField field indent nested>
 	<#if jsonProperty?has_content>
-		<#lt/>${indent}@${jsonProperty}("${getFieldAnnotation(field)}")
+		<#lt/>${indent}@${jsonProperty}("${getFieldName(field)}")
 	</#if>
 	<#lt/>${indent}private ${getFieldType(field,nested)} ${getFieldName(field)}<#if jsonProperty?has_content>__</#if> = null;
 </#macro>

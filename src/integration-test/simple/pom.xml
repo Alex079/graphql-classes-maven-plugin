@@ -78,7 +78,7 @@
 					</importPackages>
 					<generatedOutputTypes>
 						<value>DEFINED_OPERATIONS</value>
-						<value>DYNAMIC_OPERATIONS</value>
+<!--						<value>DYNAMIC_OPERATIONS</value>-->
 						<value>SCHEMA_TYPES</value>
 					</generatedOutputTypes>
 				</configuration>
