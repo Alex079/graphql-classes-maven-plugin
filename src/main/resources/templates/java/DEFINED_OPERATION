@@ -8,6 +8,15 @@ public class ${className} implements ${operationsPackage}.${interfaceName}
 {
 	private static final String OPERATION_NAME = <#if name?has_content>"${name}"<#else>null</#if>;
 	private static final String DOCUMENT = <#if text?has_content>"${text?j_string}"<#else>null</#if>;
+	<#if variables?has_content>
+	private final java.util.Map<String, Object> variables;
+
+	public ${className}(java.util.function.Consumer<${className}Variables> consumer) {
+		java.util.Map<String, Object> map = new java.util.HashMap<>();
+		consumer.accept(new ${className}Variables(map));
+		this.variables = java.util.Collections.unmodifiableMap(map);
+	}
+	</#if>
 
 	@Override
 	public String getOperationName() {
@@ -19,6 +28,15 @@ public class ${className} implements ${operationsPackage}.${interfaceName}
 		return DOCUMENT;
 	}
 
-	<@classMembers.addToString fields=[{'name':'document'}] indent='\t'/>
+	@Override
+	public java.util.Map<String, Object> getVariables() {
+		<#if variables?has_content>
+		return variables;
+		<#else>
+		return java.util.Collections.emptyMap();
+		</#if>
+	}
+
+	<@classMembers.addToString fields=[{'name':'operationName'},{'name':'document'},{'name':'variables'}] indent='\t'/>
 }
 //CHECKSTYLE:ON

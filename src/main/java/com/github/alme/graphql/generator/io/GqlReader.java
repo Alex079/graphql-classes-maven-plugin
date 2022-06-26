@@ -38,30 +38,21 @@ public class GqlReader {
 			Document doc = new Parser().parseDocument(reader, configuration.getParserOptions());
 			log.info(format(LOG_PARSER, doc.getDefinitions().size()));
 
-			boolean generateSchemaInputTypes = configuration.isGenerateSchemaInputTypes();
-			boolean generateSchemaOtherTypes = configuration.isGenerateSchemaOtherTypes();
+			new InputObjectTypeTranslator().translate(doc, context);
+			log.info(format(LOG_TRANSLATOR, context.getInputObjectTypes().size(), "Input Object type"));
 
-			if (generateSchemaInputTypes) {
-				new InputObjectTypeTranslator().translate(doc, context);
-				log.info(format(LOG_TRANSLATOR, context.getInputObjectTypes().size(), "Input Object type"));
-			}
+			new EnumTypeTranslator().translate(doc, context);
+			log.info(format(LOG_TRANSLATOR, context.getEnumTypes().size(), "Enum type"));
 
-			if (generateSchemaInputTypes || generateSchemaOtherTypes) {
-				new EnumTypeTranslator().translate(doc, context);
-				log.info(format(LOG_TRANSLATOR, context.getEnumTypes().size(), "Enum type"));
-			}
+			new InterfaceTypeTranslator().translate(doc, context);
+			log.info(format(LOG_TRANSLATOR, context.getInterfaceTypes().size(), "Interface type"));
 
-			if (generateSchemaOtherTypes) {
-				new InterfaceTypeTranslator().translate(doc, context);
-				log.info(format(LOG_TRANSLATOR, context.getInterfaceTypes().size(), "Interface type"));
+			new ObjectTypeTranslator().translate(doc, context);
+			new RelayConnectionTranslator().translate(doc, context);
+			log.info(format(LOG_TRANSLATOR, context.getObjectTypes().size(), "Object type"));
 
-				new ObjectTypeTranslator().translate(doc, context);
-				new RelayConnectionTranslator().translate(doc, context);
-				log.info(format(LOG_TRANSLATOR, context.getObjectTypes().size(), "Object type"));
-
-				new UnionTypeTranslator().translate(doc, context);
-				log.info(format(LOG_TRANSLATOR, context.getUnionTypes().size(), "Union type"));
-			}
+			new UnionTypeTranslator().translate(doc, context);
+			log.info(format(LOG_TRANSLATOR, context.getUnionTypes().size(), "Union type"));
 
 			boolean generateDefinedOperations = configuration.isGenerateDefinedOperations();
 			boolean generateDynamicOperations = configuration.isGenerateDynamicOperations();

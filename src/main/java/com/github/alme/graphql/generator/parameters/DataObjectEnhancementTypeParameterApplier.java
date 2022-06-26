@@ -11,13 +11,11 @@ public class DataObjectEnhancementTypeParameterApplier implements ParameterAppli
 
 	@Override
 	public void apply(GqlConfiguration.GqlConfigurationBuilder builder) {
-		if (dataObjectEnhancementType != null) {
-			builder
-				.generateMethodChaining(
-					dataObjectEnhancementType == GqlConfiguration.DataObjectEnhancementType.METHOD_CHAINING ||
-					dataObjectEnhancementType == GqlConfiguration.DataObjectEnhancementType.BUILDER)
-				.generateDtoBuilder(dataObjectEnhancementType == GqlConfiguration.DataObjectEnhancementType.BUILDER);
-		}
+		boolean needBuilder = dataObjectEnhancementType == GqlConfiguration.DataObjectEnhancementType.BUILDER;
+		boolean needChaining = dataObjectEnhancementType == GqlConfiguration.DataObjectEnhancementType.METHOD_CHAINING;
+		builder
+			.generateMethodChaining(needChaining || needBuilder)
+			.generateDtoBuilder(needBuilder);
 	}
 
 }

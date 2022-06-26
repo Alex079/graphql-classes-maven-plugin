@@ -12,29 +12,10 @@ ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
 public class ${className}
 {
-	<#list variables as field>
-		<@classMembers.addField field=field indent='\t' nested=false/>
-		<@classMembers.addGetter field=field indent='\t' nested=false/>
-		<#if !dtoBuilder>
-			<@classMembers.addSetter className=className field=field indent='\t' nested=false/>
-		</#if>
-	</#list>
-	<@classMembers.addAsMapMethod fields=variables indent='\t'/>
-	<@classMembers.addEquals className=className fields=variables indent='\t'/>
-	<@classMembers.addHashCode fields=variables indent='\t'/>
-	<@classMembers.addToString fields=variables indent='\t'/>
-	<#if dtoBuilder>
-		<@classMembers.addConstructor className=className fields=variables indent='\t' nested=false/>
-		<@classMembers.addBuilderMethod indent='\t'/>
-		<#lt/>	public static class Builder
-		<#lt/>	{
-		<#lt/>		private Builder() { }
-		<#list variables as field>
-			<@classMembers.addField field=field indent='\t\t' nested=false/>
-			<@classMembers.addSetter className='Builder' field=field indent='\t\t' nested=false/>
-		</#list>
-		<@classMembers.addBuildMethod resultClassName=className fields=variables indent='\t\t'/>
-		<#lt/>	}
-	</#if>
+	private final java.util.Map<String, Object> map;
+	public ${className}(java.util.Map<String, Object> map) {
+		this.map = map;
+	}
+	<@classMembers.addVariables className=className variables=variables indent='\t'/>
 }
 //CHECKSTYLE:ON

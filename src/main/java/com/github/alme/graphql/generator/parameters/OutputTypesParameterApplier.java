@@ -14,16 +14,20 @@ public class OutputTypesParameterApplier implements ParameterApplier {
 
 	@Override
 	public void apply(GqlConfigurationBuilder builder) {
-		if (generatedOutputTypes != null) {
-			boolean definedOperations = generatedOutputTypes.contains(GeneratedOutputType.DEFINED_OPERATIONS);
-			//boolean dynamicOperations = generatedOutputTypes.contains(GeneratedOutputType.DYNAMIC_OPERATIONS);
-			boolean schemaTypes = generatedOutputTypes.contains(GeneratedOutputType.SCHEMA_TYPES);
-			builder
-				.generateDefinedOperations(definedOperations)
-				//.generateDynamicOperations(dynamicOperations)
-				.generateSchemaInputTypes(schemaTypes || definedOperations) //|| dynamicOperations)
-				.generateSchemaOtherTypes(schemaTypes);
+		System.out.println(generatedOutputTypes);
+		boolean needSchemaTypes = false;
+		boolean needDefinedOperations = true;
+//		boolean needDynamicOperations = false;
+		if (generatedOutputTypes != null && !generatedOutputTypes.isEmpty()) {
+			needSchemaTypes = generatedOutputTypes.contains(GeneratedOutputType.SCHEMA_TYPES);
+			needDefinedOperations = generatedOutputTypes.contains(GeneratedOutputType.DEFINED_OPERATIONS);
+//			needDynamicOperations = generatedOutputTypes.contains(GeneratedOutputType.DYNAMIC_OPERATIONS);
 		}
+		builder
+			.generateDefinedOperations(needDefinedOperations)
+//			.generateDynamicOperations(needDynamicOperations)
+			.generateSchemaInputTypes(needSchemaTypes || needDefinedOperations) // || needDynamicOperations)
+			.generateSchemaOtherTypes(needSchemaTypes);
 	}
 
 }

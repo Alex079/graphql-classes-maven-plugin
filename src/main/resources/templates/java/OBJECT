@@ -9,17 +9,11 @@ import ${i}.*;
 ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
 public class ${name}
-<#if 0 < members?size>
+<#if members?has_content>
 implements ${members?join(", ")}
 </#if>
 {
-	<#list fields as field>
-		<@classMembers.addField field=field indent='\t' nested=false/>
-		<@classMembers.addGetter field=field indent='\t' nested=false/>
-		<#if !dtoBuilder>
-			<@classMembers.addSetter className=name field=field indent='\t' nested=false/>
-		</#if>
-	</#list>
+	<@classMembers.addFields className=name fields=fields indent='\t' nested=false/>
 	<@classMembers.addEquals className=name fields=fields indent='\t'/>
 	<@classMembers.addHashCode fields=fields indent='\t'/>
 	<@classMembers.addToString fields=fields indent='\t'/>
@@ -29,10 +23,7 @@ implements ${members?join(", ")}
 		<#lt/>	public static class Builder
 		<#lt/>	{
 		<#lt/>		private Builder() { }
-		<#list fields as field>
-			<@classMembers.addField field=field indent='\t\t' nested=false/>
-			<@classMembers.addSetter className='Builder' field=field indent='\t\t' nested=false/>
-		</#list>
+		<@classMembers.addBuilderFields className='Builder' fields=fields indent='\t\t' nested=false/>
 		<@classMembers.addBuildMethod resultClassName=name fields=fields indent='\t\t'/>
 		<#lt/>	}
 	</#if>

@@ -51,7 +51,7 @@ public class DynamicOperationTranslator implements Translator {
 			result.put(interfaceTypeName, selections);
 		});
 		// build selections for unions using object types
-		ctx.getUnionTypes().forEach((unionTypeName, unionType) -> {
+		ctx.getUnionTypes().keySet().forEach(unionTypeName -> {
 			List<GqlSelection> selections = ctx.getObjectTypes().values().stream()
 				.filter(objectType -> objectType.getMembers().contains(unionTypeName))
 				.flatMap(objectType -> objectType.getFields().stream()

@@ -95,7 +95,7 @@ type T1 implements I1 {id:ID name:String t1Name: String}
 
 type Mutation {
 	delivered(item: SoldItem!): Track! @currentDate
-	test1(user: UserInput): GrCh
+	test1(user: UserInput): [GrCh]
 	test2: I1
 }
 

@@ -8,7 +8,7 @@ import ${i}.*;
 ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
 public interface ${name}
-<#if 0 < members?size>
+<#if members?has_content>
 extends ${members?join(", ")}
 </#if>
 {

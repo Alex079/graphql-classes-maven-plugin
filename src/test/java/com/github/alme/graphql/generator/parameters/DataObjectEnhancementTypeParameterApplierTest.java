@@ -5,8 +5,6 @@ import static com.github.alme.graphql.generator.dto.GqlConfiguration.DataObjectE
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -35,8 +33,8 @@ class DataObjectEnhancementTypeParameterApplierTest {
 
 		verify(builder).accept(any());
 		verify(builder).build();
-		verify(builder, never()).generateDtoBuilder(anyBoolean());
-		verify(builder, never()).generateMethodChaining(anyBoolean());
+		verify(builder).generateDtoBuilder(false);
+		verify(builder).generateMethodChaining(false);
 		verifyNoMoreInteractions(builder);
 	}
 

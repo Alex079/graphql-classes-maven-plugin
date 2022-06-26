@@ -1,3 +1,4 @@
+<#import "import/classMemberTemplates" as classMembers/>
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
@@ -7,52 +8,25 @@ import ${i}.*;
 
 ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
-public class ${className} {
+public class ${className}
+{
 	private final StringBuilder documentBuilder;
 	public ${className}(StringBuilder documentBuilder) {
 		this.documentBuilder = documentBuilder;
 	}
 	<#list selections as typeName, fields>
 		<#if typeName?has_content>
-			public ${className} on${typeName}(java.util.function.Consumer<${typeName}> selectorFunction) {
-				documentBuilder.append(" ...on ${typeName} {");
-				selectorFunction.accept(new ${typeName}());
-				documentBuilder.append(" }");
-				return this;
-			}
-			public class ${typeName} {
-			<#list fields as field>
-				<#if field.selections?has_content>
-					public ${typeName} with${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> selectorFunction) {
-						documentBuilder.append(" ${field.fragmentTypeName?uncap_first}${field.name?cap_first}: ${field.name} {");
-						selectorFunction.accept(new ${field.type.inner}Selector(documentBuilder));
-						documentBuilder.append(" }");
-						return this;
-					}
-				<#else>
-					public ${typeName} with${field.name?cap_first}() {
-						documentBuilder.append(" ${field.fragmentTypeName?uncap_first}${field.name?cap_first}: ${field.name}");
-						return this;
-					}
-				</#if>
-			</#list>
-			}
+			<#lt/>	public ${className} on${typeName}(java.util.function.Consumer<${typeName}> consumer) {
+			<#lt/>		documentBuilder.append(" ...on ${typeName} {");
+			<#lt/>		consumer.accept(new ${typeName}());
+			<#lt/>		documentBuilder.append(" }");
+			<#lt/>		return this;
+			<#lt/>	}
+			<#lt/>	public class ${typeName} {
+			<@classMembers.addSelectionFields className=typeName fields=fields indent='\t\t' nested=true/>
+			<#lt/>	}
 		<#else>
-			<#list fields as field>
-				<#if field.selections?has_content>
-					public ${className} with${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> selectorFunction) {
-						documentBuilder.append(" ${field.name} {");
-						selectorFunction.accept(new ${field.type.inner}Selector(documentBuilder));
-						documentBuilder.append(" }");
-						return this;
-					}
-				<#else>
-					public ${className} with${field.name?cap_first}() {
-						documentBuilder.append(" ${field.name}");
-						return this;
-					}
-				</#if>
-			</#list>
+			<@classMembers.addSelectionFields className=className fields=fields indent='\t' nested=true/>
 		</#if>
 	</#list>
 }

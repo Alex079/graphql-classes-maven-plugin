@@ -12,13 +12,7 @@ ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
 public class ${className}
 {
-	<#list selections as field>
-		<@classMembers.addField field=field indent='\t' nested=true/>
-		<@classMembers.addGetter field=field indent='\t' nested=true/>
-		<#if !dtoBuilder>
-			<@classMembers.addSetter className=className field=field indent='\t' nested=true/>
-		</#if>
-	</#list>
+	<@classMembers.addFields className=className fields=selections indent='\t' nested=true/>
 	<@classMembers.addEquals className=className fields=selections indent='\t'/>
 	<@classMembers.addHashCode fields=selections indent='\t'/>
 	<@classMembers.addToString fields=selections indent='\t'/>
@@ -28,10 +22,7 @@ public class ${className}
 		<#lt/>	public static class Builder
 		<#lt/>	{
 		<#lt/>		private Builder() { }
-		<#list selections as field>
-			<@classMembers.addField field=field indent='\t\t' nested=true/>
-			<@classMembers.addSetter className='Builder' field=field indent='\t\t' nested=true/>
-		</#list>
+		<@classMembers.addBuilderFields className='Builder' fields=selections indent='\t\t' nested=true/>
 		<@classMembers.addBuildMethod resultClassName=className fields=selections indent='\t\t'/>
 		<#lt/>	}
 	</#if>

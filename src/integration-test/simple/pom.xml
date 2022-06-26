@@ -44,6 +44,12 @@
 			<version>4.3.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.22.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -77,9 +83,9 @@
 						<value>java.math</value>
 					</importPackages>
 					<generatedOutputTypes>
+						<value>SCHEMA_TYPES</value>
 						<value>DEFINED_OPERATIONS</value>
 <!--						<value>DYNAMIC_OPERATIONS</value>-->
-						<value>SCHEMA_TYPES</value>
 					</generatedOutputTypes>
 				</configuration>
 				<executions>
@@ -90,7 +96,7 @@
 						</goals>
 						<configuration>
 							<packageName>it.gson</packageName>
-							<jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>
+<!--							<jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>-->
 							<dataObjectEnhancement>BUILDER</dataObjectEnhancement>
 						</configuration>
 					</execution>

@@ -59,10 +59,10 @@ The generated sources are added to maven build.
       <td>class with<br/>
 - <code>String getDocument()</code><br/>
 - <code>String getOperation()</code><br/>
--	<code>Variables getVariables()</code><br/>
--	<code>Map&lt;String, Object&gt; getVariablesAsMap()</code><br/>
--	<code>Class&lt;Result&gt; getResultClass()</code><br/>
-- nested public static classes corresponding to field selection set with aliases and fragments resolved</td>
+- <code>Variables getVariables()</code><br/>
+- <code>Map&lt;String, Object&gt; getVariablesAsMap()</code><br/>
+- <code>Class&lt;Result&gt; getResultClass()</code><br/>
+classes in dedicated packages corresponding to field selection sets with aliases and fragments resolved</td>
     </tr>
     <tr>
       <td>[]</td>

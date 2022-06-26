@@ -1,109 +1,136 @@
 package it.test;
 
-import java.time.OffsetDateTime;
-import java.util.Map;
+import static java.util.Collections.singletonList;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import static it.test.support.Utils.gsonConvert;
+import static it.test.support.Utils.jacksonConvert;
+
+import java.util.Objects;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import it.test.support.GsonDateTimeAdapter;
-import it.test.support.JacksonDateTimeDeserializer;
-import it.test.support.JacksonDateTimeSerializer;
 
 class ITest {
 
-    private static final Gson G = new GsonBuilder()
-            .registerTypeAdapter(OffsetDateTime.class, new GsonDateTimeAdapter())
-            .create();
-    private static final ObjectMapper J = new ObjectMapper().registerModule(new SimpleModule()
-            .addSerializer(new JacksonDateTimeSerializer())
-            .addDeserializer(OffsetDateTime.class, new JacksonDateTimeDeserializer()))
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+	@Test
+	void testEmptyType() {
+		it.gson.types.EmptyType emptyType1WithGson = it.gson.types.EmptyType.builder().build();
+		it.gson.types.EmptyType emptyType2WithGson = it.gson.types.EmptyType.builder().build();
+		assertThat(emptyType1WithGson).isEqualTo(emptyType2WithGson)
+			.extracting(Objects::toString).isEqualTo("{ }");
 
-    private Map<?, ?> testGson(Object input) {
-        System.out.printf("Transforming %s using Gson%n", input);
-        String json = G.toJson(input);
-        Map<?, ?> output = G.fromJson(json, Map.class);
-        System.out.printf("To JSON:%n%s%nTo Map:%n%s%n%n", json, output);
-        return output;
-    }
+		it.jackson.types.EmptyType emptyType1WithJackson = new it.jackson.types.EmptyType();
+		it.jackson.types.EmptyType emptyType2WithJackson = new it.jackson.types.EmptyType();
+		assertThat(emptyType1WithJackson).isEqualTo(emptyType2WithJackson)
+			.extracting(Objects::toString).isEqualTo("{ }");
+	}
 
-    private Map<?, ?> testJackson(Object input) throws JsonProcessingException {
-        System.out.printf("Transforming %s using Jackson%n", input);
-        String json = J.writeValueAsString(input);
-        Map<?, ?> output = J.readValue(json, Map.class);
-        System.out.printf("To JSON:%n%s%nTo Map:%n%s%n%n", json, output);
-        return output;
-    }
+	@Test
+	void testUnnamedQueryResult() throws JsonProcessingException {
+		String g = gsonConvert(it.gson.unnamedQuery.UnnamedQueryResult.builder()
+			.setItemsInDelivery(singletonList(it.gson.unnamedQuery.itemsInDelivery.ItemResult.builder()
+				.setPrice(1.0)
+				.build()
+			))
+			.build()
+		);
+		String j = jacksonConvert(new it.jackson.unnamedQuery.UnnamedQueryResult()
+			.setItemsInDelivery(singletonList(new it.jackson.unnamedQuery.itemsInDelivery.ItemResult()
+				.setPrice(1.0)
+			))
+		);
+		assertThat(g).isEqualTo(j);
+	}
 
-    @Test
-    void testEmptyType() {
-        it.gson.types.EmptyType emptyType1WithGson = it.gson.types.EmptyType.builder().build();
-        it.gson.types.EmptyType emptyType2WithGson = it.gson.types.EmptyType.builder().build();
-        System.out.printf("Comparing %s to %s%n", emptyType1WithGson, emptyType2WithGson);
-        Assertions.assertEquals(emptyType1WithGson, emptyType2WithGson);
-        System.out.println();
-
-        it.jackson.types.EmptyType emptyType1WithJackson = new it.jackson.types.EmptyType();
-        it.jackson.types.EmptyType emptyType2WithJackson = new it.jackson.types.EmptyType();
-        System.out.printf("Comparing %s to %s%n", emptyType1WithJackson, emptyType2WithJackson);
-        Assertions.assertEquals(emptyType1WithJackson, emptyType2WithJackson);
-        System.out.println();
-    }
-
-    @Test
-    void testUnnamedQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(it.gson.unnamedQuery.UnnamedQueryResult.builder().build());
-        Map<?, ?> j = testJackson(new it.jackson.unnamedQuery.UnnamedQueryResult());
-        Assertions.assertEquals(g.entrySet(), j.entrySet());
-    }
-
-    @Test
-    void testTrackingInfoQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(it.gson.trackingInfoQuery.TrackingInfoQueryVariables.builder()
-            .setItemId("ID")
-            .build());
-        Map<?, ?> j = testJackson(new it.jackson.trackingInfoQuery.TrackingInfoQueryVariables()
-            .setItemId("ID"));
-        Assertions.assertEquals(g.entrySet(), j.entrySet());
-    }
-
-    @Test
-    void testItemsInDeliveryByPaymentQuery() throws JsonProcessingException {
-        Map<?, ?> g = testGson(it.gson.itemsInDeliveryByPaymentQuery.ItemsInDeliveryByPaymentQueryVariables.builder()
-            .setPaidWith(it.gson.types.PaymentType.CASH)
-            .build());
-        Map<?, ?> j = testJackson(new it.jackson.itemsInDeliveryByPaymentQuery.ItemsInDeliveryByPaymentQueryVariables()
-            .setPaidWith(it.jackson.types.PaymentType.CASH));
-        Assertions.assertEquals(g.entrySet(), j.entrySet());
-    }
-
-    @Test
-    void testDeliveredMutation() throws JsonProcessingException {
-        Map<?, ?> g = testGson(it.gson.deliveredMutation.DeliveredMutationVariables.builder()
-            .setItem(it.gson.types.SoldItem.builder()
-                .setItem("Item")
-                .setPaidWith(it.gson.types.PaymentType.CASH)
-                .setTrack("Track")
-                .build())
-            .build());
-        Map<?, ?> j = testJackson(new it.jackson.deliveredMutation.DeliveredMutationVariables()
-            .setItem(new it.jackson.types.SoldItem()
-                .setItem("Item")
-                .setPaidWith(it.jackson.types.PaymentType.CASH)
-                .setTrack("Track")));
-        Assertions.assertEquals(g.entrySet(), j.entrySet());
-    }
+//	@Test
+//	void testDynamicUnion() {
+//		it.gson.mutation.DynamicMutation gMutation = new it.gson.mutation.DynamicMutation(selection -> selection
+//			.withTest1(grChSelector -> grChSelector
+//				.onChannel(channel -> channel
+//					.withName()
+//					.withUsers(it.gson.selectors.UserSelector::withName)
+//				)
+//				.onGroup(group -> group
+//					.withName()
+//					.withUsers(it.gson.selectors.UserSelector::withName)
+//				)
+//			)
+//		);
+//		it.jackson.mutation.DynamicMutation jMutation = new it.jackson.mutation.DynamicMutation(selection -> selection
+//			.withTest1(grChSelector -> grChSelector
+//				.onChannel(channel -> channel
+//					.withName()
+//					.withUsers(it.jackson.selectors.UserSelector::withName)
+//				)
+//				.onGroup(group -> group
+//					.withName()
+//					.withUsers(it.jackson.selectors.UserSelector::withName)
+//				)
+//			)
+//		);
+//		final String expectedDocument = "mutation { test1 { " +
+//			"...on Channel { name$Channel: name users$Channel: users { name } } " +
+//			"...on Group { name$Group: name users$Group: users { name } } " +
+//			"} }";
+//
+//		assertThat(gMutation.getDocument()).isEqualTo(jMutation.getDocument()).isEqualTo(expectedDocument);
+//
+//		final String resultExample = "{\n" +
+//			"  \"test1\": [\n" +
+//			"    {\n" +
+//			"      \"name$Channel\": \"C\",\n" +
+//			"      \"users$Channel\": [\n" +
+//			"        {\"name\": \"U\"}\n" +
+//			"      ]\n" +
+//			"    },\n" +
+//			"    {\n" +
+//			"      \"name$Group\": \"G\",\n" +
+//			"      \"users$Group\": [\n" +
+//			"        {\"name\": \"U\"}\n" +
+//			"      ]\n" +
+//			"    }\n" +
+//			"  ]\n" +
+//			"}";
+//
+//		it.gson.results.MutationResult gResult = gsonConvert(resultExample, it.gson.results.MutationResult.class);
+//		it.jackson.results.MutationResult jResult = jacksonConvert(resultExample, it.jackson.results.MutationResult.class);
+//		assertThat(gResult.toString()).isEqualTo(jResult.toString());
+//	}
+//
+//	@Test
+//	void testDynamicInterface() {
+//		it.gson.mutation.DynamicMutation gMutation = new it.gson.mutation.DynamicMutation(selection -> selection
+//			.withTest2(i1Selector -> i1Selector
+//				.onT1(it.gson.selectors.I1Selector.T1::withName)
+//				.withId()
+//				.withT1Name()
+//			)
+//		);
+//		it.jackson.mutation.DynamicMutation jMutation = new it.jackson.mutation.DynamicMutation(selection -> selection
+//			.withTest2(i1Selector -> i1Selector
+//				.onT1(it.jackson.selectors.I1Selector.T1::withName)
+//				.withId()
+//				.withT1Name()
+//			)
+//		);
+//		final String expectedDocument = "mutation { test2 { ...on T1 { name$T1: name } id t1Name } }";
+//
+//		assertThat(gMutation.getDocument()).isEqualTo(jMutation.getDocument()).isEqualTo(expectedDocument);
+//
+//		final String resultExample = "{\n" +
+//			"  \"test2\": {\n" +
+//			"    \"id\": \"ID\",\n" +
+//			"    \"t1Name\": \"N\",\n" +
+//			"    \"name$T1\": \"N2\"\n" +
+//			"  }\n" +
+//			"}";
+//
+//		it.gson.results.MutationResult gResult = gsonConvert(resultExample, it.gson.results.MutationResult.class);
+//		it.jackson.results.MutationResult jResult = jacksonConvert(resultExample, it.jackson.results.MutationResult.class);
+//		assertThat(gResult.toString()).isEqualTo(jResult.toString());
+//	}
 
 }

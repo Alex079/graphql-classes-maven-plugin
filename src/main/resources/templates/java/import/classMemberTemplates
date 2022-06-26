@@ -14,7 +14,7 @@
 
 <#function getFieldType field nested>
 	<#if field.selections?has_content>
-		<#return field.type.getCustom(currentPackage+nested?then('.'+field.name,'')+'.'+field.type.inner+'Result') />
+		<#return field.type.getCustom(currentPackage+nested?then('.'+field.name+'.','.')+field.type.inner+'Result') />
 	<#else>
 		<#return field.type.full />
 	</#if>
@@ -22,7 +22,7 @@
 
 <#function getFieldName field>
 	<#if field.fragmentTypeName?has_content>
-		<#return field.fragmentTypeName?uncap_first+field.name?cap_first />
+		<#return field.name + '$' + field.fragmentTypeName />
 	<#else>
 		<#return field.name />
 	</#if>
@@ -51,6 +51,56 @@
 		<#lt/>${indent}	return this;
 	</#if>
 	<#lt/>${indent}}
+</#macro>
+
+<#macro addFields className fields indent nested>
+	<#list fields as field>
+		<@addField field=field indent=indent nested=nested/>
+		<@addGetter field=field indent=indent nested=nested/>
+		<#if !dtoBuilder>
+			<@addSetter className=className field=field indent=indent nested=nested/>
+		</#if>
+	</#list>
+</#macro>
+
+<#macro addBuilderFields className fields indent nested>
+	<#list fields as field>
+		<@addField field=field indent=indent nested=nested/>
+		<@addSetter className=className field=field indent=indent nested=nested/>
+	</#list>
+</#macro>
+
+<#macro addSelectionFields className fields indent nested>
+	<#list fields as field>
+		<#if field.selections?has_content>
+			<#lt/>${indent}public ${className} with${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> consumer) {
+			<#if field.fragmentTypeName?has_content>
+				<#lt/>${indent}	documentBuilder.append(" ${getFieldName(field)}:");
+			</#if>
+			<#lt/>${indent}	documentBuilder.append(" ${field.name} {");
+			<#lt/>${indent}	consumer.accept(new ${field.type.inner}Selector(documentBuilder));
+			<#lt/>${indent}	documentBuilder.append(" }");
+			<#lt/>${indent}	return this;
+			<#lt/>${indent}}
+		<#else>
+			<#lt/>${indent}public ${className} with${field.name?cap_first}() {
+			<#if field.fragmentTypeName?has_content>
+				<#lt/>${indent}	documentBuilder.append(" ${getFieldName(field)}:");
+			</#if>
+			<#lt/>${indent}	documentBuilder.append(" ${field.name}");
+			<#lt/>${indent}	return this;
+			<#lt/>${indent}}
+		</#if>
+	</#list>
+</#macro>
+
+<#macro addVariables className variables indent>
+	<#list variables as field>
+		<#lt/>${indent}public ${className} set${field.name?cap_first}(${field.type.full} value) {
+		<#lt/>${indent}	map.put("${field.name}", value);
+		<#lt/>${indent}	return this;
+		<#lt/>${indent}}
+	</#list>
 </#macro>
 
 <#macro addEquals className fields indent>

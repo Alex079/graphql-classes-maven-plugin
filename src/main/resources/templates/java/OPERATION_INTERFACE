@@ -5,7 +5,8 @@ ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
 public interface ${interfaceName}
 {
-	String getDocument();
 	String getOperationName();
+	String getDocument();
+	java.util.Map<String, Object> getVariables();
 }
 //CHECKSTYLE:ON

@@ -7,7 +7,6 @@ ${generatedAnnotation!}
 public class ${className}
 implements ${operationsPackage}.${interfaceName}
 {
-
 	private final String document;
 
 	@Override
@@ -20,13 +19,17 @@ implements ${operationsPackage}.${interfaceName}
 		return document;
 	}
 
-	public ${className}(java.util.function.Consumer<${selectorsPackage}.${interfaceName}Selector> selectorFunction) {
+	@Override
+	public java.util.Map<String, Object> getVariables() {
+		return java.util.Collections.emptyMap();
+	}
+
+	public ${className}(java.util.function.Consumer<${selectorsPackage}.${interfaceName}Selector> consumer) {
 		StringBuilder documentBuilder = new StringBuilder("${operation} {");
-		selectorFunction.accept(new ${selectorsPackage}.${interfaceName}Selector(documentBuilder));
+		consumer.accept(new ${selectorsPackage}.${interfaceName}Selector(documentBuilder));
 		this.document = documentBuilder.append(" }").toString();
 	}
 
 	<@classMembers.addToString fields=[{'name':'document'}] indent='\t'/>
-
 }
 //CHECKSTYLE:ON

@@ -103,7 +103,7 @@ public class GeneratorMojo extends AbstractMojo {
 
 	/**
 	 * The type of data object enhancement.
-	 * Can be empty or take one of the following values:
+	 * Can be empty (the default) or take one of the following values:
 	 * METHOD_CHAINING (data object setters will return 'this' instead of 'void'),
 	 * BUILDER (data objects will use builder pattern)
 	 */
@@ -112,13 +112,17 @@ public class GeneratorMojo extends AbstractMojo {
 
 	/**
 	 * A set of output types
-	 * Can be empty or take values from the following list:
+	 * Can be empty or take one or many values from the following list:
 	 * SCHEMA_TYPES (all the types defined in GraphQL schema files),
-	 * DEFINED_OPERATIONS (all the operations defined in input files)
+	 * DEFINED_OPERATIONS (default value, all the operations defined in input files)
 	 */
 	@Parameter(property = "gql.generatedOutputTypes")
 	private Set<GqlConfiguration.GeneratedOutputType> generatedOutputTypes;
 
+	/**
+	 * The maximum number of tokens to process by the GraphQL engine.
+	 * @see graphql.parser.ParserOptions#MAX_QUERY_TOKENS
+	 */
 	@Parameter(property = "gql.parserMaxTokens")
 	private Integer parserMaxTokens;
 
