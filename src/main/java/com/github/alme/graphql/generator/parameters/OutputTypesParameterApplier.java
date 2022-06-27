@@ -14,7 +14,6 @@ public class OutputTypesParameterApplier implements ParameterApplier {
 
 	@Override
 	public void apply(GqlConfigurationBuilder builder) {
-		System.out.println(generatedOutputTypes);
 		boolean needSchemaTypes = false;
 		boolean needDefinedOperations = true;
 //		boolean needDynamicOperations = false;

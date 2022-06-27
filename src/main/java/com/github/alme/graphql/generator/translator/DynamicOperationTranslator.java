@@ -61,9 +61,9 @@ public class DynamicOperationTranslator implements Translator {
 			result.put(unionTypeName, selections);
 		});
 		// link selections by inner type
-		result.forEach((name, selections) ->
-			selections.forEach(selection ->
-				selection.addSelections(result.get(selection.getType().getInner()))));
+		result.values().stream()
+			.flatMap(Collection::stream)
+			.forEach(selection -> selection.addSelections(result.get(selection.getType().getInner())));
 		return result;
 	}
 
