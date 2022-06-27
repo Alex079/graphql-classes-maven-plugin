@@ -1,10 +1,8 @@
 package com.github.alme.graphql.generator.translator;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -56,26 +54,30 @@ public class Util {
 		GqlContext ctx,
 		String typeName
 	) {
-		Collection<GqlSelection> result = new ArrayList<>();
-		result.addAll(
+		return deepMerge(streamSelection(selectionSet, allFragments, requiredFragments, ctx, typeName));
+	}
+
+	private static Stream<GqlSelection> streamSelection(
+		SelectionSet selectionSet,
+		Collection<FragmentDefinition> allFragments,
+		Collection<FragmentDefinition> requiredFragments,
+		GqlContext ctx,
+		String typeName
+	) {
+		return Stream.of(
 			selectionSet.getSelectionsOfType(Field.class).stream()
 				.map(field -> {
 					GqlType type = guessTypeOfField(field, ctx, typeName);
 					GqlSelection selection = new GqlSelection(field.getAlias() == null ? field.getName() : field.getAlias(), type, "");
 					if (field.getSelectionSet() != null) {
-						selection.addSelections(translateSelection(field.getSelectionSet(),
-							allFragments, requiredFragments, ctx, type.getInner()));
+						selection.addSelections(translateSelection(field.getSelectionSet(), allFragments, requiredFragments, ctx, type.getInner()));
 					}
 					return selection;
-				})
-				.collect(toList()));
-		result.addAll(
+				}),
 			selectionSet.getSelectionsOfType(InlineFragment.class).stream()
 				.map(fragment -> translateSelection(fragment.getSelectionSet(),
 					allFragments, requiredFragments, ctx, fragment.getTypeCondition().getName()))
-				.flatMap(Collection::stream)
-				.collect(toList()));
-		result.addAll(
+				.flatMap(Collection::stream),
 			selectionSet.getSelectionsOfType(FragmentSpread.class).stream()
 				.map(FragmentSpread::getName)
 				.map(fragmentName -> allFragments.stream()
@@ -88,8 +90,32 @@ public class Util {
 				.map(fragment -> translateSelection(fragment.getSelectionSet(),
 					allFragments, requiredFragments, ctx, fragment.getTypeCondition().getName()))
 				.flatMap(Collection::stream)
-				.collect(toList()));
-		return result;
+			)
+			.flatMap(Function.identity());
+	}
+
+	private static Collection<GqlSelection> deepMerge(Stream<GqlSelection> selection) {
+		return selection
+			.reduce(
+				new HashMap<GqlSelection, GqlSelection>(),
+				(result, currItem) -> {
+					GqlSelection prevItem = result.remove(currItem);
+					if (prevItem == null) {
+						result.put(currItem, currItem);
+					}
+					else {
+						GqlSelection nextItem = new GqlSelection(currItem.getName(), currItem.getType(), currItem.getFragmentTypeName())
+							.addSelections(deepMerge(Stream.concat(prevItem.getSelections().stream(), currItem.getSelections().stream())));
+						result.put(nextItem, nextItem);
+					}
+					return result;
+				},
+				(mapA, mapB) -> {
+					mapA.putAll(mapB);
+					return mapA;
+				}
+			)
+			.keySet();
 	}
 
 	private static GqlType guessTypeOfField(Field field, GqlContext ctx, String containerTypeName) {
