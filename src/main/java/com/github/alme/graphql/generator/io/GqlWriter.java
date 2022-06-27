@@ -93,23 +93,22 @@ public class GqlWriter {
 			context.getUnionTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.UNION, name, type));
 			context.getObjectTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.OBJECT, name, type));
 		}
-		boolean generateDefinedOperations = configuration.isGenerateDefinedOperations();
-		boolean generateDynamicOperations = configuration.isGenerateDynamicOperations();
-		if (generateDefinedOperations || generateDynamicOperations) {
+		if (!context.getDefinedOperations().isEmpty() || !context.getDynamicOperations().isEmpty()) {
 			context.getSchema().keySet().stream()
 				.map(GqlWriter::firstUpper)
 				.forEach(interfaceName -> makeOperationInterface(log, configuration, interfaceName));
 		}
+		boolean generateDefinedOperations = configuration.isGenerateDefinedOperations();
+		boolean generateDynamicOperations = configuration.isGenerateDynamicOperations();
 		if (generateDefinedOperations) {
 			context.getDefinedOperations().forEach((name, operation) -> makeDefinedOperation(log, configuration, name, operation));
 		}
 		if (generateDynamicOperations) {
+			context.getDynamicOperations().forEach(operation -> makeDynamicOperation(log, configuration, operation));
 			context.getDynamicSelections().forEach((typeName, selections) -> {
 				makeDynamicOperationResult(log, configuration, typeName, selections);
 				makeDynamicOperationSelector(log, configuration, typeName, selections);
 			});
-			context.getDynamicOperations().forEach(operation ->
-				makeDynamicOperation(log, configuration, operation));
 		}
 		CFG.clearSharedVariables();
 	}
