@@ -10,3 +10,5 @@ type EmptyType
 
 # still empty
 type EmptyType2 {}
+
+scalar Scalar1

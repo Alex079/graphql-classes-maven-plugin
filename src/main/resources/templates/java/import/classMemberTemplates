@@ -74,7 +74,7 @@
 	<#list fields as field>
 		<#if field.selections?has_content>
 			<#lt/>${indent}public ${className} with${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> consumer) {
-			<#if field.fragmentTypeName?has_content>
+			<#if getFieldName(field) != field.name>
 				<#lt/>${indent}	documentBuilder.append(" ${getFieldName(field)}:");
 			</#if>
 			<#lt/>${indent}	documentBuilder.append(" ${field.name} {");
@@ -84,7 +84,7 @@
 			<#lt/>${indent}}
 		<#else>
 			<#lt/>${indent}public ${className} with${field.name?cap_first}() {
-			<#if field.fragmentTypeName?has_content>
+			<#if getFieldName(field) != field.name>
 				<#lt/>${indent}	documentBuilder.append(" ${getFieldName(field)}:");
 			</#if>
 			<#lt/>${indent}	documentBuilder.append(" ${field.name}");
@@ -169,15 +169,5 @@
 		<#lt/>${indent}		${getFieldName(field)}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
 	</#list>
 	<#lt/>${indent}	);
-	<#lt/>${indent}}
-</#macro>
-
-<#macro addAsMapMethod fields indent>
-	<#lt/>${indent}public java.util.Map<String, Object> asMap() {
-	<#lt/>${indent}	java.util.Map<String, Object> result = new java.util.HashMap<>();
-	<#list fields as field>
-		<#lt/>${indent}	result.put("${field.name}", get${field.name?cap_first}());
-	</#list>
-	<#lt/>${indent}	return java.util.Collections.unmodifiableMap(result);
 	<#lt/>${indent}}
 </#macro>

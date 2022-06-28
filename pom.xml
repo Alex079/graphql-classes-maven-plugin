@@ -142,7 +142,7 @@
 								<argument>-Dgql.sourceDirectory=../simple/GraphQL</argument>
 								<argument>-Dgql.sourceIncludes=*.graphql,*.graphqls,,,</argument>
 								<argument>-Dgql.outputDirectory=output</argument>
-								<argument>-Dgql.scalarMap=S1=String,S2=Integer,,,Address=String,DateTime=java.time.OffsetDateTime</argument>
+								<argument>-Dgql.scalarMap=S1=String,S2=Integer,,,Scalar1=Integer,DateTime=java.time.OffsetDateTime</argument>
 								<argument>-Dgql.generatedOutputTypes=DEFINED_OPERATIONS</argument>
 								<argument>-e</argument>
 								<argument>-Dmaven.repo.local=${project.build.directory}/local-repo</argument>

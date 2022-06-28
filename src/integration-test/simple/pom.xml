@@ -76,7 +76,7 @@
 					<sourceDirectoryAlternative>wrong_directory</sourceDirectoryAlternative>
 					<outputDirectory>${project.build.directory}\generated-it-test-sources\java</outputDirectory>
 					<scalarMap>
-						<Address>String</Address>
+						<Scalar1>Integer</Scalar1>
 						<DateTime>java.time.OffsetDateTime</DateTime>
 					</scalarMap>
 					<importPackages>

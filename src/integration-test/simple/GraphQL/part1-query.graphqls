@@ -50,7 +50,7 @@ interface Interface2 {
 }
 
 type Type3UnionField2 implements Interface2 {
-    fieldC: Int
+    fieldC: Scalar1
     name: String
 }
 
