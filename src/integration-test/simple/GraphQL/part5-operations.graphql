@@ -1,0 +1,37 @@
+
+{
+    field1(arg2: []) @include(if: true) {
+        idA
+        id
+    }
+    field1(arg2: []) @skip(if: true) {
+        idB
+        id
+    }
+}
+
+fragment ValueFragment on Type1MutationField2 {
+    t1Value: value
+}
+
+fragment ValueFragment on Type2MutationField2 {
+    t2Value: value {
+        ...ValueFragment
+    }
+}
+
+fragment ValueFragment on Type3MutationField2 {
+    t3Value: value
+}
+
+mutation updateField2($id: ID = "0") {
+    field2(arg1: $id) {
+        id name
+        ...on Type2MutationField2 {
+            ...ValueFragment
+        }
+        ... on Type1MutationField2 {
+            ...ValueFragment
+        }
+    }
+}

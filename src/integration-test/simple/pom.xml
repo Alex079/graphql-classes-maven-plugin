@@ -68,9 +68,9 @@
 				<version>@project.version@</version>
 				<configuration>
 					<source>
+						<directory>GraphQL</directory>
 						<includes>
-							<include>schema.graphqls</include>
-							<include>*.graphql</include>
+							<include>*.graphql*</include>
 						</includes>
 					</source>
 					<sourceDirectoryAlternative>wrong_directory</sourceDirectoryAlternative>
@@ -109,7 +109,7 @@
 							<packageName>it.jackson</packageName>
 							<jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation>
 							<generatedAnnotationVersion>${java.specification.version}</generatedAnnotationVersion>
-							<dataObjectEnhancement>METHOD_CHAINING</dataObjectEnhancement>
+							<dataObjectEnhancement>METHOD_CHAINING</dataObjectEnhancement><!-- BUILDER does not work for Jackson -->
 						</configuration>
 					</execution>
 				</executions>

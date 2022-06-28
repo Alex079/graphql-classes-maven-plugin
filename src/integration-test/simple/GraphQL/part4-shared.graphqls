@@ -1,0 +1,12 @@
+
+directive @onField(arg1: String! = "0", arg2: Int!, arg3: EnumOnFieldArg3) on FIELD | FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+enum EnumOnFieldArg3 {
+    V1, V2
+}
+
+# yes, empty type
+type EmptyType
+
+# still empty
+type EmptyType2 {}
