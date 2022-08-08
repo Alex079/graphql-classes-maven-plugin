@@ -36,7 +36,7 @@ class EnumTypeTranslatorTest {
 	@Test
 	void translateNoEnums() {
 		when(doc.getDefinitionsOfType(EnumTypeDefinition.class)).thenReturn(emptyList());
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -51,7 +51,7 @@ class EnumTypeTranslatorTest {
 				.enumValueDefinition(EnumValueDefinition.newEnumValueDefinition().name("V1").build())
 				.enumValueDefinition(EnumValueDefinition.newEnumValueDefinition().name("V2").build())
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -72,7 +72,7 @@ class EnumTypeTranslatorTest {
 				.name("Enum1")
 				.enumValueDefinitions(singletonList(EnumValueDefinition.newEnumValueDefinition().name("V1").build()))
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 

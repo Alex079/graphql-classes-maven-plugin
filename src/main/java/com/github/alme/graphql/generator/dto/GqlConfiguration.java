@@ -21,6 +21,7 @@ public class GqlConfiguration {
 	Collection<Path> sourceFiles;
 	@Singular Set<String> importPackages;
 	@Singular Map<String, String> scalars;
+	@Singular Map<String, String> aliases;
 	boolean generateMethodChaining;
 	boolean generateDtoBuilder;
 	boolean generateDefinedOperations;
@@ -28,6 +29,8 @@ public class GqlConfiguration {
 	boolean generateSchemaInputTypes;
 	boolean generateSchemaOtherTypes;
 	String jsonPropertyAnnotation;
+	String jsonPropertyPrefix;
+	String jsonPropertySuffix;
 	String generatedAnnotation;
 	String schemaTypesPackageName;
 	String operationsPackageName;
@@ -50,7 +53,7 @@ public class GqlConfiguration {
 	public enum GeneratedOutputType {
 		SCHEMA_TYPES,
 		DEFINED_OPERATIONS,
-//		DYNAMIC_OPERATIONS,
+		DYNAMIC_OPERATIONS,
 	}
 
 	public enum DataObjectEnhancementType {

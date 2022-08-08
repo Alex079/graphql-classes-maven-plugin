@@ -12,10 +12,12 @@ import com.github.alme.graphql.generator.io.GqlReader;
 import com.github.alme.graphql.generator.io.GqlWriter;
 import com.github.alme.graphql.generator.io.ReaderFactory;
 import com.github.alme.graphql.generator.io.WriterFactory;
+import com.github.alme.graphql.generator.parameters.AliasMapParameterApplier;
 import com.github.alme.graphql.generator.parameters.DataObjectEnhancementTypeParameterApplier;
+import com.github.alme.graphql.generator.parameters.FieldTransformationApplier;
 import com.github.alme.graphql.generator.parameters.GeneratedAnnotationParameterApplier;
-import com.github.alme.graphql.generator.parameters.OutputTypesParameterApplier;
 import com.github.alme.graphql.generator.parameters.OutputDirectoryParameterApplier;
+import com.github.alme.graphql.generator.parameters.OutputTypesParameterApplier;
 import com.github.alme.graphql.generator.parameters.ParserOptionsParameterApplier;
 import com.github.alme.graphql.generator.parameters.ScalarMapParameterApplier;
 import com.github.alme.graphql.generator.parameters.SourceParameterApplier;
@@ -59,19 +61,19 @@ public class GeneratorMojo extends AbstractMojo {
 	private Set<String> sourceExcludesAlternative;
 
 	/**
-	 * A root directory for generated files
+	 * A root directory for generated files.
 	 */
 	@Parameter(property = "gql.outputDirectory")
 	private File outputDirectory;
 
 	/**
-	 * A name of base package for generated classes
+	 * A name of base package for generated classes.
 	 */
 	@Parameter(property = "gql.packageName", defaultValue = "gql.generated")
 	private String packageName;
 
 	/**
-	 * A mapping of GraphQL scalars to known java classes
+	 * A mapping of GraphQL scalars to known java classes.
 	 */
 	@Parameter
 	private Map<String, String> scalarMap;
@@ -84,19 +86,46 @@ public class GeneratorMojo extends AbstractMojo {
 	private Set<String> scalarMapAlternative;
 
 	/**
-	 * A set of packages to import into generated classes
+	 * A mapping of GraphQL field names to GraphQL field aliases.
+	 * Can be used to avoid Java keyword collisions for dynamic operations only.
+	 */
+	@Parameter
+	private Map<String, String> aliasMap;
+
+	/**
+	 * <b>This parameter is used when running from command line and is ignored when "aliasMap" configuration exists.</b>
+	 * A mapping of GraphQL field names to aliases formatted as a list of key=value pairs. See "aliasMap" parameter.
+	 * Can be used to avoid Java keyword collisions for dynamic operations only.
+	 */
+	@Parameter(property = "gql.fieldMap", readonly = true)
+	private Set<String> aliasMapAlternative;
+
+	/**
+	 * A set of packages to import into generated classes.
 	 */
 	@Parameter(property = "gql.importPackages")
 	private Set<String> importPackages;
 
 	/**
-	 * An annotation to be used on generated fields to avoid java keywords collisions
+	 * An annotation to be used on generated private fields.
 	 */
 	@Parameter(property = "gql.jsonPropertyAnnotation")
 	private String jsonPropertyAnnotation;
 
 	/**
-	 * A version of '@Generated' annotation to use on generated classes
+	 * A prefix to be added to generated private fields to avoid java keywords collisions.
+	 */
+	@Parameter(property = "gql.privateFieldPrefix")
+	private String privateFieldPrefix;
+
+	/**
+	 * A suffix to be added to generated private fields to avoid java keywords collisions.
+	 */
+	@Parameter(property = "gql.privateFieldSuffix")
+	private String privateFieldSuffix;
+
+	/**
+	 * A version of '@Generated' annotation to use on generated classes.
 	 */
 	@Parameter(property = "gql.generatedAnnotationVersion")
 	private String generatedAnnotationVersion;
@@ -105,16 +134,16 @@ public class GeneratorMojo extends AbstractMojo {
 	 * The type of data object enhancement.
 	 * Can be empty (the default) or take one of the following values:
 	 * METHOD_CHAINING (data object setters will return 'this' instead of 'void'),
-	 * BUILDER (data objects will use builder pattern)
+	 * BUILDER (data objects will use builder pattern).
 	 */
 	@Parameter(property = "gql.dataObjectEnhancement")
 	private GqlConfiguration.DataObjectEnhancementType dataObjectEnhancement;
 
 	/**
-	 * A set of output types
+	 * A set of output types.
 	 * Can be empty or take one or many values from the following list:
 	 * SCHEMA_TYPES (all the types defined in GraphQL schema files),
-	 * DEFINED_OPERATIONS (default value, all the operations defined in input files)
+	 * DEFINED_OPERATIONS (default value, all the operations defined in input files).
 	 */
 	@Parameter(property = "gql.generatedOutputTypes")
 	private Set<GqlConfiguration.GeneratedOutputType> generatedOutputTypes;
@@ -127,7 +156,7 @@ public class GeneratorMojo extends AbstractMojo {
 	private Integer parserMaxTokens;
 
 	/**
-	 * A maven project to add newly generated sources into
+	 * A maven project to add newly generated sources into.
 	 */
 	@Parameter(defaultValue = "${project}", readonly = true)
 	private MavenProject project;
@@ -138,17 +167,18 @@ public class GeneratorMojo extends AbstractMojo {
 			.accept(new SourceParameterApplier(project, source, sourceDirectoryAlternative, sourceIncludesAlternative, sourceExcludesAlternative))
 			.accept(new OutputDirectoryParameterApplier(project, outputDirectory, packageName))
 			.accept(new ScalarMapParameterApplier(scalarMap, scalarMapAlternative))
+			.accept(new AliasMapParameterApplier(aliasMap, aliasMapAlternative))
 			.accept(new DataObjectEnhancementTypeParameterApplier(dataObjectEnhancement))
 			.accept(new OutputTypesParameterApplier(generatedOutputTypes))
 			.accept(new GeneratedAnnotationParameterApplier(generatedAnnotationVersion))
 			.accept(new ParserOptionsParameterApplier(parserMaxTokens))
+			.accept(new FieldTransformationApplier(jsonPropertyAnnotation, privateFieldPrefix, privateFieldSuffix))
 			.importPackages(importPackages)
-			.jsonPropertyAnnotation(jsonPropertyAnnotation)
 			.build();
 
 		getLog().info(format("Current configuration: %s.", configuration));
 
-		GqlContext context = new GqlContext(getLog(), configuration.getScalars());
+		GqlContext context = new GqlContext(getLog(), configuration.getScalars(), configuration.getAliases());
 		ReaderFactory readerFactory = new ReaderFactory(configuration.getSourceFiles(), getLog());
 		WriterFactory writerFactory = new WriterFactory();
 

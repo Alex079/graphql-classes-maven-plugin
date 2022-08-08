@@ -16,7 +16,7 @@ implements ${members?join(", ")}
 	<@classMembers.addFields className=name fields=fields indent='\t' nested=false/>
 	<@classMembers.addEquals className=name fields=fields indent='\t'/>
 	<@classMembers.addHashCode fields=fields indent='\t'/>
-	<@classMembers.addToString fields=fields indent='\t'/>
+	<@classMembers.addToGraphQlString fields=fields indent='\t'/>
 	<#if dtoBuilder>
 		<@classMembers.addConstructor className=name fields=fields indent='\t' nested=false/>
 		<@classMembers.addBuilderMethod indent='\t'/>

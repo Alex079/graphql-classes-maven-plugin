@@ -50,7 +50,7 @@ class InputObjectTypeTranslatorTest {
 	@Test
 	void translateNoInputObjectTypes() {
 		when(doc.getDefinitionsOfType(InputObjectTypeDefinition.class)).thenReturn(emptyList());
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -74,7 +74,7 @@ class InputObjectTypeTranslatorTest {
 						newObjectField().name("n").value(newStringValue("v").build()).build()).build()).build())
 					.build())
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -119,7 +119,7 @@ class InputObjectTypeTranslatorTest {
 						newObjectField().name("n").value(newStringValue("v").build()).build()).build()).build())
 					.build()))
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 

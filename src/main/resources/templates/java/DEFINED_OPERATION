@@ -11,9 +11,9 @@ public class ${className} implements ${operationsPackage}.${interfaceName}
 	<#if variables?has_content>
 	private final java.util.Map<String, Object> variables;
 
-	public ${className}(java.util.function.Consumer<${className}Variables> consumer) {
+	public ${className}(java.util.function.Consumer<${className}Variables> variables) {
 		java.util.Map<String, Object> map = new java.util.HashMap<>();
-		consumer.accept(new ${className}Variables(map));
+		variables.accept(new ${className}Variables(map));
 		this.variables = java.util.Collections.unmodifiableMap(map);
 	}
 	</#if>

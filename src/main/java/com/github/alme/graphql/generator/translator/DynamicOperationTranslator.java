@@ -4,10 +4,8 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import com.github.alme.graphql.generator.dto.GqlContext;
@@ -29,23 +27,23 @@ public class DynamicOperationTranslator implements Translator {
 	private static Map<String, Collection<GqlSelection>> createCompleteSelections(GqlContext ctx) {
 		Map<String, Collection<GqlSelection>> result = new HashMap<>();
 		// build selections for object types
+		Map<String, String> aliasMap = ctx.getAliases();
 		ctx.getObjectTypes().forEach((objectTypeName, objectType) ->
-			result.put(objectTypeName, objectType.getFields().stream().map(field ->
-				new GqlSelection(field.getName(), field.getType(), "")).collect(toList()))
+			result.put(objectTypeName, objectType.getFields().stream()
+				.map(field -> new GqlSelection(field, aliasMap.getOrDefault(field.getName(), ""), ""))
+				.collect(toList()))
 		);
 		// build selections for interfaces using object types
 		ctx.getInterfaceTypes().forEach((interfaceTypeName, interfaceType) -> {
-			Set<String> uniqueNames = new HashSet<>();
 			List<GqlSelection> selections = Stream.concat(
-				interfaceType.getFields().stream().map(field -> {
-					uniqueNames.add(field.getName());
-					return new GqlSelection(field.getName(), field.getType(), "");
-				}),
+				interfaceType.getFields().stream()
+					.map(field ->
+						new GqlSelection(field, aliasMap.getOrDefault(field.getName(), ""), "")),
 				ctx.getObjectTypes().values().stream()
 					.filter(objectType -> objectType.getMembers().contains(interfaceTypeName))
 					.flatMap(objectType -> objectType.getFields().stream()
-						.filter(field -> !uniqueNames.contains(field.getName()))
-						.map(field -> new GqlSelection(field.getName(), field.getType(), objectType.getName()))
+						.map(field ->
+							new GqlSelection(field, field.getName() + '$' + objectType.getName(), objectType.getName()))
 					)
 			).collect(toList());
 			result.put(interfaceTypeName, selections);
@@ -55,7 +53,8 @@ public class DynamicOperationTranslator implements Translator {
 			List<GqlSelection> selections = ctx.getObjectTypes().values().stream()
 				.filter(objectType -> objectType.getMembers().contains(unionTypeName))
 				.flatMap(objectType -> objectType.getFields().stream()
-					.map(field -> new GqlSelection(field.getName(), field.getType(), objectType.getName()))
+					.map(field ->
+						new GqlSelection(field, field.getName() + '$' + objectType.getName(), objectType.getName()))
 				)
 				.collect(toList());
 			result.put(unionTypeName, selections);

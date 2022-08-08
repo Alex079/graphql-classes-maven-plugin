@@ -24,9 +24,9 @@ implements ${operationsPackage}.${interfaceName}
 		return java.util.Collections.emptyMap();
 	}
 
-	public ${className}(java.util.function.Consumer<${selectorsPackage}.${typeName}Selector> consumer) {
+	public ${className}(java.util.function.Consumer<${selectorsPackage}.${typeName}Selector> selector) {
 		StringBuilder documentBuilder = new StringBuilder("${operation} {");
-		consumer.accept(new ${selectorsPackage}.${typeName}Selector(documentBuilder));
+		selector.accept(new ${selectorsPackage}.${typeName}Selector(documentBuilder));
 		this.document = documentBuilder.append(" }").toString();
 	}
 

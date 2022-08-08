@@ -39,6 +39,8 @@ public class GqlWriter {
 	private static final String INTERFACE_NAME_KEY = "interfaceName";
 	private static final String CLASS_NAME_KEY = "className";
 	private static final String JSON_PROPERTY_KEY = "jsonProperty";
+	private static final String PROPERTY_PREFIX_KEY = "propertyPrefix";
+	private static final String PROPERTY_SUFFIX_KEY = "propertySuffix";
 	private static final String METHOD_CHAINING_KEY = "methodChaining";
 	private static final String DTO_BUILDER_KEY = "dtoBuilder";
 	private static final String IMPORT_PACKAGES_KEY = "importPackages";
@@ -72,6 +74,8 @@ public class GqlWriter {
 			CFG.setSharedVariable(RESULTS_PACKAGE_KEY, configuration.getResultsPackageName());
 			CFG.setSharedVariable(SELECTORS_PACKAGE_KEY, configuration.getSelectorsPackageName());
 			CFG.setSharedVariable(JSON_PROPERTY_KEY, configuration.getJsonPropertyAnnotation());
+			CFG.setSharedVariable(PROPERTY_PREFIX_KEY, configuration.getJsonPropertyPrefix());
+			CFG.setSharedVariable(PROPERTY_SUFFIX_KEY, configuration.getJsonPropertySuffix());
 			CFG.setSharedVariable(METHOD_CHAINING_KEY, configuration.isGenerateMethodChaining());
 			CFG.setSharedVariable(DTO_BUILDER_KEY, configuration.isGenerateDtoBuilder());
 			CFG.setSharedVariable(IMPORT_PACKAGES_KEY, configuration.getImportPackages());
@@ -197,8 +201,8 @@ public class GqlWriter {
 				return;
 			}
 			makeDefinedOperationResult(log,
-				packagePath.resolve(selection.getName()),
-				packageName + "." + selection.getName(),
+				packagePath.resolve(selection.getTitle()),
+				packageName + "." + selection.getTitle(),
 				selection.getType().getInner(),
 				selection.getSelections());
 		});

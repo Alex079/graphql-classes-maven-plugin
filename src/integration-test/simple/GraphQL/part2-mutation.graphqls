@@ -5,8 +5,8 @@ schema {
 
 type Mutation1 {
     field1(arg1: ID!, arg2: InputMutationArg2!): TypeMutationField1
-    field2(arg1: ID!): Interface1MutationField2
-    field3(arg1: ID!): Union1MutationField3
+    field2(arg1: ID!): [Interface1MutationField2]
+    field3(arg1: ID!): [Union1MutationField3]
 }
 
 type TypeMutationField1 {

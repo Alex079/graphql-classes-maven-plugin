@@ -54,7 +54,7 @@ class OperationTranslatorTest {
 
 	@Test
 	void translateNoOperations() {
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 		when(doc.getDefinitionsOfType(OperationDefinition.class)).thenReturn(emptyList());
 
 		translator.translate(doc, ctx);
@@ -64,7 +64,7 @@ class OperationTranslatorTest {
 
 	@Test
 	void translateWithoutSchema() {
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 		when(doc.getDefinitionsOfType(OperationDefinition.class)).thenReturn(singletonList(
 			newOperationDefinition()
 				.operation(OperationDefinition.Operation.MUTATION)
@@ -78,7 +78,7 @@ class OperationTranslatorTest {
 
 	@Test
 	void translateOneEmptyUnnamedOperationWithoutFragments() {
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 		ctx.getSchema().put("query", "Query");
 		when(doc.getDefinitionsOfType(OperationDefinition.class)).thenReturn(singletonList(
 			newOperationDefinition()
@@ -106,7 +106,7 @@ class OperationTranslatorTest {
 
 	@Test
 	void translateOneOperationWithoutFragments() {
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 		ctx.getSchema().put("query", "Query");
 		when(doc.getDefinitionsOfType(OperationDefinition.class)).thenReturn(singletonList(
 			newOperationDefinition()
@@ -131,13 +131,13 @@ class OperationTranslatorTest {
 				assertThat(operation.getVariables()).isEmpty();
 				assertThat(operation.getSelections())
 					.hasSize(1)
-					.first().isEqualTo(new GqlSelection("f", GqlType.named("String"), ""));
+					.first().isEqualTo(new GqlSelection(new GqlField("f", GqlType.named("String")), "", ""));
 			});
 	}
 
 	@Test
 	void translateOneOperationWithFragmentsAndAnnotations() {
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 		ctx.getSchema().put("query", "Query");
 		ctx.getObjectTypes().put("Type1",
 			new GqlStructure("Type1").addFields(singletonList(
@@ -201,17 +201,19 @@ class OperationTranslatorTest {
 				assertThat(operation.getSelections())
 					.hasSize(2)
 					.containsExactlyInAnyOrder(
-						new GqlSelection("a", GqlType.named("Type1"), "")
-							.addSelections(singletonList(new GqlSelection("field1", GqlType.mandatory(GqlType.named("CustomType1")), ""))),
-						new GqlSelection("b", GqlType.named("Type2"), "")
-							.addSelections(singletonList(new GqlSelection("f2", GqlType.mandatory(GqlType.named("CustomType2")), "")))
+						new GqlSelection(new GqlField("a", GqlType.named("Type1")), "", "")
+							.addSelections(singletonList(
+								new GqlSelection(new GqlField("field1", GqlType.mandatory(GqlType.named("CustomType1"))), "", ""))),
+						new GqlSelection(new GqlField("b", GqlType.named("Type2")), "", "")
+							.addSelections(singletonList(
+								new GqlSelection(new GqlField("f2", GqlType.mandatory(GqlType.named("CustomType2"))), "", "")))
 					);
 			});
 	}
 
 	@Test
 	void translateOneOperationWithVariables() {
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 		ctx.getSchema().put("mutation", "Mutation");
 		ctx.getObjectTypes().put("Mutation",
 			new GqlStructure("Mutation").addFields(asList(
@@ -246,7 +248,7 @@ class OperationTranslatorTest {
 					.first().isEqualTo(new GqlField("v", GqlType.named("InputType")));
 				assertThat(operation.getSelections())
 					.hasSize(1)
-					.first().isEqualTo(new GqlSelection("a", GqlType.named("Type1"), ""));
+					.first().isEqualTo(new GqlSelection(new GqlField("a", GqlType.named("Type1")), "", ""));
 			});
 	}
 

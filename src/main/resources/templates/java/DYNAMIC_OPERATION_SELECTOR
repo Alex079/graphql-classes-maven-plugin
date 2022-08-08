@@ -2,6 +2,8 @@
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
+import ${schemaTypesPackage}.*;
+
 <#list importPackages as i>
 import ${i}.*;
 </#list>
@@ -16,17 +18,17 @@ public class ${className}
 	}
 	<#list selections as typeName, fields>
 		<#if typeName?has_content>
-			<#lt/>	public ${className} on${typeName}(java.util.function.Consumer<${typeName}> consumer) {
+			<#lt/>	public ${className} on${typeName}(java.util.function.Consumer<${typeName}Selector> selector) {
 			<#lt/>		documentBuilder.append(" ...on ${typeName} {");
-			<#lt/>		consumer.accept(new ${typeName}());
+			<#lt/>		selector.accept(new ${typeName}Selector());
 			<#lt/>		documentBuilder.append(" }");
 			<#lt/>		return this;
 			<#lt/>	}
-			<#lt/>	public class ${typeName} {
-			<@classMembers.addSelectionFields className=typeName fields=fields indent='\t\t' nested=true/>
+			<#lt/>	public class ${typeName}Selector {
+			<@classMembers.addSelectionFields className=typeName+'Selector' fields=fields indent='\t\t'/>
 			<#lt/>	}
 		<#else>
-			<@classMembers.addSelectionFields className=className fields=fields indent='\t' nested=true/>
+			<@classMembers.addSelectionFields className=className fields=fields indent='\t'/>
 		</#if>
 	</#list>
 }

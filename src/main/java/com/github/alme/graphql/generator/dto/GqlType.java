@@ -6,7 +6,9 @@ import lombok.Value;
 public class GqlType {
 
 	public enum Flag {
-		MANDATORY, LIST, NAMED
+		MANDATORY,
+		LIST,
+		NAMED,
 	}
 
 	Flag flag;
@@ -39,7 +41,6 @@ public class GqlType {
 				return nested.getFull();
 			case LIST:
 				return String.format("java.util.List<%s>", nested.getFull());
-			case NAMED:
 			default:
 				return name;
 		}
@@ -51,7 +52,6 @@ public class GqlType {
 				return nested.getCustom(customType);
 			case LIST:
 				return String.format("java.util.List<%s>", nested.getCustom(customType));
-			case NAMED:
 			default:
 				return customType;
 		}
@@ -64,7 +64,6 @@ public class GqlType {
 				return String.format("%s!", nested);
 			case LIST:
 				return String.format("[%s]", nested);
-			case NAMED:
 			default:
 				return name;
 		}

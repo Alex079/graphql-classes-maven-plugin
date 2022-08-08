@@ -94,7 +94,7 @@ class GqlWriterTest {
 								.type(newListType(newTypeName("Type3").build()).build())
 								.build())
 						.build()));
-		this.ctx = new GqlContext(log, emptyMap());
+		this.ctx = new GqlContext(log, emptyMap(), emptyMap());
 		translator.translate(doc, ctx);
 	}
 
@@ -103,7 +103,7 @@ class GqlWriterTest {
 				newObjectTypeDefinition()
 						.name("Object1")
 						.build()));
-		this.ctx = new GqlContext(log, emptyMap());
+		this.ctx = new GqlContext(log, emptyMap(), emptyMap());
 		translator.translate(doc, ctx);
 	}
 

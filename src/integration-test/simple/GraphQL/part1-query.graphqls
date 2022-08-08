@@ -30,17 +30,18 @@ type TreeNode {
 }
 
 interface Interface1 {
-    node: TreeNode
+    switch: TreeNode
 }
 
 type Type1UnionField2 implements Interface1 {
     fieldA: ID
-    node: TreeNode
+    switch: TreeNode
 }
 
 type Type2UnionField2 implements Interface1 {
     name: String
-    node: TreeNode
+    switch: TreeNode
+    int: Int
 }
 
 union UnionQueryField2 = Type1UnionField2 | Type2UnionField2

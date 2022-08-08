@@ -38,7 +38,7 @@ class UnionTypeTranslatorTest {
 	@Test
 	void translateNoUnions() {
 		when(doc.getDefinitionsOfType(UnionTypeDefinition.class)).thenReturn(emptyList());
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -53,7 +53,7 @@ class UnionTypeTranslatorTest {
 				.memberType(newTypeName("Type1").build())
 				.memberType(newTypeName("Type2").build())
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -74,7 +74,7 @@ class UnionTypeTranslatorTest {
 				.name("Union1")
 				.memberTypes(singletonList(newTypeName("Type1").build()))
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 

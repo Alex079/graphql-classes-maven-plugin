@@ -13,6 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>${java.specification.version}</maven.compiler.source>
 		<maven.compiler.target>${java.specification.version}</maven.compiler.target>
+		<maven.compiler.release>${java.specification.version}</maven.compiler.release>
 	</properties>
 
 	<dependencies>
@@ -79,13 +80,16 @@
 						<Scalar1>Integer</Scalar1>
 						<DateTime>java.time.OffsetDateTime</DateTime>
 					</scalarMap>
+					<aliasMap>
+						<switch>switch1</switch>
+					</aliasMap>
 					<importPackages>
 						<value>java.math</value>
 					</importPackages>
 					<generatedOutputTypes>
 						<value>SCHEMA_TYPES</value>
 						<value>DEFINED_OPERATIONS</value>
-<!--						<value>DYNAMIC_OPERATIONS</value>-->
+						<value>DYNAMIC_OPERATIONS</value>
 					</generatedOutputTypes>
 				</configuration>
 				<executions>
@@ -96,7 +100,8 @@
 						</goals>
 						<configuration>
 							<packageName>it.gson</packageName>
-<!--							<jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>-->
+							<jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>
+							<privateFieldPrefix>p_</privateFieldPrefix>
 							<dataObjectEnhancement>BUILDER</dataObjectEnhancement>
 						</configuration>
 					</execution>
@@ -110,6 +115,17 @@
 							<jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation>
 							<generatedAnnotationVersion>${java.specification.version}</generatedAnnotationVersion>
 							<dataObjectEnhancement>METHOD_CHAINING</dataObjectEnhancement><!-- BUILDER does not work for Jackson -->
+						</configuration>
+					</execution>
+					<execution>
+						<id>plain</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<packageName>it.plain</packageName>
+							<privateFieldPrefix>_</privateFieldPrefix>
+							<privateFieldSuffix>_</privateFieldSuffix>
 						</configuration>
 					</execution>
 				</executions>

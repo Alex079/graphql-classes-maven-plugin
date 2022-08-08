@@ -9,20 +9,23 @@
 			<#lt/>${indent}.flatMap(java.util.Collection::stream)
 			<@addNullCheck fieldType=fieldType.nested indent=indent/>
 		<#break/>
+		<#default>
+			<#lt/>${indent}.forEach($ -> {});
+		<#break/>
 	</#switch>
 </#macro>
 
 <#function getFieldType field nested>
 	<#if field.selections?has_content>
-		<#return field.type.getCustom(currentPackage+nested?then('.'+field.name+'.','.')+field.type.inner+'Result') />
+		<#return field.type.getCustom(currentPackage+nested?then('.'+field.title+'.','.')+field.type.inner+'Result') />
 	<#else>
 		<#return field.type.full />
 	</#if>
 </#function>
 
 <#function getFieldName field>
-	<#if field.fragmentTypeName?has_content>
-		<#return field.name + '$' + field.fragmentTypeName />
+	<#if field.alias?has_content>
+		<#return field.alias />
 	<#else>
 		<#return field.name />
 	</#if>
@@ -32,12 +35,12 @@
 	<#if jsonProperty?has_content>
 		<#lt/>${indent}@${jsonProperty}("${getFieldName(field)}")
 	</#if>
-	<#lt/>${indent}private ${getFieldType(field,nested)} ${getFieldName(field)}<#if jsonProperty?has_content>__</#if> = null;
+	<#lt/>${indent}private ${getFieldType(field,nested)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = null;
 </#macro>
 
 <#macro addGetter field indent nested>
 	<#lt/>${indent}public ${getFieldType(field,nested)} get${getFieldName(field)?cap_first}() {
-	<#lt/>${indent}	return this.${getFieldName(field)}<#if jsonProperty?has_content>__</#if>;
+	<#lt/>${indent}	return this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!};
 	<#lt/>${indent}}
 </#macro>
 
@@ -45,8 +48,7 @@
 	<#lt/>${indent}public ${methodChaining?then(className,"void")} set${getFieldName(field)?cap_first}(${getFieldType(field,nested)} v) {
 	<#lt/>${indent}	java.util.stream.Stream.of(v)
 	<@addNullCheck fieldType=field.type indent=indent+'\t\t'/>
-	<#lt/>${indent}		.forEach($ -> {});
-	<#lt/>${indent}	this.${getFieldName(field)}<#if jsonProperty?has_content>__</#if> = v;
+	<#lt/>${indent}	this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = v;
 	<#if methodChaining>
 		<#lt/>${indent}	return this;
 	</#if>
@@ -70,26 +72,85 @@
 	</#list>
 </#macro>
 
-<#macro addSelectionFields className fields indent nested>
+<#macro addSelectionFieldBody field hasArguments hasSelections indent>
+	<#if field.alias?has_content>
+		<#lt/>${indent}documentBuilder.append(" ${field.alias}:");
+	</#if>
+	<#lt/>${indent}documentBuilder.append(" ${field.name}");
+	<#if hasArguments>
+		<#lt/>${indent}if (arguments != null) {
+		<#lt/>${indent}	documentBuilder.append(" (");
+		<#lt/>${indent}	arguments.accept(new ${field.title?cap_first}Arguments());
+		<#lt/>${indent}	documentBuilder.append(" )");
+		<#lt/>${indent}}
+	</#if>
+	<#if hasSelections>
+		<#lt/>${indent}if (selector != null) {
+		<#lt/>${indent}	documentBuilder.append(" {");
+		<#lt/>${indent}	selector.accept(new ${field.type.inner}Selector(documentBuilder));
+		<#lt/>${indent}	documentBuilder.append(" }");
+		<#lt/>${indent}}
+	</#if>
+	<#lt/>${indent}return this;
+</#macro>
+
+<#macro asLiteral fieldType indent>
+	<#switch fieldType.flag>
+		<#case 'MANDATORY'>
+			<#lt/>${indent}.filter(java.util.Objects::nonNull)
+			<@asLiteral fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#case 'LIST'>
+			<#lt/>${indent}.flatMap(v -> {
+			<#lt/>${indent}	if (v == null) {
+			<#lt/>${indent}		documentBuilder.append(" null");
+			<#lt/>${indent}		return java.util.stream.Stream.empty();
+			<#lt/>${indent}	}
+			<#lt/>${indent}	documentBuilder.append(" [");
+			<#lt/>${indent}	return v.stream().onClose(() -> documentBuilder.append(" ]"));
+			<#lt/>${indent}})
+			<@asLiteral fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#case 'NAMED'>
+			<#lt/>${indent}.forEach(v -> documentBuilder.append(" ").append(v)); // TODO quotes
+		<#break/>
+	</#switch>
+</#macro>
+
+<#macro addSelectionFields className fields indent>
 	<#list fields as field>
+		<#if field.arguments?has_content>
+			<#lt/>${indent}public class ${field.title?cap_first}Arguments {
+			<#list field.arguments as argument>
+				<#lt/>${indent}	public ${field.title?cap_first}Arguments set${argument.name?cap_first}(${argument.type.full} value) {
+				<#lt/>${indent}		documentBuilder.append(" ${argument.name}:");
+				<#lt/>${indent}		java.util.stream.Stream.of(value)
+				<@asLiteral fieldType=argument.type indent=indent+'\t\t\t'/>
+				<#lt/>${indent}		return this;
+				<#lt/>${indent}	}
+			</#list>
+			<#lt/>${indent}}
+		</#if>
 		<#if field.selections?has_content>
-			<#lt/>${indent}public ${className} with${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> consumer) {
-			<#if getFieldName(field) != field.name>
-				<#lt/>${indent}	documentBuilder.append(" ${getFieldName(field)}:");
+			<#if field.arguments?has_content>
+				<#lt/>${indent}public ${className} get${field.name?cap_first}(java.util.function.Consumer<${field.title?cap_first}Arguments> arguments, java.util.function.Consumer<${field.type.inner}Selector> selector) {
+				<@addSelectionFieldBody field=field hasArguments=true hasSelections=true indent=indent+'\t' />
+				<#lt/>${indent}}
+			<#else>
+				<#lt/>${indent}public ${className} get${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> selector) {
+				<@addSelectionFieldBody field=field hasArguments=false hasSelections=true indent=indent+'\t' />
+				<#lt/>${indent}}
 			</#if>
-			<#lt/>${indent}	documentBuilder.append(" ${field.name} {");
-			<#lt/>${indent}	consumer.accept(new ${field.type.inner}Selector(documentBuilder));
-			<#lt/>${indent}	documentBuilder.append(" }");
-			<#lt/>${indent}	return this;
-			<#lt/>${indent}}
 		<#else>
-			<#lt/>${indent}public ${className} with${field.name?cap_first}() {
-			<#if getFieldName(field) != field.name>
-				<#lt/>${indent}	documentBuilder.append(" ${getFieldName(field)}:");
+			<#if field.arguments?has_content>
+				<#lt/>${indent}public ${className} get${field.name?cap_first}(java.util.function.Consumer<${field.title?cap_first}Arguments> arguments) {
+				<@addSelectionFieldBody field=field hasArguments=true hasSelections=false indent=indent+'\t' />
+				<#lt/>${indent}}
+			<#else>
+				<#lt/>${indent}public ${className} get${field.name?cap_first}() {
+				<@addSelectionFieldBody field=field hasArguments=false hasSelections=false indent=indent+'\t' />
+				<#lt/>${indent}}
 			</#if>
-			<#lt/>${indent}	documentBuilder.append(" ${field.name}");
-			<#lt/>${indent}	return this;
-			<#lt/>${indent}}
 		</#if>
 	</#list>
 </#macro>
@@ -144,14 +205,27 @@
 	<#lt/>${indent}}
 </#macro>
 
+<#macro addToGraphQlString fields indent>
+	<#lt/>${indent}@Override
+	<#lt/>${indent}public String toString() {
+	<#lt/>${indent}	StringBuilder documentBuilder = new StringBuilder().append(" {");
+	<#list fields as field>
+		<#lt/>${indent}		documentBuilder.append(" ${getFieldName(field)}:");
+		<#lt/>${indent}		java.util.stream.Stream.of(get${getFieldName(field)?cap_first}())
+		<@asLiteral fieldType=field.type indent=indent+'\t\t\t'/>
+	</#list>
+	<#lt/>${indent}		return documentBuilder.append(" }").toString();
+	<#lt/>${indent}}
+</#macro>
+
 <#macro addConstructor className fields indent nested>
 	<#lt/>${indent}private ${className}(
 	<#list fields as field>
-		<#lt/>${indent}	${getFieldType(field,nested)} ${getFieldName(field)}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
+		<#lt/>${indent}	${getFieldType(field,nested)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!}<#sep>,</#sep>
 	</#list>
 	<#lt/>${indent}) {
 	<#list fields as field>
-		<#lt/>${indent}	this.${getFieldName(field)}<#if jsonProperty?has_content>__</#if> = ${getFieldName(field)}<#if jsonProperty?has_content>__</#if>;
+		<#lt/>${indent}	this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = ${propertyPrefix!}${getFieldName(field)}${propertySuffix!};
 	</#list>
 	<#lt/>${indent}}
 </#macro>
@@ -166,7 +240,7 @@
 	<#lt/>${indent}public ${resultClassName} build() {
 	<#lt/>${indent}	return new ${resultClassName}(
 	<#list fields as field>
-		<#lt/>${indent}		${getFieldName(field)}<#if jsonProperty?has_content>__</#if><#sep>,</#sep>
+		<#lt/>${indent}		${propertyPrefix!}${getFieldName(field)}${propertySuffix!}<#sep>,</#sep>
 	</#list>
 	<#lt/>${indent}	);
 	<#lt/>${indent}}

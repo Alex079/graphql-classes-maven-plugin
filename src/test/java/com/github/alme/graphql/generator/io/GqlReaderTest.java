@@ -38,7 +38,7 @@ class GqlReaderTest {
 	@Test
 	void throwExceptionWhenInputIsEmpty() {
 		when(readerFactory.getReader()).thenReturn(new StringReader("  "));
-		GqlContext context = new GqlContext(log, emptyMap());
+		GqlContext context = new GqlContext(log, emptyMap(), emptyMap());
 
 		assertThatThrownBy(() -> reader.read(context, MINIMAL_CONFIG))
 			.isExactlyInstanceOf(graphql.parser.InvalidSyntaxException.class)
@@ -48,7 +48,7 @@ class GqlReaderTest {
 	@Test
 	void throwExceptionWhenInputIsInvalid() {
 		when(readerFactory.getReader()).thenReturn(new StringReader(INVALID_SCHEMA));
-		GqlContext context = new GqlContext(log, emptyMap());
+		GqlContext context = new GqlContext(log, emptyMap(), emptyMap());
 
 		assertThatThrownBy(() -> reader.read(context, MINIMAL_CONFIG))
 			.isExactlyInstanceOf(graphql.parser.InvalidSyntaxException.class)
@@ -58,7 +58,7 @@ class GqlReaderTest {
 	@Test
 	void parseMinimalSchema() {
 		when(readerFactory.getReader()).thenReturn(new StringReader(MINIMAL_SCHEMA));
-		GqlContext context = new GqlContext(log, emptyMap());
+		GqlContext context = new GqlContext(log, emptyMap(), emptyMap());
 
 		reader.read(context, GqlConfiguration.builder().generateSchemaOtherTypes(true).build());
 

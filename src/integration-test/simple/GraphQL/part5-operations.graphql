@@ -8,6 +8,9 @@
         idB
         id
     }
+    field2(arg2: []) {
+        edges { node { ...on TreeNode { cl:synchronized { value } } } }
+    }
 }
 
 fragment ValueFragment on Type1MutationField2 {

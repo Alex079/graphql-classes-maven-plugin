@@ -1,5 +1,7 @@
 package com.github.alme.graphql.generator.translator;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +12,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.github.alme.graphql.generator.dto.GqlArgument;
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlSelection;
@@ -68,7 +71,11 @@ public class Util {
 			selectionSet.getSelectionsOfType(Field.class).stream()
 				.map(field -> {
 					GqlType type = guessTypeOfField(field, ctx, typeName);
-					GqlSelection selection = new GqlSelection(field.getAlias() == null ? field.getName() : field.getAlias(), type, "");
+					String alias = field.getAlias();
+					if (alias == null) {
+						alias = "";
+					}
+					GqlSelection selection = new GqlSelection(new GqlField(field.getName(), type), alias, "");
 					if (field.getSelectionSet() != null) {
 						selection.addSelections(translateSelection(field.getSelectionSet(), allFragments, requiredFragments, ctx, type.getInner()));
 					}
@@ -104,8 +111,9 @@ public class Util {
 						result.put(currItem, currItem);
 					}
 					else {
-						GqlSelection nextItem = new GqlSelection(currItem.getName(), currItem.getType(), currItem.getFragmentTypeName())
-							.addSelections(deepMerge(Stream.concat(prevItem.getSelections().stream(), currItem.getSelections().stream())));
+						GqlSelection nextItem =
+							new GqlSelection(currItem.getField(), currItem.getAlias(), currItem.getFragmentTypeName())
+								.addSelections(deepMerge(Stream.concat(prevItem.getSelections().stream(), currItem.getSelections().stream())));
 						result.put(nextItem, nextItem);
 					}
 					return result;
@@ -154,7 +162,13 @@ public class Util {
 	}
 
 	public static Function<FieldDefinition, GqlField> fromFieldDef(GqlContext ctx) {
-		return v -> new GqlField(v.getName(), translateType(v.getType(), ctx));
+		return v -> {
+			GqlField field = new GqlField(v.getName(), translateType(v.getType(), ctx));
+			return field
+				.addArguments(v.getInputValueDefinitions().stream()
+					.map(definition -> new GqlArgument(definition.getName(), translateType(definition.getType(), ctx)))
+					.collect(toList()));
+		};
 	}
 
 	public static Function<InputValueDefinition, GqlField> fromInputValueDef(GqlContext ctx) {

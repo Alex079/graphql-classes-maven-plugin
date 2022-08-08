@@ -16,16 +16,16 @@ public class OutputTypesParameterApplier implements ParameterApplier {
 	public void apply(GqlConfigurationBuilder builder) {
 		boolean needSchemaTypes = false;
 		boolean needDefinedOperations = true;
-//		boolean needDynamicOperations = false;
+		boolean needDynamicOperations = false;
 		if (generatedOutputTypes != null && !generatedOutputTypes.isEmpty()) {
 			needSchemaTypes = generatedOutputTypes.contains(GeneratedOutputType.SCHEMA_TYPES);
 			needDefinedOperations = generatedOutputTypes.contains(GeneratedOutputType.DEFINED_OPERATIONS);
-//			needDynamicOperations = generatedOutputTypes.contains(GeneratedOutputType.DYNAMIC_OPERATIONS);
+			needDynamicOperations = generatedOutputTypes.contains(GeneratedOutputType.DYNAMIC_OPERATIONS);
 		}
 		builder
 			.generateDefinedOperations(needDefinedOperations)
-//			.generateDynamicOperations(needDynamicOperations)
-			.generateSchemaInputTypes(needSchemaTypes || needDefinedOperations) // || needDynamicOperations)
+			.generateDynamicOperations(needDynamicOperations)
+			.generateSchemaInputTypes(needSchemaTypes || needDefinedOperations || needDynamicOperations)
 			.generateSchemaOtherTypes(needSchemaTypes);
 	}
 

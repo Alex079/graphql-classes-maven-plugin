@@ -15,6 +15,7 @@ public class GqlContext {
 
 	Log log;
 	Map<String, String> scalars;
+	Map<String, String> aliases;
 	Map<String, String> schema = new HashMap<>();
 	Map<Structure, Map<String, GqlStructure>> structures = new EnumMap<>(Structure.class);
 	Map<String, GqlOperation> definedOperations = new HashMap<>();
