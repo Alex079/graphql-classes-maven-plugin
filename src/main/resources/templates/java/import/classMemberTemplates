@@ -112,7 +112,17 @@
 			<@asLiteral fieldType=fieldType.nested indent=indent/>
 		<#break/>
 		<#case 'NAMED'>
-			<#lt/>${indent}.forEach(v -> documentBuilder.append(" ").append(v)); // TODO quotes
+			<#lt/>${indent}.forEach(v -> {
+			<#lt/>${indent}	documentBuilder.append(" ");
+			<#lt/>${indent}	boolean needQuotes = CharSequence.class.isAssignableFrom(v.getClass());
+			<#lt/>${indent}	if (needQuotes) {
+			<#lt/>${indent}		documentBuilder.append("\"\"\"");
+			<#lt/>${indent}	}
+			<#lt/>${indent}	documentBuilder.append(v);
+			<#lt/>${indent}	if (needQuotes) {
+			<#lt/>${indent}		documentBuilder.append("\"\"\"");
+			<#lt/>${indent}	}
+			<#lt/>${indent}});
 		<#break/>
 	</#switch>
 </#macro>

@@ -123,7 +123,7 @@ class ITest {
 					)
 			)
 		);
-		final String expectedDocument = "mutation { field3 ( arg1: 1 ) {" +
+		final String expectedDocument = "mutation { field3 ( arg1: \"\"\"1\"\"\" ) {" +
 			" ...on Type1MutationField2 { name$Type1MutationField2: name value$Type1MutationField2: value }" +
 			" ...on Type2MutationField2 { id$Type2MutationField2: id value$Type2MutationField2: value { value } } } }";
 
