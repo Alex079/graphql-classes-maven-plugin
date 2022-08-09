@@ -113,6 +113,10 @@
 		<#break/>
 		<#case 'NAMED'>
 			<#lt/>${indent}.forEach(v -> {
+			<#lt/>${indent}	if (v == null) {
+			<#lt/>${indent}		documentBuilder.append(" null");
+			<#lt/>${indent}		return;
+			<#lt/>${indent}	}
 			<#lt/>${indent}	documentBuilder.append(" ");
 			<#lt/>${indent}	boolean needQuotes = CharSequence.class.isAssignableFrom(v.getClass());
 			<#lt/>${indent}	if (needQuotes) {
