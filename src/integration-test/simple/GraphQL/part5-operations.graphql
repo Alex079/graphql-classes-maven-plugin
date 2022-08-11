@@ -27,7 +27,7 @@ fragment ValueFragment on Type3MutationField2 {
     t3Value: value
 }
 
-mutation updateField2($id: ID = "0") {
+mutation updateField2($id: [ID!]! = ["0"]) {
     field2(arg1: $id) {
         id name
         ...on Type2MutationField2 {

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static it.test.support.Utils.gsonConvert;
 import static it.test.support.Utils.jacksonConvert;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class ITest {
 
 	@Test
 	void testDocumentGeneration() {
-		CharSequence[] expected = {"mutation updateField2($id: ID = \"\"\"0\"\"\") {\n" +
+		CharSequence[] expected = {"mutation updateField2($id: [ID!]! = [\"\"\"0\"\"\"]) {\n" +
 			"\tfield2(arg1: $id) {\n" +
 			"\t\tid\n" +
 			"\t\tname\n" +
@@ -51,17 +52,17 @@ class ITest {
 				"}"};
 
 		it.gson.updateField2Mutation.UpdateField2Mutation gMutation =
-			new it.gson.updateField2Mutation.UpdateField2Mutation(var -> var.setId("2"));
+			new it.gson.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(gMutation.getDocument()).contains(expected);
 
 		it.jackson.updateField2Mutation.UpdateField2Mutation jMutation =
-			new it.jackson.updateField2Mutation.UpdateField2Mutation(var -> var.setId("2"));
+			new it.jackson.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(jMutation.getDocument()).contains(expected);
 
 		it.plain.updateField2Mutation.UpdateField2Mutation pMutation =
-			new it.plain.updateField2Mutation.UpdateField2Mutation(var -> var.setId("2"));
+			new it.plain.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(pMutation.getDocument()).contains(expected);
 	}
@@ -124,20 +125,20 @@ class ITest {
 			)
 		);
 		final String expectedDocument = "mutation { field3 ( arg1: \"\"\"1\"\"\" ) {" +
-			" ...on Type1MutationField2 { name$Type1MutationField2: name value$Type1MutationField2: value }" +
-			" ...on Type2MutationField2 { id$Type2MutationField2: id value$Type2MutationField2: value { value } } } }";
+			" ...on Type1MutationField2 { name_Type1MutationField2: name value_Type1MutationField2: value }" +
+			" ...on Type2MutationField2 { id_Type2MutationField2: id value_Type2MutationField2: value { value } } } }";
 
 		assertThat(gMutation.getDocument()).isEqualTo(jMutation.getDocument()).isEqualTo(expectedDocument);
 
 		final String resultExample = "{" +
 			"  \"field3\": [" +
 			"    {" +
-			"      \"name$Type2MutationField2\": \"C\"," +
-			"      \"value$Type2MutationField2\": {\"value\": 2}" +
+			"      \"name_Type2MutationField2\": \"C\"," +
+			"      \"value_Type2MutationField2\": {\"value\": 2}" +
 			"    }," +
 			"    {" +
-			"      \"id$Type1MutationField2\": \"G\"," +
-			"      \"value$Type1MutationField2\": 3" +
+			"      \"id_Type1MutationField2\": \"G\"," +
+			"      \"value_Type1MutationField2\": 3" +
 			"    }" +
 			"  ]" +
 			"}";
@@ -163,7 +164,7 @@ class ITest {
 				.getName()
 			)
 		);
-		final String expectedDocument = "mutation { field2 { ...on Type1MutationField2 { name$Type1MutationField2: name } id name } }";
+		final String expectedDocument = "mutation { field2 { ...on Type1MutationField2 { name_Type1MutationField2: name } id name } }";
 
 		assertThat(gMutation.getDocument()).isEqualTo(jMutation.getDocument()).isEqualTo(expectedDocument);
 
@@ -171,11 +172,11 @@ class ITest {
 			"  \"field2\": [" +
 			"    {" +
 			"      \"id\": \"ID1\"," +
-			"      \"id$Type1MutationField2\": \"N\"" +
+			"      \"id_Type1MutationField2\": \"N\"" +
 			"    }," +
 			"    {" +
 			"      \"id\": \"ID2\"," +
-			"      \"value$Type2MutationField2\": {\"value\": 2}" +
+			"      \"value_Type2MutationField2\": {\"value\": 2}" +
 			"    }" +
 			"  ]" +
 			"}";

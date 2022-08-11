@@ -43,7 +43,7 @@ public class DynamicOperationTranslator implements Translator {
 					.filter(objectType -> objectType.getMembers().contains(interfaceTypeName))
 					.flatMap(objectType -> objectType.getFields().stream()
 						.map(field ->
-							new GqlSelection(field, field.getName() + '$' + objectType.getName(), objectType.getName()))
+							new GqlSelection(field, field.getName() + '_' + objectType.getName(), objectType.getName()))
 					)
 			).collect(toList());
 			result.put(interfaceTypeName, selections);
@@ -54,7 +54,7 @@ public class DynamicOperationTranslator implements Translator {
 				.filter(objectType -> objectType.getMembers().contains(unionTypeName))
 				.flatMap(objectType -> objectType.getFields().stream()
 					.map(field ->
-						new GqlSelection(field, field.getName() + '$' + objectType.getName(), objectType.getName()))
+						new GqlSelection(field, field.getName() + '_' + objectType.getName(), objectType.getName()))
 				)
 				.collect(toList());
 			result.put(unionTypeName, selections);

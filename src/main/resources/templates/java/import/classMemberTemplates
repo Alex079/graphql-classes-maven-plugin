@@ -72,6 +72,22 @@
 	</#list>
 </#macro>
 
+<#macro asLiteralArgument fieldType indent>
+	<#switch fieldType.flag>
+		<#case 'MANDATORY'>
+			<#lt/>${indent}.map(java.util.Objects::requireNonNull)
+			<@asLiteralArgument fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#case 'LIST'>
+			<#lt/>${indent}.flatMap(arrayAppender(documentBuilder))
+			<@asLiteralArgument fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#default>
+			<#lt/>${indent}.forEach(valueAppender(documentBuilder));
+		<#break/>
+	</#switch>
+</#macro>
+
 <#macro addSelectionFieldBody field hasArguments hasSelections indent>
 	<#if field.alias?has_content>
 		<#lt/>${indent}documentBuilder.append(" ${field.alias}:");
@@ -94,43 +110,6 @@
 	<#lt/>${indent}return this;
 </#macro>
 
-<#macro asLiteral fieldType indent>
-	<#switch fieldType.flag>
-		<#case 'MANDATORY'>
-			<#lt/>${indent}.filter(java.util.Objects::nonNull)
-			<@asLiteral fieldType=fieldType.nested indent=indent/>
-		<#break/>
-		<#case 'LIST'>
-			<#lt/>${indent}.flatMap(v -> {
-			<#lt/>${indent}	if (v == null) {
-			<#lt/>${indent}		documentBuilder.append(" null");
-			<#lt/>${indent}		return java.util.stream.Stream.empty();
-			<#lt/>${indent}	}
-			<#lt/>${indent}	documentBuilder.append(" [");
-			<#lt/>${indent}	return v.stream().onClose(() -> documentBuilder.append(" ]"));
-			<#lt/>${indent}})
-			<@asLiteral fieldType=fieldType.nested indent=indent/>
-		<#break/>
-		<#case 'NAMED'>
-			<#lt/>${indent}.forEach(v -> {
-			<#lt/>${indent}	if (v == null) {
-			<#lt/>${indent}		documentBuilder.append(" null");
-			<#lt/>${indent}		return;
-			<#lt/>${indent}	}
-			<#lt/>${indent}	documentBuilder.append(" ");
-			<#lt/>${indent}	boolean needQuotes = CharSequence.class.isAssignableFrom(v.getClass());
-			<#lt/>${indent}	if (needQuotes) {
-			<#lt/>${indent}		documentBuilder.append("\"\"\"");
-			<#lt/>${indent}	}
-			<#lt/>${indent}	documentBuilder.append(v);
-			<#lt/>${indent}	if (needQuotes) {
-			<#lt/>${indent}		documentBuilder.append("\"\"\"");
-			<#lt/>${indent}	}
-			<#lt/>${indent}});
-		<#break/>
-	</#switch>
-</#macro>
-
 <#macro addSelectionFields className fields indent>
 	<#list fields as field>
 		<#if field.arguments?has_content>
@@ -139,7 +118,7 @@
 				<#lt/>${indent}	public ${field.title?cap_first}Arguments set${argument.name?cap_first}(${argument.type.full} value) {
 				<#lt/>${indent}		documentBuilder.append(" ${argument.name}:");
 				<#lt/>${indent}		java.util.stream.Stream.of(value)
-				<@asLiteral fieldType=argument.type indent=indent+'\t\t\t'/>
+				<@asLiteralArgument fieldType=argument.type indent=indent+'\t\t\t'/>
 				<#lt/>${indent}		return this;
 				<#lt/>${indent}	}
 			</#list>
@@ -172,6 +151,8 @@
 <#macro addVariables className variables indent>
 	<#list variables as field>
 		<#lt/>${indent}public ${className} set${field.name?cap_first}(${field.type.full} value) {
+		<#lt/>${indent}	java.util.stream.Stream.of(value)
+		<@addNullCheck fieldType=field.type indent=indent+'\t\t'/>
 		<#lt/>${indent}	map.put("${field.name}", value);
 		<#lt/>${indent}	return this;
 		<#lt/>${indent}}
@@ -217,6 +198,51 @@
 	<#lt/>${indent}		.append(" }")
 	<#lt/>${indent}		.toString();
 	<#lt/>${indent}}
+</#macro>
+
+<#macro addAppenders>
+	private java.util.function.Function<java.util.List<?>, java.util.stream.Stream<?>> arrayAppender(StringBuilder documentBuilder) {
+		return v -> {
+			if (v == null) {
+				documentBuilder.append(" null");
+				return java.util.stream.Stream.empty();
+			}
+			documentBuilder.append(" [");
+			return v.stream().onClose(() -> documentBuilder.append(" ]"));
+		};
+	}
+	private java.util.function.Consumer<Object> valueAppender(StringBuilder documentBuilder) {
+		return v -> {
+			if (v == null) {
+				documentBuilder.append(" null");
+				return;
+			}
+			documentBuilder.append(" ");
+			boolean needQuotes = !v.getClass().isEnum() && !Number.class.isInstance(v) && java.io.Serializable.class.isInstance(v);
+			if (needQuotes) {
+				documentBuilder.append("\"\"\"");
+			}
+			documentBuilder.append(v);
+			if (needQuotes) {
+				documentBuilder.append("\"\"\"");
+			}
+		};
+	}
+</#macro>
+
+<#macro asLiteral fieldType indent>
+	<#switch fieldType.flag>
+		<#case 'MANDATORY'>
+			<@asLiteral fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#case 'LIST'>
+			<#lt/>${indent}.flatMap(arrayAppender(documentBuilder))
+			<@asLiteral fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#default>
+			<#lt/>${indent}.forEach(valueAppender(documentBuilder));
+		<#break/>
+	</#switch>
 </#macro>
 
 <#macro addToGraphQlString fields indent>

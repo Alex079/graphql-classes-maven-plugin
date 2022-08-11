@@ -16,6 +16,9 @@ public class ${className}
 	public ${className}(StringBuilder documentBuilder) {
 		this.documentBuilder = documentBuilder;
 	}
+	<#if selections?values?drop_while(list -> !list?drop_while(field -> !field.arguments?has_content)?has_content)?has_content>
+		<@classMembers.addAppenders />
+	</#if>
 	<#list selections as typeName, fields>
 		<#if typeName?has_content>
 			<#lt/>	public ${className} on${typeName}(java.util.function.Consumer<${typeName}Selector> selector) {
