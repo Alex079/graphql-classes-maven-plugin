@@ -200,36 +200,6 @@
 	<#lt/>${indent}}
 </#macro>
 
-<#macro addAppenders>
-	private java.util.function.Function<java.util.List<?>, java.util.stream.Stream<?>> arrayAppender(StringBuilder documentBuilder) {
-		return v -> {
-			if (v == null) {
-				documentBuilder.append(" null");
-				return java.util.stream.Stream.empty();
-			}
-			documentBuilder.append(" [");
-			return v.stream().onClose(() -> documentBuilder.append(" ]"));
-		};
-	}
-	private java.util.function.Consumer<Object> valueAppender(StringBuilder documentBuilder) {
-		return v -> {
-			if (v == null) {
-				documentBuilder.append(" null");
-				return;
-			}
-			documentBuilder.append(" ");
-			boolean needQuotes = !v.getClass().isEnum() && !Number.class.isInstance(v) && java.io.Serializable.class.isInstance(v);
-			if (needQuotes) {
-				documentBuilder.append("\"\"\"");
-			}
-			documentBuilder.append(v);
-			if (needQuotes) {
-				documentBuilder.append("\"\"\"");
-			}
-		};
-	}
-</#macro>
-
 <#macro asLiteral fieldType indent>
 	<#switch fieldType.flag>
 		<#case 'MANDATORY'>

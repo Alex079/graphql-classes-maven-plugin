@@ -17,12 +17,12 @@ class ITest {
 		it.gson.types.EmptyType emptyType1WithGson = it.gson.types.EmptyType.builder().build();
 		it.gson.types.EmptyType emptyType2WithGson = it.gson.types.EmptyType.builder().build();
 		assertThat(emptyType1WithGson).isEqualTo(emptyType2WithGson)
-			.extracting(Objects::toString).isEqualTo(" { }");
+			.extracting(Objects::toString).isEqualTo("{ }");
 
 		it.jackson.types.EmptyType emptyType1WithJackson = new it.jackson.types.EmptyType();
 		it.jackson.types.EmptyType emptyType2WithJackson = new it.jackson.types.EmptyType();
 		assertThat(emptyType1WithJackson).isEqualTo(emptyType2WithJackson)
-			.extracting(Objects::toString).isEqualTo(" { }");
+			.extracting(Objects::toString).isEqualTo("{ }");
 	}
 
 	@Test

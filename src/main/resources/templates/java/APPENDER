@@ -1,0 +1,44 @@
+//CHECKSTYLE:OFF
+package ${operationsPackage};
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+public final class GraphQlAppender {
+
+	private GraphQlAppender() {}
+
+	public static Function<List<?>, Stream<?>> arrayAppender(StringBuilder documentBuilder) {
+		return value -> {
+			if (value == null) {
+				documentBuilder.append(" null");
+				return java.util.stream.Stream.empty();
+			}
+			documentBuilder.append(" [");
+			return value.stream().onClose(() -> documentBuilder.append(" ]"));
+		};
+	}
+
+	public static Consumer<Object> valueAppender(StringBuilder documentBuilder) {
+		return value -> {
+			if (value == null) {
+				documentBuilder.append(" null");
+				return;
+			}
+			documentBuilder.append(" ");
+			boolean needQuotes = !value.getClass().isEnum() && !Number.class.isInstance(value) && Serializable.class.isInstance(value);
+			if (needQuotes) {
+				documentBuilder.append("\"\"\"");
+			}
+			documentBuilder.append(value);
+			if (needQuotes) {
+				documentBuilder.append("\"\"\"");
+			}
+		};
+	}
+
+}
+//CHECKSTYLE:ON

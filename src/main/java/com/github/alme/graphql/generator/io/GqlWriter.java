@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GqlWriter {
 
+	private static final String APPENDER_TEMPLATE = "APPENDER";
 	private static final String OPERATION_INTERFACE_TEMPLATE = "OPERATION_INTERFACE";
 	private static final String DEFINED_OPERATION_TEMPLATE = "DEFINED_OPERATION";
 	private static final String DEFINED_OPERATION_VARIABLES_TEMPLATE = "DEFINED_OPERATION_VARIABLES";
@@ -34,6 +35,7 @@ public class GqlWriter {
 	private static final String DYNAMIC_OPERATION_TEMPLATE = "DYNAMIC_OPERATION";
 	private static final String DYNAMIC_OPERATION_SELECTOR_TEMPLATE = "DYNAMIC_OPERATION_SELECTOR";
 	private static final String DYNAMIC_OPERATION_RESULT_TEMPLATE = "DYNAMIC_OPERATION_RESULT";
+	private static final String APPENDER_CLASS_NAME = "GraphQlAppender";
 	private static final String UNNAMED_OPERATION = "Unnamed";
 	private static final String DYNAMIC_OPERATION = "Dynamic";
 	private static final String INTERFACE_NAME_KEY = "interfaceName";
@@ -87,7 +89,7 @@ public class GqlWriter {
 		boolean generateSchemaInputTypes = configuration.isGenerateSchemaInputTypes();
 		boolean generateSchemaOtherTypes = configuration.isGenerateSchemaOtherTypes();
 		if (generateSchemaInputTypes) {
-			context.getInputObjectTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.OBJECT, name, type));
+			context.getInputObjectTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.INPUT_OBJECT, name, type));
 		}
 		if (generateSchemaInputTypes || generateSchemaOtherTypes) {
 			context.getEnumTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.ENUM, name, type));
@@ -97,13 +99,13 @@ public class GqlWriter {
 			context.getUnionTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.UNION, name, type));
 			context.getObjectTypes().forEach((name, type) -> makeStructure(log, configuration, Structure.OBJECT, name, type));
 		}
-		if (!context.getDefinedOperations().isEmpty() || !context.getDynamicOperations().isEmpty()) {
+		boolean generateDefinedOperations = configuration.isGenerateDefinedOperations() && !context.getDefinedOperations().isEmpty();
+		boolean generateDynamicOperations = configuration.isGenerateDynamicOperations() && !context.getDynamicOperations().isEmpty();
+		if (generateDefinedOperations || generateDynamicOperations) {
 			context.getSchema().keySet().stream()
 				.map(GqlWriter::firstUpper)
 				.forEach(interfaceName -> makeOperationInterface(log, configuration, interfaceName));
 		}
-		boolean generateDefinedOperations = configuration.isGenerateDefinedOperations();
-		boolean generateDynamicOperations = configuration.isGenerateDynamicOperations();
 		if (generateDefinedOperations) {
 			context.getDefinedOperations().forEach((name, operation) -> makeDefinedOperation(log, configuration, name, operation));
 		}
@@ -114,6 +116,12 @@ public class GqlWriter {
 				makeDynamicOperationSelector(log, configuration, typeName, selections);
 			});
 		}
+		if (
+			(generateSchemaInputTypes && !context.getInputObjectTypes().isEmpty()) ||
+			(generateDynamicOperations && !context.getDynamicOperations().isEmpty())
+		) {
+			makeSharedClasses(log, configuration);
+		}
 		CFG.clearSharedVariables();
 	}
 
@@ -121,6 +129,15 @@ public class GqlWriter {
 		Path path = configuration.getSchemaTypesPackagePath().resolve(name + FILE_EXTENSION);
 		try (Writer writer = writerFactory.getWriter(path)) {
 			CFG.getTemplate(category.name()).process(type, writer);
+		} catch (TemplateException | IOException e) {
+			log.error(String.format(LOG_CANNOT_CREATE, path), e);
+		}
+	}
+
+	private void makeSharedClasses(Log log, GqlConfiguration configuration) {
+		Path path = configuration.getOperationsPackagePath().resolve(APPENDER_CLASS_NAME + FILE_EXTENSION);
+		try (Writer writer = writerFactory.getWriter(path)) {
+			CFG.getTemplate(APPENDER_TEMPLATE).process(null, writer);
 		} catch (TemplateException | IOException e) {
 			log.error(String.format(LOG_CANNOT_CREATE, path), e);
 		}
