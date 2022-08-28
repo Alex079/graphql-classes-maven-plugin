@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.22</version>
+			<version>1.18.24</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -39,12 +39,12 @@
 		<dependency>
 			<groupId>com.graphql-java</groupId>
 			<artifactId>graphql-java</artifactId>
-			<version>18.0</version>
+			<version>19.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.graphql-java-kickstart</groupId>
 			<artifactId>graphql-java-tools</artifactId>
-			<version>12.0.2</version>
+			<version>13.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
@@ -54,19 +54,19 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>5.8.2</version>
+			<version>5.9.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.22.0</version>
+			<version>3.23.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>4.3.1</version>
+			<version>4.7.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
