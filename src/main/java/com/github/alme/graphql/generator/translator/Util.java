@@ -162,13 +162,10 @@ public class Util {
 	}
 
 	public static Function<FieldDefinition, GqlField> fromFieldDef(GqlContext ctx) {
-		return v -> {
-			GqlField field = new GqlField(v.getName(), translateType(v.getType(), ctx));
-			return field
-				.addArguments(v.getInputValueDefinitions().stream()
-					.map(definition -> new GqlArgument(definition.getName(), translateType(definition.getType(), ctx)))
-					.collect(toList()));
-		};
+		return v -> new GqlField(v.getName(), translateType(v.getType(), ctx))
+			.addArguments(v.getInputValueDefinitions().stream()
+				.map(definition -> new GqlArgument(definition.getName(), translateType(definition.getType(), ctx)))
+				.collect(toList()));
 	}
 
 	public static Function<InputValueDefinition, GqlField> fromInputValueDef(GqlContext ctx) {
