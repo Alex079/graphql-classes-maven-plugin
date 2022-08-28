@@ -1,22 +1,19 @@
 //CHECKSTYLE:OFF
-package ${typesPackage};
+package ${schemaTypesPackage};
 
 <#list importPackages as i>
 import ${i}.*;
 </#list>
 
-<#if annotationVersion?has_content>@javax.annotation<#if annotationVersion!='1.8'>.processing</#if>.Generated(value = "com.github.alme.graphql.generator.GeneratorMojo", date = "${.now?iso_utc_ms}")</#if>
+${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
 public interface ${name}
-<#if 0 < members?size>
+<#if members?has_content>
 extends ${members?join(", ")}
 </#if>
 {
 	<#list fields as f>
 	${f.type.full} get${f.name?cap_first}();
-
-	${useChainedAccessors?string(name,"void")} set${f.name?cap_first}(${f.type.full} v);
-
 	</#list>
 }
 //CHECKSTYLE:ON

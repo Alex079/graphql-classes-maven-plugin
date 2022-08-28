@@ -1,0 +1,21 @@
+<#import "import/classMemberTemplates" as classMembers/>
+//CHECKSTYLE:OFF
+package ${currentPackage};
+
+import ${schemaTypesPackage}.*;
+
+<#list importPackages as i>
+import ${i}.*;
+</#list>
+
+${generatedAnnotation!}
+@SuppressWarnings({"all", "PMD"})
+public class ${className}
+{
+	private final java.util.Map<String, Object> map;
+	public ${className}(java.util.Map<String, Object> map) {
+		this.map = map;
+	}
+	<@classMembers.addVariables className=className variables=variables indent='\t'/>
+}
+//CHECKSTYLE:ON

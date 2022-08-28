@@ -2,9 +2,9 @@ package com.github.alme.graphql.generator.translator;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,11 +12,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.github.alme.graphql.generator.dto.GqlArgument;
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlSelection;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 import com.github.alme.graphql.generator.dto.GqlType;
+
 import graphql.language.Field;
 import graphql.language.FieldDefinition;
 import graphql.language.FragmentDefinition;
@@ -29,10 +31,10 @@ import graphql.language.SelectionSet;
 import graphql.language.Type;
 import graphql.language.TypeName;
 import graphql.language.VariableDefinition;
+import lombok.experimental.UtilityClass;
 
-public final class Util {
-
-	private Util() {}
+@UtilityClass
+public class Util {
 
 	public static GqlType translateType(Type<?> type, GqlContext ctx) {
 		if (type instanceof NonNullType) {
@@ -55,61 +57,92 @@ public final class Util {
 		GqlContext ctx,
 		String typeName
 	) {
-		Collection<GqlSelection> result = new ArrayList<>();
-		result.addAll(
+		return deepMerge(streamSelection(selectionSet, allFragments, requiredFragments, ctx, typeName));
+	}
+
+	private static Stream<GqlSelection> streamSelection(
+		SelectionSet selectionSet,
+		Collection<FragmentDefinition> allFragments,
+		Collection<FragmentDefinition> requiredFragments,
+		GqlContext ctx,
+		String typeName
+	) {
+		return Stream.of(
 			selectionSet.getSelectionsOfType(Field.class).stream()
-				.map((field) -> {
+				.map(field -> {
 					GqlType type = guessTypeOfField(field, ctx, typeName);
-					GqlSelection selection = new GqlSelection(field.getAlias() == null ? field.getName() : field.getAlias(), type);
+					String alias = field.getAlias();
+					if (alias == null) {
+						alias = "";
+					}
+					GqlSelection selection = new GqlSelection(new GqlField(field.getName(), type), alias, "");
 					if (field.getSelectionSet() != null) {
-						selection.addSelections(translateSelection(field.getSelectionSet(),
-							allFragments, requiredFragments, ctx, type.getInner()));
+						selection.addSelections(translateSelection(field.getSelectionSet(), allFragments, requiredFragments, ctx, type.getInner()));
 					}
 					return selection;
-				})
-				.collect(toList()));
-		result.addAll(
+				}),
 			selectionSet.getSelectionsOfType(InlineFragment.class).stream()
-				.map((fragment) -> translateSelection(fragment.getSelectionSet(),
+				.map(fragment -> translateSelection(fragment.getSelectionSet(),
 					allFragments, requiredFragments, ctx, fragment.getTypeCondition().getName()))
-				.flatMap(Collection::stream)
-				.collect(toList()));
-		result.addAll(
+				.flatMap(Collection::stream),
 			selectionSet.getSelectionsOfType(FragmentSpread.class).stream()
 				.map(FragmentSpread::getName)
-				.map((fragmentName) -> allFragments.stream()
-					.filter((candidate) -> matchesByNameAndType(candidate, fragmentName, typeName, ctx)).findAny())
+				.map(fragmentName -> allFragments.stream()
+					.filter(candidate -> Objects.equals(candidate.getName(), fragmentName))
+					.filter(candidate -> matchesByType(candidate.getTypeCondition().getName(), typeName, ctx))
+					.findAny())
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.peek(requiredFragments::add)
-				.map((fragment) -> translateSelection(fragment.getSelectionSet(),
+				.map(fragment -> translateSelection(fragment.getSelectionSet(),
 					allFragments, requiredFragments, ctx, fragment.getTypeCondition().getName()))
 				.flatMap(Collection::stream)
-				.collect(toList()));
-		return result;
+			)
+			.flatMap(Function.identity());
 	}
 
-	private static GqlType guessTypeOfField(Field field, GqlContext ctx, String containerType) {
+	private static Collection<GqlSelection> deepMerge(Stream<GqlSelection> selection) {
+		return selection
+			.reduce(
+				new HashMap<GqlSelection, GqlSelection>(),
+				(result, currItem) -> {
+					GqlSelection prevItem = result.remove(currItem);
+					if (prevItem == null) {
+						result.put(currItem, currItem);
+					}
+					else {
+						GqlSelection nextItem =
+							new GqlSelection(currItem.getField(), currItem.getAlias(), currItem.getFragmentTypeName())
+								.addSelections(deepMerge(Stream.concat(prevItem.getSelections().stream(), currItem.getSelections().stream())));
+						result.put(nextItem, nextItem);
+					}
+					return result;
+				},
+				(mapA, mapB) -> {
+					mapA.putAll(mapB);
+					return mapA;
+				}
+			)
+			.keySet();
+	}
+
+	private static GqlType guessTypeOfField(Field field, GqlContext ctx, String containerTypeName) {
 		return Stream.concat(
-			Optional.ofNullable(ctx.getObjectTypes().get(containerType))
+			Optional.ofNullable(ctx.getObjectTypes().get(containerTypeName))
 				.map(GqlStructure::getFields)
 				.map(Collection::stream)
 				.orElseGet(Stream::empty),
-			Optional.ofNullable(ctx.getInterfaceTypes().get(containerType))
+			Optional.ofNullable(ctx.getInterfaceTypes().get(containerTypeName))
 				.map(GqlStructure::getFields)
 				.map(Collection::stream)
 				.orElseGet(Stream::empty))
-			.filter((candidate) -> Objects.equals(field.getName(), candidate.getName()))
+			.filter(candidate -> Objects.equals(field.getName(), candidate.getName()))
 			.map(GqlField::getType)
 			.findAny()
 			.orElse(GqlType.named("String"));
 	}
 
-	private static boolean matchesByNameAndType(FragmentDefinition candidate, String fragmentName, String selectionType, GqlContext ctx) {
-		if (!Objects.equals(fragmentName, candidate.getName())) {
-			return false;
-		}
-		String candidateType = candidate.getTypeCondition().getName();
+	private static boolean matchesByType(String candidateType, String selectionType, GqlContext ctx) {
 		if (Objects.equals(selectionType, candidateType)) {
 			return true;
 		}
@@ -117,7 +150,7 @@ public final class Util {
 		candidateTypes.add(candidateType);
 		Set<String> selectionTypes = new HashSet<>();
 		selectionTypes.add(selectionType);
-		ctx.getObjectTypes().values().forEach((typeStructure) -> {
+		ctx.getObjectTypes().values().forEach(typeStructure -> {
 			if (typeStructure.getMembers().contains(candidateType)) {
 				candidateTypes.add(typeStructure.getName());
 			}
@@ -125,27 +158,22 @@ public final class Util {
 				selectionTypes.add(typeStructure.getName());
 			}
 		});
-		/*
-		 Given matching fragment name and not matching selection type and fragment condition type,
-		 'selectionType' is likely to be an interface or a union,
-		 'candidateType' is likely to be an object.
-		 In this case 'selectionTypes' is likely to contain more elements than 'candidateTypes'.
-		 'disjoint' method will iterate over the second collection if the first collection is a 'Set',
-		 therefore it is slightly better to invoke 'disjoint(selectionTypes, candidateTypes)'.
-		*/
 		return !Collections.disjoint(selectionTypes, candidateTypes);
 	}
 
 	public static Function<FieldDefinition, GqlField> fromFieldDef(GqlContext ctx) {
-		return (v) -> new GqlField(v.getName(), translateType(v.getType(), ctx));
+		return v -> new GqlField(v.getName(), translateType(v.getType(), ctx))
+			.addArguments(v.getInputValueDefinitions().stream()
+				.map(definition -> new GqlArgument(definition.getName(), translateType(definition.getType(), ctx)))
+				.collect(toList()));
 	}
 
 	public static Function<InputValueDefinition, GqlField> fromInputValueDef(GqlContext ctx) {
-		return (v) -> new GqlField(v.getName(), translateType(v.getType(), ctx));
+		return v -> new GqlField(v.getName(), translateType(v.getType(), ctx));
 	}
 
 	public static Function<VariableDefinition, GqlField> fromVariableDef(GqlContext ctx) {
-		return (v) -> new GqlField(v.getName(), translateType(v.getType(), ctx));
+		return v -> new GqlField(v.getName(), translateType(v.getType(), ctx));
 	}
 
 }

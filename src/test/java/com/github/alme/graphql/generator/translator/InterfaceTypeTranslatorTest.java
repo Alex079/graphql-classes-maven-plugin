@@ -47,7 +47,7 @@ class InterfaceTypeTranslatorTest {
 	@Test
 	void translateNoInterfaces() {
 		when(doc.getDefinitionsOfType(InterfaceTypeDefinition.class)).thenReturn(emptyList());
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -68,7 +68,7 @@ class InterfaceTypeTranslatorTest {
 					.type(newNonNullType(newListType(newNonNullType(newTypeName("Type2").build()).build()).build()).build())
 					.build())
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -113,7 +113,7 @@ class InterfaceTypeTranslatorTest {
 					.type(newNonNullType(newListType(newNonNullType(newTypeName("Type2").build()).build()).build()).build())
 					.build())
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -163,7 +163,7 @@ class InterfaceTypeTranslatorTest {
 					.type(newNonNullType(newListType(newNonNullType(newTypeName("Type2").build()).build()).build()).build())
 					.build())
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 

@@ -1,30 +1,34 @@
 package com.github.alme.graphql.generator.translator;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
+import static graphql.language.EnumValue.newEnumValue;
 import static graphql.language.FieldDefinition.newFieldDefinition;
 import static graphql.language.InputValueDefinition.newInputValueDefinition;
 import static graphql.language.ListType.newListType;
 import static graphql.language.ObjectTypeDefinition.newObjectTypeDefinition;
 import static graphql.language.ObjectTypeExtensionDefinition.newObjectTypeExtensionDefinition;
 import static graphql.language.TypeName.newTypeName;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 import java.util.Collection;
+
+import com.github.alme.graphql.generator.dto.GqlArgument;
+import com.github.alme.graphql.generator.dto.GqlContext;
+import com.github.alme.graphql.generator.dto.GqlField;
+import com.github.alme.graphql.generator.dto.GqlType;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.github.alme.graphql.generator.dto.GqlContext;
-import com.github.alme.graphql.generator.dto.GqlField;
-import com.github.alme.graphql.generator.dto.GqlType;
 
 import graphql.language.Document;
 import graphql.language.ObjectTypeDefinition;
@@ -43,7 +47,7 @@ class ObjectTypeTranslatorTest {
 	@Test
 	void translateNoObjectTypes() {
 		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(emptyList());
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -68,7 +72,7 @@ class ObjectTypeTranslatorTest {
 								.type(newListType(newTypeName("Type3").build()).build())
 								.build())
 						.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -97,7 +101,7 @@ class ObjectTypeTranslatorTest {
 				newObjectTypeDefinition()
 						.name("Object1")
 						.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -128,7 +132,7 @@ class ObjectTypeTranslatorTest {
 										.build())
 								.build())
 						.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -149,5 +153,41 @@ class ObjectTypeTranslatorTest {
 					break;
 			}
 		});
+	}
+
+	@Test
+	void translateArguments() {
+		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(singletonList(
+			newObjectTypeDefinition()
+				.name("Object1")
+				.fieldDefinition(newFieldDefinition()
+					.name("field1")
+					.type(newListType(newTypeName("Type1").build()).build())
+					.inputValueDefinition(newInputValueDefinition()
+						.name("arg1")
+						.type(newTypeName("Enum1").build())
+						.defaultValue(newEnumValue("V1").build())
+						.build())
+					.build())
+				.build()));
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
+
+		translator.translate(doc, ctx);
+
+		assertEquals(1, ctx.getObjectTypes().size());
+		assertTrue(ctx.getObjectTypes().containsKey("Object1"));
+		Collection<GqlField> fields = ctx.getObjectTypes().get("Object1").getFields();
+		assertEquals(1, fields.size());
+		GqlField field = fields.iterator().next();
+		GqlType fieldType = field.getType();
+		assertEquals("field1", field.getName());
+		assertEquals(GqlType.Flag.LIST, fieldType.getFlag());
+		assertEquals("Type1", fieldType.getNested().getName());
+		assertEquals(1, field.getArguments().size());
+		GqlArgument argument = field.getArguments().iterator().next();
+		GqlType argumentType = argument.getType();
+		assertEquals("arg1", argument.getName());
+		assertEquals(GqlType.Flag.NAMED, argumentType.getFlag());
+		assertEquals("Enum1", argumentType.getName());
 	}
 }

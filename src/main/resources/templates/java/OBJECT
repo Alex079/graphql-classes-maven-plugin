@@ -1,79 +1,31 @@
+<#import "import/classMemberTemplates" as classMembers/>
 //CHECKSTYLE:OFF
-<#macro m_check_null input>
-		<#switch input.flag>
-		<#case 'MANDATORY'>
-		.map(Objects::requireNonNull)
-		<@m_check_null input.nested/>
-		<#break>
-		<#case 'LIST'>
-		.filter(Objects::nonNull)
-		.flatMap(Collection::stream)
-		<@m_check_null input.nested/>
-		<#break>
-		</#switch>
-</#macro>
-package ${typesPackage};
+package ${schemaTypesPackage};
 
 <#list importPackages as i>
 import ${i}.*;
 </#list>
 
-<#if annotationVersion?has_content>@javax.annotation<#if annotationVersion!='1.8'>.processing</#if>.Generated(value = "com.github.alme.graphql.generator.GeneratorMojo", date = "${.now?iso_utc_ms}")</#if>
+${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
 public class ${name}
-<#if 0 < members?size>
+<#if members?has_content>
 implements ${members?join(", ")}
 </#if>
 {
-	<#list fields as f>
-	<#if jsonProperty?has_content>@${jsonProperty}("${f.name}")</#if>
-	private ${f.type.full} ${f.name}<#if jsonProperty?has_content>__</#if>;
-
-	public ${f.type.full} get${f.name?cap_first}() {
-		return this.${f.name}<#if jsonProperty?has_content>__</#if>;
-	}
-
-	public ${useChainedAccessors?string(name,"void")} set${f.name?cap_first}(${f.type.full} v) {
-		java.util.stream.Stream.of(v)
-		<@m_check_null f.type/>
-		.forEach($ -> {});
-		this.${f.name}<#if jsonProperty?has_content>__</#if> = v;<#if useChainedAccessors>
-		return this;</#if>
-	}
-
-	</#list>
-
-	@Override
-	public String toString() {
-		return new StringBuilder().append("{")
-		<#list fields as f>
-			.append(" ${f.name} = ").append(get${f.name?cap_first}())<#sep>.append(",")</#sep>
-		</#list>
-			.append(" }").toString();
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof ${name})) return false;
-		<#if 0 < fields?size>
-		${name} other = (${name}) o;
-		</#if>
-		return true
-		<#list fields as f>
-			&& Objects.equals(this.get${f.name?cap_first}(), other.get${f.name?cap_first}())
-		</#list>
-		;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(
-		<#list fields as f>
-			get${f.name?cap_first}()<#sep>,</#sep>
-		</#list>
-		);
-	}
-
+	<@classMembers.addFields className=name fields=fields indent='\t' nested=false/>
+	<@classMembers.addEquals className=name fields=fields indent='\t'/>
+	<@classMembers.addHashCode fields=fields indent='\t'/>
+	<@classMembers.addToString fields=fields indent='\t'/>
+	<#if dtoBuilder>
+		<@classMembers.addConstructor className=name fields=fields indent='\t' nested=false/>
+		<@classMembers.addBuilderMethod indent='\t'/>
+		<#lt/>	public static class Builder
+		<#lt/>	{
+		<#lt/>		private Builder() { }
+		<@classMembers.addBuilderFields className='Builder' fields=fields indent='\t\t' nested=false/>
+		<@classMembers.addBuildMethod resultClassName=name fields=fields indent='\t\t'/>
+		<#lt/>	}
+	</#if>
 }
 //CHECKSTYLE:ON

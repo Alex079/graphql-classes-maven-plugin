@@ -1,0 +1,51 @@
+
+schema {
+    mutation: Mutation1
+}
+
+type Mutation1 {
+    field1(arg1: ID!, arg2: InputMutationArg2!): TypeMutationField1
+    field2(arg1: ID!): [Interface1MutationField2]
+    field3(arg1: ID!): [Union1MutationField3]
+}
+
+type TypeMutationField1 {
+    id: ID!
+    field1: String!
+    field2: EnumMutationArg2!
+
+}
+
+input InputMutationArg2 {
+    field1: String!
+    field2: EnumMutationArg2!
+}
+
+enum EnumMutationArg2 {
+    V1 V3
+}
+
+interface Interface1MutationField2 {
+    id: ID!
+    name: String!
+}
+
+type Type1MutationField2 implements Interface1MutationField2 {
+    id: ID!
+    name: String!
+    value: Int
+}
+
+type Type3MutationField2 {
+    value: Int
+}
+
+type Type2MutationField2 implements Interface1MutationField2 {
+    id: ID!
+    name: String!
+    value: Type3MutationField2
+}
+
+union Union1MutationField3 =
+    | Type1MutationField2
+    | Type2MutationField2

@@ -6,7 +6,6 @@ import static com.github.alme.graphql.generator.translator.Util.fromFieldDef;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlStructure;
@@ -17,14 +16,6 @@ import graphql.language.ObjectTypeExtensionDefinition;
 import graphql.language.TypeName;
 
 public class ObjectTypeTranslator implements Translator {
-
-	private static final Collection<String> IMPLICIT_SCHEMA = new HashSet<>();
-
-	static {
-		IMPLICIT_SCHEMA.add("Query");
-		IMPLICIT_SCHEMA.add("Mutation");
-		IMPLICIT_SCHEMA.add("Subscription");
-	}
 
 	@Override
 	public void translate(Document doc, GqlContext ctx) {
@@ -43,16 +34,11 @@ public class ObjectTypeTranslator implements Translator {
 	}
 
 	private void populate(GqlContext ctx, Collection<? extends ObjectTypeDefinition> definitions) {
-		definitions.forEach(definition -> {
-			String name = definition.getName();
+		definitions.forEach(definition ->
 			ctx.getObjectTypes()
-				.computeIfAbsent(name, GqlStructure::new)
+				.computeIfAbsent(definition.getName(), GqlStructure::new)
 				.addMembers(definition.getImplements().stream().map(TypeName.class::cast).map(TypeName::getName).collect(toSet()))
-				.addFields(definition.getFieldDefinitions().stream().map(fromFieldDef(ctx)).collect(toSet()));
-			if (IMPLICIT_SCHEMA.contains(name)) {
-				ctx.getSchema().put(name.toLowerCase(), name);
-			}
-		});
+				.addFields(definition.getFieldDefinitions().stream().map(fromFieldDef(ctx)).collect(toSet())));
 	}
 
 }

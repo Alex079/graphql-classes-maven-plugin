@@ -6,7 +6,6 @@ import static com.github.alme.graphql.generator.translator.Util.fromVariableDef;
 import static com.github.alme.graphql.generator.translator.Util.translateSelection;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,21 +45,20 @@ public class OperationTranslator implements Translator {
 	@Override
 	public void translate(Document doc, GqlContext ctx) {
 		Collection<OperationDefinition> operations = doc.getDefinitionsOfType(OperationDefinition.class);
-		populate(doc, ctx, operations);
+		Collection<FragmentDefinition> allFragments = doc.getDefinitionsOfType(FragmentDefinition.class);
+		populate(ctx, operations, allFragments);
 	}
 
-	private void populate(Document doc, GqlContext ctx, Collection<OperationDefinition> definitions) {
-		definitions.forEach((definition) -> {
+	private void populate(GqlContext ctx, Collection<OperationDefinition> definitions, Collection<FragmentDefinition> allFragments) {
+		definitions.forEach(definition -> {
 			String operation = definition.getOperation().name().toLowerCase();
 			String typeName = ctx.getSchema().get(operation);
 			if (typeName != null) {
-				Collection<FragmentDefinition> allFragments = doc.getDefinitionsOfType(FragmentDefinition.class);
 				Collection<FragmentDefinition> requiredFragments = new HashSet<>();
-				Collection<GqlSelection> selections = translateSelection(definition.getSelectionSet(),
-					allFragments, requiredFragments, ctx, typeName);
+				Collection<GqlSelection> selections = translateSelection(definition.getSelectionSet(), allFragments, requiredFragments, ctx, typeName);
 				String documentString = getDocumentString(definition, requiredFragments, ctx.getLog());
-				ctx.getOperations()
-					.computeIfAbsent(definition.getName(), (name) -> new GqlOperation(name, operation, typeName, documentString))
+				ctx.getDefinedOperations()
+					.computeIfAbsent(definition.getName(), name -> new GqlOperation(name, operation, typeName, documentString))
 					.addSelections(selections)
 					.addVariables(definition.getVariableDefinitions().stream().map(fromVariableDef(ctx)).collect(toSet()));
 			}
@@ -68,13 +66,12 @@ public class OperationTranslator implements Translator {
 	}
 
 	private String getDocumentString(OperationDefinition operation, Collection<FragmentDefinition> fragments, Log log) {
-		try {
-			Map<String, Collection<?>> input = new HashMap<>();
-			input.put(OPERATIONS_KEY, Collections.singletonList(operation));
-			input.put(FRAGMENTS_KEY, fragments);
-			StringWriter out = new StringWriter();
-			CFG.getTemplate(OPERATION_DOCUMENT).process(input, new PrintWriter(out));
-			return out.toString();
+		Map<String, Collection<?>> input = new HashMap<>();
+		input.put(OPERATIONS_KEY, Collections.singletonList(operation));
+		input.put(FRAGMENTS_KEY, fragments);
+		try (StringWriter writer = new StringWriter()) {
+			CFG.getTemplate(OPERATION_DOCUMENT).process(input, writer);
+			return writer.toString();
 		} catch (TemplateException | IOException e) {
 			log.warn(String.format("Operation document [%s] is not created.", operation.getName()), e);
 			return null;

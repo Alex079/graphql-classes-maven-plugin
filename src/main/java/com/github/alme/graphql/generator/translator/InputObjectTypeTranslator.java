@@ -34,7 +34,7 @@ public class InputObjectTypeTranslator implements Translator {
 
 	private void populate(GqlContext ctx, Collection<? extends InputObjectTypeDefinition> definitions) {
 		definitions.forEach((definition) ->
-			ctx.getObjectTypes()
+			ctx.getInputObjectTypes()
 				.computeIfAbsent(definition.getName(), GqlStructure::new)
 				.addFields(definition.getInputValueDefinitions().stream().map(fromInputValueDef(ctx)).collect(toSet())));
 	}

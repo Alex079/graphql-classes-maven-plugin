@@ -1,0 +1,30 @@
+<#import "import/classMemberTemplates" as classMembers/>
+//CHECKSTYLE:OFF
+package ${currentPackage};
+
+import ${schemaTypesPackage}.*;
+
+<#list importPackages as i>
+import ${i}.*;
+</#list>
+
+${generatedAnnotation!}
+@SuppressWarnings({"all", "PMD"})
+public class ${className}
+{
+	<@classMembers.addFields className=className fields=selections indent='\t' nested=false/>
+	<@classMembers.addEquals className=className fields=selections indent='\t'/>
+	<@classMembers.addHashCode fields=selections indent='\t'/>
+	<@classMembers.addToString fields=selections indent='\t'/>
+	<#if dtoBuilder>
+		<@classMembers.addConstructor className=className fields=selections indent='\t' nested=false/>
+		<@classMembers.addBuilderMethod indent='\t'/>
+		<#lt/>	public static class Builder
+		<#lt/>	{
+		<#lt/>		private Builder() { }
+		<@classMembers.addBuilderFields className='Builder' fields=selections indent='\t\t' nested=false/>
+		<@classMembers.addBuildMethod resultClassName=className fields=selections indent='\t\t'/>
+		<#lt/>	}
+	</#if>
+}
+//CHECKSTYLE:ON

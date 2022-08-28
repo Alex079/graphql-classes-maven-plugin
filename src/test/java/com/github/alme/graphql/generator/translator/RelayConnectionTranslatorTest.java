@@ -46,7 +46,7 @@ class RelayConnectionTranslatorTest {
 	@Test
 	void translateNoObjectTypes() {
 		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(emptyList());
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -67,7 +67,7 @@ class RelayConnectionTranslatorTest {
 						.build())
 					.build())
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -93,7 +93,7 @@ class RelayConnectionTranslatorTest {
 						.build())
 					.build())
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -140,7 +140,7 @@ class RelayConnectionTranslatorTest {
 						.build())
 					.build())
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 

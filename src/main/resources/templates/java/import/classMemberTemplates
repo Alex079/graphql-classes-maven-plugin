@@ -1,0 +1,257 @@
+<#macro addNullCheck fieldType indent>
+	<#switch fieldType.flag>
+		<#case 'MANDATORY'>
+			<#lt/>${indent}.map(java.util.Objects::requireNonNull)
+			<@addNullCheck fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#case 'LIST'>
+			<#lt/>${indent}.filter(java.util.Objects::nonNull)
+			<#lt/>${indent}.flatMap(java.util.Collection::stream)
+			<@addNullCheck fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#default>
+			<#lt/>${indent}.forEach($ -> {});
+		<#break/>
+	</#switch>
+</#macro>
+
+<#function getFieldType field nested>
+	<#if field.selections?has_content>
+		<#return field.type.getCustom(currentPackage+nested?then('.'+field.title+'.','.')+field.type.inner+'Result') />
+	<#else>
+		<#return field.type.full />
+	</#if>
+</#function>
+
+<#function getFieldName field>
+	<#if field.alias?has_content>
+		<#return field.alias />
+	<#else>
+		<#return field.name />
+	</#if>
+</#function>
+
+<#macro addField field indent nested>
+	<#if jsonProperty?has_content>
+		<#lt/>${indent}@${jsonProperty}("${getFieldName(field)}")
+	</#if>
+	<#lt/>${indent}private ${getFieldType(field,nested)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = null;
+</#macro>
+
+<#macro addGetter field indent nested>
+	<#lt/>${indent}public ${getFieldType(field,nested)} get${getFieldName(field)?cap_first}() {
+	<#lt/>${indent}	return this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!};
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addSetter className field indent nested>
+	<#lt/>${indent}public ${methodChaining?then(className,"void")} set${getFieldName(field)?cap_first}(${getFieldType(field,nested)} v) {
+	<#lt/>${indent}	java.util.stream.Stream.of(v)
+	<@addNullCheck fieldType=field.type indent=indent+'\t\t'/>
+	<#lt/>${indent}	this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = v;
+	<#if methodChaining>
+		<#lt/>${indent}	return this;
+	</#if>
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addFields className fields indent nested>
+	<#list fields as field>
+		<@addField field=field indent=indent nested=nested/>
+		<@addGetter field=field indent=indent nested=nested/>
+		<#if !dtoBuilder>
+			<@addSetter className=className field=field indent=indent nested=nested/>
+		</#if>
+	</#list>
+</#macro>
+
+<#macro addBuilderFields className fields indent nested>
+	<#list fields as field>
+		<@addField field=field indent=indent nested=nested/>
+		<@addSetter className=className field=field indent=indent nested=nested/>
+	</#list>
+</#macro>
+
+<#macro asLiteralArgument fieldType indent>
+	<#switch fieldType.flag>
+		<#case 'MANDATORY'>
+			<#lt/>${indent}.map(java.util.Objects::requireNonNull)
+			<@asLiteralArgument fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#case 'LIST'>
+			<#lt/>${indent}.flatMap(arrayAppender(documentBuilder))
+			<@asLiteralArgument fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#default>
+			<#lt/>${indent}.forEach(valueAppender(documentBuilder));
+		<#break/>
+	</#switch>
+</#macro>
+
+<#macro addSelectionFieldBody field hasArguments hasSelections indent>
+	<#if field.alias?has_content>
+		<#lt/>${indent}documentBuilder.append(" ${field.alias}:");
+	</#if>
+	<#lt/>${indent}documentBuilder.append(" ${field.name}");
+	<#if hasArguments>
+		<#lt/>${indent}if (arguments != null) {
+		<#lt/>${indent}	documentBuilder.append(" (");
+		<#lt/>${indent}	arguments.accept(new ${field.title?cap_first}Arguments());
+		<#lt/>${indent}	documentBuilder.append(" )");
+		<#lt/>${indent}}
+	</#if>
+	<#if hasSelections>
+		<#lt/>${indent}if (selector != null) {
+		<#lt/>${indent}	documentBuilder.append(" {");
+		<#lt/>${indent}	selector.accept(new ${field.type.inner}Selector(documentBuilder));
+		<#lt/>${indent}	documentBuilder.append(" }");
+		<#lt/>${indent}}
+	</#if>
+	<#lt/>${indent}return this;
+</#macro>
+
+<#macro addSelectionFields className fields indent>
+	<#list fields as field>
+		<#if field.arguments?has_content>
+			<#lt/>${indent}public class ${field.title?cap_first}Arguments {
+			<#list field.arguments as argument>
+				<#lt/>${indent}	public ${field.title?cap_first}Arguments set${argument.name?cap_first}(${argument.type.full} value) {
+				<#lt/>${indent}		documentBuilder.append(" ${argument.name}:");
+				<#lt/>${indent}		java.util.stream.Stream.of(value)
+				<@asLiteralArgument fieldType=argument.type indent=indent+'\t\t\t'/>
+				<#lt/>${indent}		return this;
+				<#lt/>${indent}	}
+			</#list>
+			<#lt/>${indent}}
+		</#if>
+		<#if field.selections?has_content>
+			<#if field.arguments?has_content>
+				<#lt/>${indent}public ${className} get${field.name?cap_first}(java.util.function.Consumer<${field.title?cap_first}Arguments> arguments, java.util.function.Consumer<${field.type.inner}Selector> selector) {
+				<@addSelectionFieldBody field=field hasArguments=true hasSelections=true indent=indent+'\t' />
+				<#lt/>${indent}}
+			<#else>
+				<#lt/>${indent}public ${className} get${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> selector) {
+				<@addSelectionFieldBody field=field hasArguments=false hasSelections=true indent=indent+'\t' />
+				<#lt/>${indent}}
+			</#if>
+		<#else>
+			<#if field.arguments?has_content>
+				<#lt/>${indent}public ${className} get${field.name?cap_first}(java.util.function.Consumer<${field.title?cap_first}Arguments> arguments) {
+				<@addSelectionFieldBody field=field hasArguments=true hasSelections=false indent=indent+'\t' />
+				<#lt/>${indent}}
+			<#else>
+				<#lt/>${indent}public ${className} get${field.name?cap_first}() {
+				<@addSelectionFieldBody field=field hasArguments=false hasSelections=false indent=indent+'\t' />
+				<#lt/>${indent}}
+			</#if>
+		</#if>
+	</#list>
+</#macro>
+
+<#macro addVariables className variables indent>
+	<#list variables as field>
+		<#lt/>${indent}public ${className} set${field.name?cap_first}(${field.type.full} value) {
+		<#lt/>${indent}	java.util.stream.Stream.of(value)
+		<@addNullCheck fieldType=field.type indent=indent+'\t\t'/>
+		<#lt/>${indent}	map.put("${field.name}", value);
+		<#lt/>${indent}	return this;
+		<#lt/>${indent}}
+	</#list>
+</#macro>
+
+<#macro addEquals className fields indent>
+	<#lt/>${indent}@Override
+	<#lt/>${indent}public boolean equals(Object o) {
+	<#lt/>${indent}	if (this == o) return true;
+	<#lt/>${indent}	if (!(o instanceof ${className})) return false;
+	<#list fields>
+		<#lt/>${indent}	${className} other = (${className}) o;
+		<#lt/>${indent}	return
+		<#items as field>
+			<#lt/>${indent}		java.util.Objects.equals(this.get${getFieldName(field)?cap_first}(), other.get${getFieldName(field)?cap_first}())<#sep> &&</#sep>
+		</#items>
+		<#lt/>${indent}	;
+	<#else>
+		<#lt/>${indent}	return true;
+	</#list>
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addHashCode fields indent>
+	<#lt/>${indent}@Override
+	<#lt/>${indent}public int hashCode() {
+	<#lt/>${indent}	return java.util.Objects.hash(
+	<#list fields as field>
+		<#lt/>${indent}		get${getFieldName(field)?cap_first}()<#sep>,</#sep>
+	</#list>
+	<#lt/>${indent}	);
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addToString fields indent>
+	<#lt/>${indent}@Override
+	<#lt/>${indent}public String toString() {
+	<#lt/>${indent}	return new StringBuilder().append("{")
+	<#list fields as field>
+		<#lt/>${indent}		.append(" ${getFieldName(field)} = ").append(get${getFieldName(field)?cap_first}())<#sep>.append(",")</#sep>
+	</#list>
+	<#lt/>${indent}		.append(" }")
+	<#lt/>${indent}		.toString();
+	<#lt/>${indent}}
+</#macro>
+
+<#macro asLiteral fieldType indent>
+	<#switch fieldType.flag>
+		<#case 'MANDATORY'>
+			<@asLiteral fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#case 'LIST'>
+			<#lt/>${indent}.flatMap(arrayAppender(documentBuilder))
+			<@asLiteral fieldType=fieldType.nested indent=indent/>
+		<#break/>
+		<#default>
+			<#lt/>${indent}.forEach(valueAppender(documentBuilder));
+		<#break/>
+	</#switch>
+</#macro>
+
+<#macro addToGraphQlString fields indent>
+	<#lt/>${indent}@Override
+	<#lt/>${indent}public String toString() {
+	<#lt/>${indent}	StringBuilder documentBuilder = new StringBuilder().append(" {");
+	<#list fields as field>
+		<#lt/>${indent}		documentBuilder.append(" ${getFieldName(field)}:");
+		<#lt/>${indent}		java.util.stream.Stream.of(get${getFieldName(field)?cap_first}())
+		<@asLiteral fieldType=field.type indent=indent+'\t\t\t'/>
+	</#list>
+	<#lt/>${indent}		return documentBuilder.append(" }").toString();
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addConstructor className fields indent nested>
+	<#lt/>${indent}private ${className}(
+	<#list fields as field>
+		<#lt/>${indent}	${getFieldType(field,nested)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!}<#sep>,</#sep>
+	</#list>
+	<#lt/>${indent}) {
+	<#list fields as field>
+		<#lt/>${indent}	this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = ${propertyPrefix!}${getFieldName(field)}${propertySuffix!};
+	</#list>
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addBuilderMethod indent>
+	<#lt/>${indent}public static Builder builder() {
+	<#lt/>${indent}	return new Builder();
+	<#lt/>${indent}}
+</#macro>
+
+<#macro addBuildMethod resultClassName fields indent>
+	<#lt/>${indent}public ${resultClassName} build() {
+	<#lt/>${indent}	return new ${resultClassName}(
+	<#list fields as field>
+		<#lt/>${indent}		${propertyPrefix!}${getFieldName(field)}${propertySuffix!}<#sep>,</#sep>
+	</#list>
+	<#lt/>${indent}	);
+	<#lt/>${indent}}
+</#macro>

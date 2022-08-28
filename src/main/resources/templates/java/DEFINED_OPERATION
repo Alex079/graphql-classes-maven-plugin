@@ -1,0 +1,47 @@
+<#import "import/classMemberTemplates" as classMembers/>
+//CHECKSTYLE:OFF
+package ${currentPackage};
+
+${generatedAnnotation!}
+@SuppressWarnings({"all", "PMD"})
+public class ${className} implements ${operationsPackage}.${interfaceName}
+{
+	private static final String OPERATION_NAME = <#if name?has_content>"${name}"<#else>null</#if>;
+	private static final String DOCUMENT = <#if text?has_content>"${text?j_string}"<#else>null</#if>;
+	<#if variables?has_content>
+	private final java.util.Map<String, Object> variables;
+
+	public ${className}(java.util.function.Consumer<${className}Variables> variables) {
+		java.util.Map<String, Object> map = new java.util.HashMap<>();
+		variables.accept(new ${className}Variables(map));
+		this.variables = java.util.Collections.unmodifiableMap(map);
+	}
+	</#if>
+
+	@Override
+	public String getOperationName() {
+		return OPERATION_NAME;
+	}
+
+	@Override
+	public String getDocument() {
+		return DOCUMENT;
+	}
+
+	@Override
+	public java.util.Map<String, Object> getVariables() {
+		<#if variables?has_content>
+		return variables;
+		<#else>
+		return java.util.Collections.emptyMap();
+		</#if>
+	}
+
+	@Override
+	public Class<${className}Result> getResultClass() {
+		return ${className}Result.class;
+	}
+
+	<@classMembers.addToString fields=[{'name':'operationName'},{'name':'document'},{'name':'variables'}] indent='\t'/>
+}
+//CHECKSTYLE:ON

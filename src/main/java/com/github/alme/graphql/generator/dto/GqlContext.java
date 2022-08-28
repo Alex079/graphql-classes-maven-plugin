@@ -1,7 +1,9 @@
 package com.github.alme.graphql.generator.dto;
 
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.maven.plugin.logging.Log;
@@ -13,9 +15,12 @@ public class GqlContext {
 
 	Log log;
 	Map<String, String> scalars;
+	Map<String, String> aliases;
 	Map<String, String> schema = new HashMap<>();
 	Map<Structure, Map<String, GqlStructure>> structures = new EnumMap<>(Structure.class);
-	Map<String, GqlOperation> operations = new HashMap<>();
+	Map<String, GqlOperation> definedOperations = new HashMap<>();
+	Collection<GqlOperation> dynamicOperations = new HashSet<>();
+	Map<String, Collection<GqlSelection>> dynamicSelections = new HashMap<>();
 
 	private Map<String, GqlStructure> getStructures(Structure category) {
 		return structures.computeIfAbsent(category, s -> new HashMap<>());
@@ -31,6 +36,10 @@ public class GqlContext {
 
 	public Map<String, GqlStructure> getObjectTypes() {
 		return getStructures(Structure.OBJECT);
+	}
+
+	public Map<String, GqlStructure> getInputObjectTypes() {
+		return getStructures(Structure.INPUT_OBJECT);
 	}
 
 	public Map<String, GqlStructure> getUnionTypes() {

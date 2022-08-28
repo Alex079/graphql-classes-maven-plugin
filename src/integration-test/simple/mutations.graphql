@@ -1,9 +1,0 @@
-
-mutation delivered($item: SoldItem!) {
-	delivered(item: $item) {
-        delivered
-        id
-        itemId
-        from {...SameNameFragment}
-    }
-}

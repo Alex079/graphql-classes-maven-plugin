@@ -1,0 +1,17 @@
+
+extend schema {
+    subscription: Subscription1
+}
+
+type Subscription1 {
+    subscribe(for: InputEventNotification!): OutputEventNotification
+}
+
+input InputEventNotification {
+    names: [String!]!
+}
+
+type OutputEventNotification {
+    name: String
+    value: [String!]
+}

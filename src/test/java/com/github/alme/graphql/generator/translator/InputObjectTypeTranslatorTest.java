@@ -50,7 +50,7 @@ class InputObjectTypeTranslatorTest {
 	@Test
 	void translateNoInputObjectTypes() {
 		when(doc.getDefinitionsOfType(InputObjectTypeDefinition.class)).thenReturn(emptyList());
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
@@ -74,13 +74,13 @@ class InputObjectTypeTranslatorTest {
 						newObjectField().name("n").value(newStringValue("v").build()).build()).build()).build())
 					.build())
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
-		assertEquals(1, ctx.getObjectTypes().size());
-		assertTrue(ctx.getObjectTypes().containsKey("Input1"));
-		Collection<GqlField> input1 = ctx.getObjectTypes().get("Input1").getFields();
+		assertEquals(1, ctx.getInputObjectTypes().size());
+		assertTrue(ctx.getInputObjectTypes().containsKey("Input1"));
+		Collection<GqlField> input1 = ctx.getInputObjectTypes().get("Input1").getFields();
 		assertEquals(2, input1.size());
 		input1.forEach(gqlField -> {
 			switch (gqlField.getName()) {
@@ -119,13 +119,13 @@ class InputObjectTypeTranslatorTest {
 						newObjectField().name("n").value(newStringValue("v").build()).build()).build()).build())
 					.build()))
 				.build()));
-		GqlContext ctx = new GqlContext(log, emptyMap());
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
 
-		assertEquals(1, ctx.getObjectTypes().size());
-		assertTrue(ctx.getObjectTypes().containsKey("Input1"));
-		Collection<GqlField> input1 = ctx.getObjectTypes().get("Input1").getFields();
+		assertEquals(1, ctx.getInputObjectTypes().size());
+		assertTrue(ctx.getInputObjectTypes().containsKey("Input1"));
+		Collection<GqlField> input1 = ctx.getInputObjectTypes().get("Input1").getFields();
 		assertEquals(2, input1.size());
 		input1.forEach(gqlField -> {
 			switch (gqlField.getName()) {
