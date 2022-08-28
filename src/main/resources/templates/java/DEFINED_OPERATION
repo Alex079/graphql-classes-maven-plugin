@@ -37,6 +37,11 @@ public class ${className} implements ${operationsPackage}.${interfaceName}
 		</#if>
 	}
 
+	@Override
+	public Class<${className}Result> getResultClass() {
+		return ${className}Result.class;
+	}
+
 	<@classMembers.addToString fields=[{'name':'operationName'},{'name':'document'},{'name':'variables'}] indent='\t'/>
 }
 //CHECKSTYLE:ON

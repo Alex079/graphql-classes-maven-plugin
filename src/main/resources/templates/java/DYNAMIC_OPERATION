@@ -4,8 +4,7 @@ package ${currentPackage};
 
 ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
-public class ${className}
-implements ${operationsPackage}.${interfaceName}
+public class ${className} implements ${operationsPackage}.${interfaceName}
 {
 	private final String document;
 
@@ -22,6 +21,11 @@ implements ${operationsPackage}.${interfaceName}
 	@Override
 	public java.util.Map<String, Object> getVariables() {
 		return java.util.Collections.emptyMap();
+	}
+
+	@Override
+	public Class<${resultsPackage}.${typeName}Result> getResultClass() {
+		return ${resultsPackage}.${typeName}Result.class;
 	}
 
 	public ${className}(java.util.function.Consumer<${selectorsPackage}.${typeName}Selector> selector) {

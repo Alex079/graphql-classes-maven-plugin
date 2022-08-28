@@ -8,5 +8,6 @@ public interface ${interfaceName}
 	String getOperationName();
 	String getDocument();
 	java.util.Map<String, Object> getVariables();
+	Class<?> getResultClass();
 }
 //CHECKSTYLE:ON
