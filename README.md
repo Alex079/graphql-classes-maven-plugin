@@ -25,6 +25,65 @@ This goal runs the classes generation and is bound to the phase generate-sources
 Usually, a server app needs all GraphQL schema types to be represented by Java classes. The plugin can be configured
 to output Java classes for GraphQL schema types by setting `generatedOutputTypes` property value to `SCHEMA_TYPES`.
 
+<details><summary>Example</summary>
+
+The GraphQL types
+```graphql
+type TreeNode {
+    left: TreeNode
+    right: TreeNode
+    value: String
+}
+interface Interface1 {
+    switch: TreeNode
+}
+```
+could be translated into the following Java classes
+```java
+package pkg;
+/* imports */
+public interface Interface1
+{
+	TreeNode getSwitch();
+}
+```
+```java
+package pkg;
+/* imports */
+public class TreeNode
+{
+	private TreeNode _left_ = null;
+	public TreeNode getLeft() {
+		return this._left_;
+	}
+	public void setLeft(TreeNode v) {
+		java.util.stream.Stream.of(v)
+			.forEach($ -> {});
+		this._left_ = v;
+	}
+	private String _value_ = null;
+	public String getValue() {
+		return this._value_;
+	}
+	public void setValue(String v) {
+		java.util.stream.Stream.of(v)
+			.forEach($ -> {});
+		this._value_ = v;
+	}
+	private TreeNode _right_ = null;
+	public TreeNode getRight() {
+		return this._right_;
+	}
+	public void setRight(TreeNode v) {
+		java.util.stream.Stream.of(v)
+			.forEach($ -> {});
+		this._right_ = v;
+	}
+	/* equals, hashCode, toString */
+}
+```
+</details>
+
 ### Client-defined GraphQL operations
 
 A client app can define its own operations. Usually, there could be a file with definitions of operations and
@@ -38,6 +97,121 @@ classes for GraphQL operations defined in files. The following classes will be g
 The generated result classes will contain only the requested fields. Union (or interface) result classes will contain
 all the requested fields of all the requested union members (or interface implementors). Aliases must be set to avoid
 name collisions for fields from different fragments.
+
+<details><summary>Result example</summary>
+
+Input file with operations
+```graphql
+fragment ValueFragment on Type1MutationField2 {
+    t1Value: value
+}
+
+fragment ValueFragment on Type2MutationField2 {
+    t2Value: value {
+        ...ValueFragment
+    }
+}
+
+fragment ValueFragment on Type3MutationField2 {
+    t3Value: value
+}
+
+mutation updateField2($id: [ID!]! = ["0"]) {
+    field2(arg1: $id) {
+        id name
+        ...on Type2MutationField2 {
+            ...ValueFragment
+        }
+        ... on Type1MutationField2 {
+            ...ValueFragment
+        }
+    }
+}
+```
+could be translated into the following classes
+```java
+package pkg;
+/* imports */
+public class UpdateField2MutationResult
+{
+	private java.util.List<pkg.field2.Interface1MutationField2Result> _field2_ = null;
+	public java.util.List<pkg.field2.Interface1MutationField2Result> getField2() {
+		return this._field2_;
+	}
+	public void setField2(java.util.List<pkg.field2.Interface1MutationField2Result> v) {
+		java.util.stream.Stream.of(v)
+			.filter(java.util.Objects::nonNull)
+			.flatMap(java.util.Collection::stream)
+			.forEach($ -> {});
+		this._field2_ = v;
+	}
+	/* equals, hashCode, toString */
+}
+```
+```java
+package pkg.field2;
+/* imports */
+public class Interface1MutationField2Result
+{
+	private String _name_ = null;
+	public String getName() {
+		return this._name_;
+	}
+	public void setName(String v) {
+		java.util.stream.Stream.of(v)
+			.map(java.util.Objects::requireNonNull)
+			.forEach($ -> {});
+		this._name_ = v;
+	}
+	private pkg.field2.t2Value.Type3MutationField2Result _t2Value_ = null;
+	public pkg.field2.t2Value.Type3MutationField2Result getT2Value() {
+		return this._t2Value_;
+	}
+	public void setT2Value(pkg.field2.t2Value.Type3MutationField2Result v) {
+		java.util.stream.Stream.of(v)
+			.forEach($ -> {});
+		this._t2Value_ = v;
+	}
+	private Integer _t1Value_ = null;
+	public Integer getT1Value() {
+		return this._t1Value_;
+	}
+	public void setT1Value(Integer v) {
+		java.util.stream.Stream.of(v)
+			.forEach($ -> {});
+		this._t1Value_ = v;
+	}
+	private String _id_ = null;
+	public String getId() {
+		return this._id_;
+	}
+	public void setId(String v) {
+		java.util.stream.Stream.of(v)
+			.map(java.util.Objects::requireNonNull)
+			.forEach($ -> {});
+		this._id_ = v;
+	}
+	/* equals, hashCode, toString */
+}
+```
+```java
+package pkg.field2.t2Value;
+/* imports */
+public class Type3MutationField2Result
+{
+	private Integer _t3Value_ = null;
+	public Integer getT3Value() {
+		return this._t3Value_;
+	}
+	public void setT3Value(Integer v) {
+		java.util.stream.Stream.of(v)
+			.forEach($ -> {});
+		this._t3Value_ = v;
+	}
+	/* equals, hashCode, toString */
+}
+```
+</details>
 
 ### Dynamic GraphQL operations
 
@@ -55,6 +229,76 @@ Additionally, the following classes, shared by all dynamic operations, will be g
 The generated result classes will contain all possible fields. This includes union (or interface) results which are
 represented by classes containing all the fields of all the union members (or interface implementors) using
 automatically generated aliases to avoid field name collisions.
+
+
+<details><summary>Usage example</summary>
+
+The following code in Java
+```java
+public class Class {
+	public Query getQuery() {
+		return new DynamicQuery(querySelector -> querySelector
+			.getField2(
+				field2Arguments -> field2Arguments
+					.setArg2(List.of(new InputQueryArg2()))
+					.setAfter("123"),
+				unionQueryField2ConnectionSelector -> unionQueryField2ConnectionSelector
+					.getPageInfo(pageInfoSelector -> pageInfoSelector
+						.getStartCursor()
+						.getEndCursor()
+						.getHasNextPage()
+						.getHasPreviousPage())
+					.getEdges(unionQueryField2ConnectionEdgeSelector -> unionQueryField2ConnectionEdgeSelector
+						.getCursor()
+						.getNode(unionQueryField2Selector -> unionQueryField2Selector
+							.onType1UnionField2(type1UnionField2Selector -> type1UnionField2Selector
+								.getFieldA()
+								.getSwitch(TreeNodeSelector::getValue))
+							.onType2UnionField2(type2UnionField2Selector -> type2UnionField2Selector
+								.getName()
+								.getInt())
+							.onType3UnionField2(type3UnionField2Selector -> type3UnionField2Selector
+								.getName()
+								.getFieldC())))));
+	}
+}
+```
+could produce a GraphQL operation like the below
+```graphql
+query {
+  field2(
+    arg2: [{ id: null }]
+    after: """123"""
+  ) {
+    pageInfo {
+      startCursor
+      endCursor
+      hasNextPage
+      hasPreviousPage
+    }
+    edges {
+      cursor
+      node {
+        ... on Type1UnionField2 {
+          fieldA_Type1UnionField2: fieldA
+          switch_Type1UnionField2: switch {
+            value
+          }
+        }
+        ... on Type2UnionField2 {
+          name_Type2UnionField2: name
+          int_Type2UnionField2: int
+        }
+        ... on Type3UnionField2 {
+          name_Type3UnionField2: name
+          fieldC_Type3UnionField2: fieldC
+        }
+      }
+    }
+  }
+}
+```
+</details>
 
 ### Serialization
 
@@ -95,14 +339,14 @@ property, because in this case setter methods will not be generated.
 | jsonPropertyAnnotation     | `String`                    | Annotation to be used on generated private fields.                                                                                                                                                                                                                                                                                                                |
 | privateFieldPrefix         | `String`                    | Prefix to be added to generated private field names to avoid Java keywords collisions.                                                                                                                                                                                                                                                                            |
 | privateFieldSuffix         | `String`                    | Suffix to be added to generated private field names to avoid Java keywords collisions.<br/>_Default_: `"__"`, when jsonPropertyAnnotation is set                                                                                                                                                                                                                  |
-| generatedAnnotationVersion | `String`                    | Version of `@Generated` annotation to use on generated classes (i.e. "1.8", "11", "15").                                                                                                                                                                                                                                                                          |
+| generatedAnnotationVersion | `String`                    | The version of `@Generated` annotation to use on generated classes (i.e. "1.8", "11", "15", ...). At the moment, the real difference is between "1.8" and the rest.                                                                                                                                                                                               |
 | dataObjectEnhancement      | `DataObjectEnhancementType` | The type of data object enhancement. Can be empty or take one of the following values: METHOD_CHAINING (data object setters will return 'this' instead of 'void'), BUILDER (data objects will use builder pattern).                                                                                                                                               |
 | generatedOutputTypes       | `Set<GeneratedOutputType>`  | The scope of the plugin output. Can be empty or take one or many values from the following list: SCHEMA_TYPES (all the types defined in GraphQL schema files), DEFINED_OPERATIONS (all the operations defined in input files), DYNAMIC_OPERATIONS (one operation per schema entry allowing to construct operations at runtime).<br/>_Default_: DEFINED_OPERATIONS |
 | parserMaxTokens            | `Integer`                   | Maximum number of tokens to process by the GraphQL engine.                                                                                                                                                                                                                                                                                                        |
 
-### Example
+<details><summary>Example</summary>
 
-```
+```xml
 <plugin>
   <groupId>com.github.alex079</groupId>
   <artifactId>graphql-classes-maven-plugin</artifactId>
@@ -123,7 +367,7 @@ property, because in this case setter methods will not be generated.
       <value>java.math</value>
     </importPackages>
     <jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>
-    <useChainedAccessors>true</useChainedAccessors>
+    <dataObjectEnhancement>METHOD_CHAINING</dataObjectEnhancement>
     <generatedAnnotationVersion>1.8</generatedAnnotationVersion>
   </configuration>
   <executions>
@@ -135,30 +379,31 @@ property, because in this case setter methods will not be generated.
   </executions>
 </plugin>
 ```
+</details>
 
 ## Without POM
 
-| Command Line Property          | Type                        | Description                                                                                                                                                                                                                                                                                                                                                                          |
-|--------------------------------|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| gql.sourceDirectory            | `File`                      | Directory containing source files.<br/>_Default_: current directory                                                                                                                                                                                                                                                                                                                  |
-| gql.sourceIncludes             | `Set<String>`               | Set of patterns to include.                                                                                                                                                                                                                                                                                                                                                          |
-| gql.sourceExcludes             | `Set<String>`               | Set of patterns to exclude.                                                                                                                                                                                                                                                                                                                                                          |
-| gql.outputDirectory            | `File`                      | The root directory for generated files.<br/>_Default_: `"./generated-sources/java"`                                                                                                                                                                                                                                                                                                  |
-| gql.packageName                | `String`                    | Name of the base package for generated classes.<br/>_Default_: `"gql.generated"`                                                                                                                                                                                                                                                                                                     |
-| gql.scalarMap                  | `Set<String>`               | Mapping of GraphQL scalars to Java classes formatted as a list of key=value pairs.<br/>_Default_: `Int=Integer,Float=Double,ID=String`                                                                                                                                                                                                                                               |
-| gql.aliasMap                   | `Set<String>`               | Mapping of GraphQL field names to GraphQL field aliases formatted as a list of key=value pairs. Can be used to avoid Java keyword collisions for dynamic operations only.                                                                                                                                                                                                            |
-| gql.importPackages             | `Set<String>`               | Set of packages to import into generated classes.                                                                                                                                                                                                                                                                                                                                    |
-| gql.jsonPropertyAnnotation     | `String`                    | Annotation to be used on generated private fields.                                                                                                                                                                                                                                                                                                                                   |
-| gql.privateFieldPrefix         | `String`                    | Prefix to be added to generated private field names to avoid Java keywords collisions.                                                                                                                                                                                                                                                                                               |
-| gql.privateFieldSuffix         | `String`                    | Suffix to be added to generated private field names to avoid Java keywords collisions.<br/>_Default_: `"__"`, when jsonPropertyAnnotation is set                                                                                                                                                                                                                                     |
-| gql.generatedAnnotationVersion | `String`                    | Version of `@Generated` annotation to use on generated classes (i.e. "1.8", "11", "15").                                                                                                                                                                                                                                                                                             |
-| gql.dataObjectEnhancement      | `DataObjectEnhancementType` | The type of data object enhancement. Can be empty or take one of the following values: METHOD_CHAINING (data object setters will return 'this' instead of 'void'), BUILDER (data objects will use builder pattern).                                                                                                                                                                  |
-| gql.generatedOutputTypes       | `Set<GeneratedOutputType>`  | The scope of the plugin output. Can be empty or take one or many values from the following list: SCHEMA_TYPES (all the types defined in GraphQL schema files), DEFINED_OPERATIONS (_default value_, all the operations defined in input files), DYNAMIC_OPERATIONS (one operation per schema entry allowing to construct operations at runtime).<br/>_Default_: `DEFINED_OPERATIONS` |
-| gql.parserMaxTokens            | `Integer`                   | Maximum number of tokens to process by the GraphQL engine.                                                                                                                                                                                                                                                                                                                           |
+| Command Line Property          | Type                        | Description                                                                                                                                                                                                                                                                                                                                                         |
+|--------------------------------|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| gql.sourceDirectory            | `File`                      | Directory containing source files.<br/>_Default_: current directory                                                                                                                                                                                                                                                                                                 |
+| gql.sourceIncludes             | `Set<String>`               | Set of patterns to include.                                                                                                                                                                                                                                                                                                                                         |
+| gql.sourceExcludes             | `Set<String>`               | Set of patterns to exclude.                                                                                                                                                                                                                                                                                                                                         |
+| gql.outputDirectory            | `File`                      | The root directory for generated files.<br/>_Default_: `"./generated-sources/java"`                                                                                                                                                                                                                                                                                 |
+| gql.packageName                | `String`                    | Name of the base package for generated classes.<br/>_Default_: `"gql.generated"`                                                                                                                                                                                                                                                                                    |
+| gql.scalarMap                  | `Set<String>`               | Mapping of GraphQL scalars to Java classes formatted as a list of key=value pairs.<br/>_Default_: `Int=Integer,Float=Double,ID=String`                                                                                                                                                                                                                              |
+| gql.aliasMap                   | `Set<String>`               | Mapping of GraphQL field names to GraphQL field aliases formatted as a list of key=value pairs. Can be used to avoid Java keyword collisions for dynamic operations only.                                                                                                                                                                                           |
+| gql.importPackages             | `Set<String>`               | Set of packages to import into generated classes.                                                                                                                                                                                                                                                                                                                   |
+| gql.jsonPropertyAnnotation     | `String`                    | Annotation to be used on generated private fields.                                                                                                                                                                                                                                                                                                                  |
+| gql.privateFieldPrefix         | `String`                    | Prefix to be added to generated private field names to avoid Java keywords collisions.                                                                                                                                                                                                                                                                              |
+| gql.privateFieldSuffix         | `String`                    | Suffix to be added to generated private field names to avoid Java keywords collisions.<br/>_Default_: `"__"`, when jsonPropertyAnnotation is set                                                                                                                                                                                                                    |
+| gql.generatedAnnotationVersion | `String`                    | The version of `@Generated` annotation to use on generated classes (i.e. "1.8", "11", "15", ...). At the moment, the real difference is between "1.8" and the rest.                                                                                                                                                                                                 |
+| gql.dataObjectEnhancement      | `DataObjectEnhancementType` | The type of data object enhancement. Can be empty or take one of the following values: METHOD_CHAINING (data object setters will return 'this' instead of 'void'), BUILDER (data objects will use builder pattern).                                                                                                                                                 |
+| gql.generatedOutputTypes       | `Set<GeneratedOutputType>`  | The scope of the plugin output. Can be empty or take one or many values from the following list: SCHEMA_TYPES (all the types defined in GraphQL schema files), DEFINED_OPERATIONS (all the operations defined in input files), DYNAMIC_OPERATIONS (one operation per schema entry allowing to construct operations at runtime).<br/>_Default_: `DEFINED_OPERATIONS` |
+| gql.parserMaxTokens            | `Integer`                   | Maximum number of tokens to process by the GraphQL engine.                                                                                                                                                                                                                                                                                                          |
 
-### Example
+<details><summary>Example</summary>
 
-```
+```shell
 mvn com.github.alex079:graphql-classes-maven-plugin:${VERSION}:generate \
 -Dgql.sourceDirectory=src/main/resources \
 -Dgql.sourceIncludes=*.graphql,*.graphqls \
@@ -167,3 +412,4 @@ mvn com.github.alex079:graphql-classes-maven-plugin:${VERSION}:generate \
 -Dgql.scalarMap=CustomType1=String,CustomType2=Integer \
 -Dgql.generatedAnnotationVersion=1.8
 ```
+</details>
