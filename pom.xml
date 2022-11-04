@@ -39,12 +39,12 @@
 		<dependency>
 			<groupId>com.graphql-java</groupId>
 			<artifactId>graphql-java</artifactId>
-			<version>19.1</version>
+			<version>19.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.graphql-java-kickstart</groupId>
 			<artifactId>graphql-java-tools</artifactId>
-			<version>13.0.0</version>
+			<version>13.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
@@ -66,7 +66,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>4.7.0</version>
+			<version>4.8.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -173,7 +173,7 @@
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.8</version>
+				<version>1.6.12</version>
 				<extensions>true</extensions>
 				<configuration>
 					<serverId>OSSRH</serverId>
@@ -203,7 +203,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.3.1</version>
+						<version>3.3.2</version>
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
