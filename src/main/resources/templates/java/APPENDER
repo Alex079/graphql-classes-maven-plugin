@@ -7,8 +7,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public final class GraphQlAppender {
-
+${generatedAnnotation!}
+@SuppressWarnings({"all", "PMD"})
+public final class GraphQlAppender
+{
 	private GraphQlAppender() {}
 
 	public static Function<List<?>, Stream<?>> arrayAppender(StringBuilder documentBuilder) {
@@ -39,6 +41,5 @@ public final class GraphQlAppender {
 			}
 		};
 	}
-
 }
 //CHECKSTYLE:ON
