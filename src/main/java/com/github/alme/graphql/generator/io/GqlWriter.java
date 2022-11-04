@@ -43,8 +43,10 @@ public class GqlWriter {
 	private static final String JSON_PROPERTY_KEY = "jsonProperty";
 	private static final String PROPERTY_PREFIX_KEY = "propertyPrefix";
 	private static final String PROPERTY_SUFFIX_KEY = "propertySuffix";
-	private static final String METHOD_CHAINING_KEY = "methodChaining";
+	private static final String DTO_METHOD_CHAINING_KEY = "dtoMethodChaining";
 	private static final String DTO_BUILDER_KEY = "dtoBuilder";
+	private static final String DTO_SETTERS_KEY = "dtoSetters";
+	private static final String DTO_CONSTRUCTOR_KEY = "dtoConstructor";
 	private static final String IMPORT_PACKAGES_KEY = "importPackages";
 	private static final String GENERATED_ANNOTATION_KEY = "generatedAnnotation";
 	private static final String FILE_EXTENSION = ".java";
@@ -78,8 +80,10 @@ public class GqlWriter {
 			CFG.setSharedVariable(JSON_PROPERTY_KEY, configuration.getJsonPropertyAnnotation());
 			CFG.setSharedVariable(PROPERTY_PREFIX_KEY, configuration.getJsonPropertyPrefix());
 			CFG.setSharedVariable(PROPERTY_SUFFIX_KEY, configuration.getJsonPropertySuffix());
-			CFG.setSharedVariable(METHOD_CHAINING_KEY, configuration.isGenerateMethodChaining());
+			CFG.setSharedVariable(DTO_METHOD_CHAINING_KEY, configuration.isGenerateDtoMethodChaining());
 			CFG.setSharedVariable(DTO_BUILDER_KEY, configuration.isGenerateDtoBuilder());
+			CFG.setSharedVariable(DTO_SETTERS_KEY, configuration.isGenerateDtoSetters());
+			CFG.setSharedVariable(DTO_CONSTRUCTOR_KEY, configuration.isGenerateDtoConstructor());
 			CFG.setSharedVariable(IMPORT_PACKAGES_KEY, configuration.getImportPackages());
 			CFG.setSharedVariable(GENERATED_ANNOTATION_KEY, configuration.getGeneratedAnnotation());
 		} catch (TemplateModelException e) {

@@ -22,8 +22,10 @@ public class GqlConfiguration {
 	@Singular Set<String> importPackages;
 	@Singular Map<String, String> scalars;
 	@Singular Map<String, String> aliases;
-	boolean generateMethodChaining;
+	boolean generateDtoMethodChaining;
 	boolean generateDtoBuilder;
+	boolean generateDtoSetters;
+	boolean generateDtoConstructor;
 	boolean generateDefinedOperations;
 	boolean generateDynamicOperations;
 	boolean generateSchemaInputTypes;
@@ -59,6 +61,7 @@ public class GqlConfiguration {
 	public enum DataObjectEnhancementType {
 		METHOD_CHAINING,
 		BUILDER,
+		VALUE,
 	}
 
 }

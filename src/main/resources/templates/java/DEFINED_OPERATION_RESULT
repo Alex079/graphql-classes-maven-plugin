@@ -16,8 +16,10 @@ public class ${className}
 	<@classMembers.addEquals className=className fields=selections indent='\t'/>
 	<@classMembers.addHashCode fields=selections indent='\t'/>
 	<@classMembers.addToString fields=selections indent='\t'/>
-	<#if dtoBuilder>
+	<#if dtoConstructor>
 		<@classMembers.addConstructor className=className fields=selections indent='\t' nested=true/>
+	</#if>
+	<#if dtoBuilder>
 		<@classMembers.addBuilderMethod indent='\t'/>
 		<#lt/>	public static class Builder
 		<#lt/>	{

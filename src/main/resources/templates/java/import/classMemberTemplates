@@ -45,11 +45,11 @@
 </#macro>
 
 <#macro addSetter className field indent nested>
-	<#lt/>${indent}public ${methodChaining?then(className,"void")} set${getFieldName(field)?cap_first}(${getFieldType(field,nested)} v) {
+	<#lt/>${indent}public ${dtoMethodChaining?then(className,"void")} set${getFieldName(field)?cap_first}(${getFieldType(field,nested)} v) {
 	<#lt/>${indent}	java.util.stream.Stream.of(v)
 	<@addNullCheck fieldType=field.type indent=indent+'\t\t'/>
 	<#lt/>${indent}	this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = v;
-	<#if methodChaining>
+	<#if dtoMethodChaining>
 		<#lt/>${indent}	return this;
 	</#if>
 	<#lt/>${indent}}
@@ -59,7 +59,7 @@
 	<#list fields as field>
 		<@addField field=field indent=indent nested=nested/>
 		<@addGetter field=field indent=indent nested=nested/>
-		<#if !dtoBuilder>
+		<#if dtoSetters>
 			<@addSetter className=className field=field indent=indent nested=nested/>
 		</#if>
 	</#list>
@@ -229,7 +229,7 @@
 </#macro>
 
 <#macro addConstructor className fields indent nested>
-	<#lt/>${indent}private ${className}(
+	<#lt/>${indent}${dtoBuilder?then("private","public")} ${className}(
 	<#list fields as field>
 		<#lt/>${indent}	${getFieldType(field,nested)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!}<#sep>,</#sep>
 	</#list>

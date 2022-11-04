@@ -17,8 +17,10 @@ implements ${members?join(", ")}
 	<@classMembers.addEquals className=name fields=fields indent='\t'/>
 	<@classMembers.addHashCode fields=fields indent='\t'/>
 	<@classMembers.addToString fields=fields indent='\t'/>
-	<#if dtoBuilder>
+	<#if dtoConstructor>
 		<@classMembers.addConstructor className=name fields=fields indent='\t' nested=false/>
+	</#if>
+	<#if dtoBuilder>
 		<@classMembers.addBuilderMethod indent='\t'/>
 		<#lt/>	public static class Builder
 		<#lt/>	{

@@ -135,8 +135,7 @@
 						</goals>
 						<configuration>
 							<packageName>it.value</packageName>
-							<privateFieldPrefix>_</privateFieldPrefix>
-							<privateFieldSuffix>_</privateFieldSuffix>
+							<privateFieldPrefix>p_</privateFieldPrefix>
 							<dataObjectEnhancement>VALUE</dataObjectEnhancement>
 						</configuration>
 					</execution>
