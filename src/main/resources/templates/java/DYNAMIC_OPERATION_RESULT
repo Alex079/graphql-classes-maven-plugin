@@ -12,19 +12,19 @@ ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
 public class ${className}
 {
-	<@classMembers.addFields className=className fields=selections indent='\t' nested=false/>
+	<@classMembers.addFields className=className fields=selections indent='\t'/>
 	<@classMembers.addEquals className=className fields=selections indent='\t'/>
 	<@classMembers.addHashCode fields=selections indent='\t'/>
 	<@classMembers.addToString fields=selections indent='\t'/>
 	<#if dtoConstructor>
-		<@classMembers.addConstructor className=className fields=selections indent='\t' nested=false/>
+		<@classMembers.addConstructor className=className fields=selections indent='\t'/>
 	</#if>
 	<#if dtoBuilder>
 		<@classMembers.addBuilderMethod indent='\t'/>
 		<#lt/>	public static class Builder
 		<#lt/>	{
 		<#lt/>		private Builder() { }
-		<@classMembers.addBuilderFields className='Builder' fields=selections indent='\t\t' nested=false/>
+		<@classMembers.addBuilderFields className='Builder' fields=selections indent='\t\t'/>
 		<@classMembers.addBuildMethod resultClassName=className fields=selections indent='\t\t'/>
 		<#lt/>	}
 	</#if>

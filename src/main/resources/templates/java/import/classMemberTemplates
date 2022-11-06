@@ -17,7 +17,7 @@
 
 <#function getFieldType field nested>
 	<#if field.selections?has_content>
-		<#return field.type.getCustom(currentPackage+nested?then('.'+field.title+'.','.')+field.type.inner+'Result') />
+		<#return field.type.getCustom(nested?then(currentPackage+'.'+field.title+'.','')+field.type.inner+'Result') />
 	<#else>
 		<#return field.type.full />
 	</#if>
@@ -55,7 +55,7 @@
 	<#lt/>${indent}}
 </#macro>
 
-<#macro addFields className fields indent nested>
+<#macro addFields className fields indent nested=false>
 	<#list fields as field>
 		<@addField field=field indent=indent nested=nested/>
 		<@addGetter field=field indent=indent nested=nested/>
@@ -65,7 +65,7 @@
 	</#list>
 </#macro>
 
-<#macro addBuilderFields className fields indent nested>
+<#macro addBuilderFields className fields indent nested=false>
 	<#list fields as field>
 		<@addField field=field indent=indent nested=nested/>
 		<@addSetter className=className field=field indent=indent nested=nested/>
@@ -228,7 +228,7 @@
 	<#lt/>${indent}}
 </#macro>
 
-<#macro addConstructor className fields indent nested>
+<#macro addConstructor className fields indent nested=false>
 	<#lt/>${indent}${dtoBuilder?then("private","public")} ${className}(
 	<#list fields as field>
 		<#lt/>${indent}	${getFieldType(field,nested)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!}<#sep>,</#sep>
