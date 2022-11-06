@@ -12,6 +12,7 @@ import static graphql.language.Argument.newArgument;
 import static graphql.language.Directive.newDirective;
 import static graphql.language.FieldDefinition.newFieldDefinition;
 import static graphql.language.InputValueDefinition.newInputValueDefinition;
+import static graphql.language.InterfaceTypeDefinition.newInterfaceTypeDefinition;
 import static graphql.language.ListType.newListType;
 import static graphql.language.ObjectTypeDefinition.newObjectTypeDefinition;
 import static graphql.language.ObjectTypeExtensionDefinition.newObjectTypeExtensionDefinition;
@@ -29,7 +30,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import graphql.language.Document;
-import graphql.language.ObjectTypeDefinition;
 import graphql.language.SourceLocation;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,8 +44,8 @@ class RelayConnectionTranslatorTest {
 	private final RelayConnectionTranslator translator = new RelayConnectionTranslator();
 
 	@Test
-	void translateNoObjectTypes() {
-		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(emptyList());
+	void skipWhenNoObjectTypes() {
+		when(doc.getDefinitions()).thenReturn(emptyList());
 		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 
 		translator.translate(doc, ctx);
@@ -54,8 +54,34 @@ class RelayConnectionTranslatorTest {
 	}
 
 	@Test
-	void translateOneObjectTypeWithoutDirective() {
-		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(singletonList(
+	void skipWhenDirectiveIsOnInterface() {
+		when(doc.getDefinitions()).thenReturn(singletonList(
+			newInterfaceTypeDefinition()
+				.name("Interface1")
+				.definition(newFieldDefinition()
+					.name("field1")
+					.directive(newDirective()
+						.name("connection")
+						.argument(newArgument("for", newStringValue("Type8").build()).build())
+						.sourceLocation(new SourceLocation(0, 0))
+						.build())
+					.type(newTypeName("Type8Connection").build())
+					.inputValueDefinition(newInputValueDefinition()
+						.name("p1")
+						.type(newTypeName("Type2").build())
+						.build())
+					.build())
+				.build()));
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
+
+		translator.translate(doc, ctx);
+
+		assertThat(ctx.getObjectTypes()).isEmpty();
+	}
+
+	@Test
+	void skipWhenOneObjectTypeWithoutDirective() {
+		when(doc.getDefinitions()).thenReturn(singletonList(
 			newObjectTypeDefinition()
 				.name("Object1")
 				.fieldDefinition(newFieldDefinition()
@@ -76,7 +102,7 @@ class RelayConnectionTranslatorTest {
 
 	@Test
 	void translateOneObjectTypeWithDirective() {
-		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(singletonList(
+		when(doc.getDefinitions()).thenReturn(singletonList(
 			newObjectTypeDefinition()
 				.name("Object1")
 				.fieldDefinition(newFieldDefinition()
@@ -116,7 +142,7 @@ class RelayConnectionTranslatorTest {
 
 	@Test
 	void translateOneObjectTypeWithExtensionWithDirective() {
-		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(asList(
+		when(doc.getDefinitions()).thenReturn(asList(
 			newObjectTypeDefinition()
 				.name("Object1")
 				.fieldDefinition(newFieldDefinition()

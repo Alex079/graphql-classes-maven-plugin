@@ -1,11 +1,11 @@
 package com.github.alme.graphql.generator.translator;
 
-import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toSet;
 
 import static com.github.alme.graphql.generator.translator.Util.fromFieldDef;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlStructure;
@@ -19,7 +19,8 @@ public class RelayConnectionTranslator implements Translator {
 
 	@Override
 	public void translate(Document doc, GqlContext ctx) {
-		Collection<ObjectTypeDefinition> injected = new RelayConnectionFactory().create(unmodifiableList(doc.getDefinitions()));
+		List definitions = doc.getDefinitions();
+		Collection<ObjectTypeDefinition> injected = new RelayConnectionFactory().create(definitions);
 		populate(ctx, injected);
 	}
 
