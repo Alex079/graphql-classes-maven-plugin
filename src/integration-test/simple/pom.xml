@@ -20,17 +20,17 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.9.0</version>
+			<version>2.10</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.13.3</version>
+			<version>2.13.4.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.13.3</version>
+			<version>2.13.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>4.7.0</version>
+			<version>4.8.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -94,24 +94,24 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>for use with Gson</id>
+						<id>builder</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<packageName>it.gson</packageName>
+							<packageName>it.builder</packageName>
 							<jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>
 							<privateFieldPrefix>p_</privateFieldPrefix>
 							<dataObjectEnhancement>BUILDER</dataObjectEnhancement>
 						</configuration>
 					</execution>
 					<execution>
-						<id>for use with Jackson</id>
+						<id>method chaining</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<packageName>it.jackson</packageName>
+							<packageName>it.chaining</packageName>
 							<jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation>
 							<generatedAnnotationVersion>${java.specification.version}</generatedAnnotationVersion>
 							<dataObjectEnhancement>METHOD_CHAINING</dataObjectEnhancement><!-- BUILDER does not work for Jackson -->
@@ -126,6 +126,17 @@
 							<packageName>it.plain</packageName>
 							<privateFieldPrefix>_</privateFieldPrefix>
 							<privateFieldSuffix>_</privateFieldSuffix>
+						</configuration>
+					</execution>
+					<execution>
+						<id>value</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<packageName>it.value</packageName>
+							<privateFieldPrefix>p_</privateFieldPrefix>
+							<dataObjectEnhancement>VALUE</dataObjectEnhancement>
 						</configuration>
 					</execution>
 				</executions>

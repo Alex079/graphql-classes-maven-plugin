@@ -13,17 +13,19 @@ public class ${name}
 implements ${members?join(", ")}
 </#if>
 {
-	<@classMembers.addFields className=name fields=fields indent='\t' nested=false/>
+	<@classMembers.addFields className=name fields=fields indent='\t'/>
 	<@classMembers.addEquals className=name fields=fields indent='\t'/>
 	<@classMembers.addHashCode fields=fields indent='\t'/>
 	<@classMembers.addToString fields=fields indent='\t'/>
+	<#if dtoConstructor>
+		<@classMembers.addConstructor className=name fields=fields indent='\t'/>
+	</#if>
 	<#if dtoBuilder>
-		<@classMembers.addConstructor className=name fields=fields indent='\t' nested=false/>
 		<@classMembers.addBuilderMethod indent='\t'/>
 		<#lt/>	public static class Builder
 		<#lt/>	{
 		<#lt/>		private Builder() { }
-		<@classMembers.addBuilderFields className='Builder' fields=fields indent='\t\t' nested=false/>
+		<@classMembers.addBuilderFields className='Builder' fields=fields indent='\t\t'/>
 		<@classMembers.addBuildMethod resultClassName=name fields=fields indent='\t\t'/>
 		<#lt/>	}
 	</#if>

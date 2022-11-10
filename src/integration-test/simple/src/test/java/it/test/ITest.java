@@ -14,13 +14,13 @@ class ITest {
 
 	@Test
 	void testEmptyType() {
-		it.gson.types.EmptyType emptyType1WithGson = it.gson.types.EmptyType.builder().build();
-		it.gson.types.EmptyType emptyType2WithGson = it.gson.types.EmptyType.builder().build();
+		it.builder.types.EmptyType emptyType1WithGson = it.builder.types.EmptyType.builder().build();
+		it.builder.types.EmptyType emptyType2WithGson = it.builder.types.EmptyType.builder().build();
 		assertThat(emptyType1WithGson).isEqualTo(emptyType2WithGson)
 			.extracting(Objects::toString).isEqualTo("{ }");
 
-		it.jackson.types.EmptyType emptyType1WithJackson = new it.jackson.types.EmptyType();
-		it.jackson.types.EmptyType emptyType2WithJackson = new it.jackson.types.EmptyType();
+		it.chaining.types.EmptyType emptyType1WithJackson = new it.chaining.types.EmptyType();
+		it.chaining.types.EmptyType emptyType2WithJackson = new it.chaining.types.EmptyType();
 		assertThat(emptyType1WithJackson).isEqualTo(emptyType2WithJackson)
 			.extracting(Objects::toString).isEqualTo("{ }");
 	}
@@ -51,13 +51,13 @@ class ITest {
 				"\tt3Value: value\n" +
 				"}"};
 
-		it.gson.updateField2Mutation.UpdateField2Mutation gMutation =
-			new it.gson.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
+		it.builder.updateField2Mutation.UpdateField2Mutation gMutation =
+			new it.builder.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(gMutation.getDocument()).contains(expected);
 
-		it.jackson.updateField2Mutation.UpdateField2Mutation jMutation =
-			new it.jackson.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
+		it.chaining.updateField2Mutation.UpdateField2Mutation jMutation =
+			new it.chaining.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(jMutation.getDocument()).contains(expected);
 
@@ -80,10 +80,10 @@ class ITest {
 			"  }]\n" +
 			"}";
 
-		it.gson.updateField2Mutation.UpdateField2MutationResult gResult =
-			gsonConvert(resultExample, it.gson.updateField2Mutation.UpdateField2MutationResult.class);
-		it.jackson.updateField2Mutation.UpdateField2MutationResult jResult =
-			jacksonConvert(resultExample, it.jackson.updateField2Mutation.UpdateField2MutationResult.class);
+		it.builder.updateField2Mutation.UpdateField2MutationResult gResult =
+			gsonConvert(resultExample, it.builder.updateField2Mutation.UpdateField2MutationResult.class);
+		it.chaining.updateField2Mutation.UpdateField2MutationResult jResult =
+			jacksonConvert(resultExample, it.chaining.updateField2Mutation.UpdateField2MutationResult.class);
 		it.plain.updateField2Mutation.UpdateField2MutationResult pResult =
 			jacksonConvert(resultExample, it.plain.updateField2Mutation.UpdateField2MutationResult.class);
 		assertThat(gResult.toString())
@@ -96,7 +96,7 @@ class ITest {
 
 	@Test
 	void testDynamicUnion() {
-		it.gson.mutation.DynamicMutation gMutation = new it.gson.mutation.DynamicMutation(selection -> selection
+		it.builder.mutation.DynamicMutation gMutation = new it.builder.mutation.DynamicMutation(selection -> selection
 			.getField3(
 				field3Arguments -> field3Arguments.setArg1("1"),
 				union1MutationField3Selector -> union1MutationField3Selector
@@ -106,11 +106,11 @@ class ITest {
 					)
 					.onType2MutationField2(type2MutationField2Selector -> type2MutationField2Selector
 						.getId()
-						.getValue(it.gson.selectors.Type3MutationField2Selector::getValue)
+						.getValue(it.builder.selectors.Type3MutationField2Selector::getValue)
 					)
 			)
 		);
-		it.jackson.mutation.DynamicMutation jMutation = new it.jackson.mutation.DynamicMutation(selection -> selection
+		it.chaining.mutation.DynamicMutation jMutation = new it.chaining.mutation.DynamicMutation(selection -> selection
 			.getField3(
 				field3Arguments -> field3Arguments.setArg1("1"),
 				union1MutationField3Selector -> union1MutationField3Selector
@@ -120,7 +120,7 @@ class ITest {
 					)
 					.onType2MutationField2(type2MutationField2Selector -> type2MutationField2Selector
 						.getId()
-						.getValue(it.jackson.selectors.Type3MutationField2Selector::getValue)
+						.getValue(it.chaining.selectors.Type3MutationField2Selector::getValue)
 					)
 			)
 		);
@@ -143,23 +143,23 @@ class ITest {
 			"  ]" +
 			"}";
 
-		it.gson.results.Mutation1Result gResult = gsonConvert(resultExample, it.gson.results.Mutation1Result.class);
-		it.jackson.results.Mutation1Result jResult = jacksonConvert(resultExample, it.jackson.results.Mutation1Result.class);
+		it.builder.results.Mutation1Result gResult = gsonConvert(resultExample, it.builder.results.Mutation1Result.class);
+		it.chaining.results.Mutation1Result jResult = jacksonConvert(resultExample, it.chaining.results.Mutation1Result.class);
 		assertThat(gResult.toString()).isEqualTo(jResult.toString());
 	}
 
 	@Test
 	void testDynamicInterface() {
-		it.gson.mutation.DynamicMutation gMutation = new it.gson.mutation.DynamicMutation(selection -> selection
+		it.builder.mutation.DynamicMutation gMutation = new it.builder.mutation.DynamicMutation(selection -> selection
 			.getField2(null, interface1MutationField2Selector -> interface1MutationField2Selector
-				.onType1MutationField2(it.gson.selectors.Interface1MutationField2Selector.Type1MutationField2Selector::getName)
+				.onType1MutationField2(it.builder.selectors.Interface1MutationField2Selector.Type1MutationField2Selector::getName)
 				.getId()
 				.getName()
 			)
 		);
-		it.jackson.mutation.DynamicMutation jMutation = new it.jackson.mutation.DynamicMutation(selection -> selection
+		it.chaining.mutation.DynamicMutation jMutation = new it.chaining.mutation.DynamicMutation(selection -> selection
 			.getField2(null, interface1MutationField2Selector -> interface1MutationField2Selector
-				.onType1MutationField2(it.jackson.selectors.Interface1MutationField2Selector.Type1MutationField2Selector::getName)
+				.onType1MutationField2(it.chaining.selectors.Interface1MutationField2Selector.Type1MutationField2Selector::getName)
 				.getId()
 				.getName()
 			)
@@ -181,8 +181,8 @@ class ITest {
 			"  ]" +
 			"}";
 
-		it.gson.results.Mutation1Result gResult = gsonConvert(resultExample, it.gson.results.Mutation1Result.class);
-		it.jackson.results.Mutation1Result jResult = jacksonConvert(resultExample, it.jackson.results.Mutation1Result.class);
+		it.builder.results.Mutation1Result gResult = gsonConvert(resultExample, it.builder.results.Mutation1Result.class);
+		it.chaining.results.Mutation1Result jResult = jacksonConvert(resultExample, it.chaining.results.Mutation1Result.class);
 		assertThat(gResult.toString()).isEqualTo(jResult.toString());
 	}
 
