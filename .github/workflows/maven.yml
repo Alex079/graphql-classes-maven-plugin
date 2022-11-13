@@ -21,7 +21,7 @@ jobs:
         os:
           - ubuntu-latest
     runs-on: ${{matrix.os}}
-    name: Build with Java ${{ matrix.distribution }}-${{ matrix.version }}
+    name: Build with ${{ matrix.distribution }}-${{ matrix.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
