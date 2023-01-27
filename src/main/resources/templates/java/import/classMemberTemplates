@@ -229,6 +229,11 @@
 </#macro>
 
 <#macro addConstructor className fields indent nested=false>
+	<#lt/>${indent}@java.beans.ConstructorProperties({
+	<#list fields as field>
+		<#lt/>${indent}	"${getFieldName(field)}"<#sep>,</#sep>
+	</#list>
+	<#lt/>${indent}})
 	<#lt/>${indent}${dtoBuilder?then("private","public")} ${className}(
 	<#list fields as field>
 		<#lt/>${indent}	${getFieldType(field,nested)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!}<#sep>,</#sep>

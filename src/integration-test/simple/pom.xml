@@ -94,14 +94,26 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>builder</id>
+						<id>builder gson</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<packageName>it.builder</packageName>
+							<packageName>it.builder.g</packageName>
 							<jsonPropertyAnnotation>com.google.gson.annotations.SerializedName</jsonPropertyAnnotation>
 							<privateFieldPrefix>p_</privateFieldPrefix>
+							<dataObjectEnhancement>BUILDER</dataObjectEnhancement>
+						</configuration>
+					</execution>
+					<execution>
+						<id>builder jackson</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<packageName>it.builder.j</packageName>
+							<jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation>
+							<privateFieldSuffix>_f</privateFieldSuffix>
 							<dataObjectEnhancement>BUILDER</dataObjectEnhancement>
 						</configuration>
 					</execution>
@@ -114,7 +126,7 @@
 							<packageName>it.chaining</packageName>
 							<jsonPropertyAnnotation>com.fasterxml.jackson.annotation.JsonProperty</jsonPropertyAnnotation>
 							<generatedAnnotationVersion>${java.specification.version}</generatedAnnotationVersion>
-							<dataObjectEnhancement>METHOD_CHAINING</dataObjectEnhancement><!-- BUILDER does not work for Jackson -->
+							<dataObjectEnhancement>METHOD_CHAINING</dataObjectEnhancement>
 						</configuration>
 					</execution>
 					<execution>
