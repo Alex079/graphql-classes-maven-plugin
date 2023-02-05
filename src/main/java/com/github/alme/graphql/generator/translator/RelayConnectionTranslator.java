@@ -19,7 +19,9 @@ public class RelayConnectionTranslator implements Translator {
 
 	@Override
 	public void translate(Document doc, GqlContext ctx) {
+		@SuppressWarnings("rawtypes")
 		List definitions = doc.getDefinitions();
+		@SuppressWarnings("unchecked")
 		Collection<ObjectTypeDefinition> injected = new RelayConnectionFactory().create(definitions);
 		populate(ctx, injected);
 	}

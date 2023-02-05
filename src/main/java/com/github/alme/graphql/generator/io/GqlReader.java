@@ -21,6 +21,7 @@ import org.apache.maven.plugin.logging.Log;
 
 import graphql.language.Document;
 import graphql.parser.Parser;
+import graphql.parser.ParserEnvironment;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -35,7 +36,11 @@ public class GqlReader {
 		Log log = context.getLog();
 		try (Reader reader = readerFactory.getReader())
 		{
-			Document doc = new Parser().parseDocument(reader, configuration.getParserOptions());
+			ParserEnvironment environment = ParserEnvironment.newParserEnvironment()
+				.document(reader)
+				.parserOptions(configuration.getParserOptions())
+				.build();
+			Document doc = Parser.parse(environment);
 			log.info(format(LOG_PARSER, doc.getDefinitions().size()));
 
 			new InputObjectTypeTranslator().translate(doc, context);
