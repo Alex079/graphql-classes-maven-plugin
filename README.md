@@ -308,9 +308,6 @@ renamed to avoid Java keyword collisions by setting `privateFieldPrefix` and/or 
 If a serialization engine accesses fields directly and not methods, it is possible to set `jsonPropertyAnnotation`
 property (i.e.`com.google.gson.annotations.SerializedName`) to allow access by exact GraphQL field names.
 
-If a deserialization engine uses setters, it is not possible to use the `VALUE` or `BUILDER` for `dataObjectEnhancement`
-property, because in this case setter methods will not be generated.
-
 ## Mapping from GraphQL to Java
 
 | GraphQL                               | Java                                                                                                                             |
