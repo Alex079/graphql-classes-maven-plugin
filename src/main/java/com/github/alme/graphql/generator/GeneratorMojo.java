@@ -22,13 +22,13 @@ import com.github.alme.graphql.generator.parameters.ParserOptionsParameterApplie
 import com.github.alme.graphql.generator.parameters.ScalarMapParameterApplier;
 import com.github.alme.graphql.generator.parameters.SourceParameterApplier;
 
-import org.apache.maven.model.FileSet;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.model.fileset.FileSet;
 
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true, requiresProject = false)
 public class GeneratorMojo extends AbstractMojo {
@@ -44,21 +44,21 @@ public class GeneratorMojo extends AbstractMojo {
 	 * Directory containing source files.<br/>
 	 * <u>Default</u>: current directory
 	 */
-	@Parameter(property = "gql.sourceDirectory", readonly = true)
-	private File sourceDirectoryAlternative;
+	@Parameter(property = "gql.sourceDirectory")
+	private String sourceDirectoryAlternative;
 
 	/**
 	 * <b>This parameter is used when running from command line and is ignored when POM configuration exists.</b><br/>
 	 * Set of patterns to include. See "source" parameter.
 	 */
-	@Parameter(property = "gql.sourceIncludes", readonly = true)
+	@Parameter(property = "gql.sourceIncludes")
 	private Set<String> sourceIncludesAlternative;
 
 	/**
 	 * <b>This parameter is used when running from command line and is ignored when POM configuration exists.</b><br/>
 	 * Set of patterns to exclude. See "source" parameter.
 	 */
-	@Parameter(property = "gql.sourceExcludes", readonly = true)
+	@Parameter(property = "gql.sourceExcludes")
 	private Set<String> sourceExcludesAlternative;
 
 	/**
@@ -87,7 +87,7 @@ public class GeneratorMojo extends AbstractMojo {
 	 * Mapping of GraphQL scalars to Java classes formatted as a list of key=value pairs. See "scalarMap" parameter.<br/>
 	 * <u>Default</u>: "Int=Integer,Float=Double,ID=String".
 	 */
-	@Parameter(property = "gql.scalarMap", readonly = true)
+	@Parameter(property = "gql.scalarMap")
 	private Set<String> scalarMapAlternative;
 
 	/**
@@ -102,7 +102,7 @@ public class GeneratorMojo extends AbstractMojo {
 	 * Mapping of GraphQL field names to GraphQL field aliases formatted as a list of key=value pairs. See "aliasMap" parameter.
 	 * Can be used to avoid Java keyword collisions for dynamic operations only.
 	 */
-	@Parameter(property = "gql.aliasMap", readonly = true)
+	@Parameter(property = "gql.aliasMap")
 	private Set<String> aliasMapAlternative;
 
 	/**
