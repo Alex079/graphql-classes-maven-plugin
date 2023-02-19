@@ -50,6 +50,7 @@ public class OutputDirectoryParameterApplier implements ParameterApplier {
 			? Paths
 				.get(project.getBasedir() == null ? "" : project.getBuild().getDirectory())
 				.resolve("generated-sources")
+				.resolve("graphql-classes")
 				.resolve("java")
 			: outputDirectory.toPath();
 	}
