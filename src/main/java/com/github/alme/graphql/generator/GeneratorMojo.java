@@ -146,7 +146,8 @@ public class GeneratorMojo extends AbstractMojo {
 	 * The type of data object enhancement.
 	 * Can be empty or take one of the following values:
 	 * METHOD_CHAINING (data object setters will return 'this' instead of 'void'),
-	 * BUILDER (data objects will use builder pattern).
+	 * BUILDER (data objects will use builder pattern),
+	 * VALUE (data objects will use value pattern).
 	 */
 	@Parameter(property = "gql.dataObjectEnhancement")
 	private GqlConfiguration.DataObjectEnhancementType dataObjectEnhancement;
