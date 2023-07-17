@@ -22,13 +22,13 @@ import com.github.alme.graphql.generator.parameters.ParserOptionsParameterApplie
 import com.github.alme.graphql.generator.parameters.ScalarMapParameterApplier;
 import com.github.alme.graphql.generator.parameters.SourceParameterApplier;
 
+import org.apache.maven.model.FileSet;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.model.fileset.FileSet;
 
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true, requiresProject = false)
 public class GeneratorMojo extends AbstractMojo {
@@ -38,6 +38,12 @@ public class GeneratorMojo extends AbstractMojo {
 	 */
 	@Parameter
 	private FileSet source;
+
+	/**
+	 * Set of source files including both schema files and operation files.
+	 */
+	@Parameter
+	private Set<FileSet> sources;
 
 	/**
 	 * <b>This parameter is used when running from command line and is ignored when POM configuration exists.</b><br/>
@@ -140,7 +146,8 @@ public class GeneratorMojo extends AbstractMojo {
 	 * The type of data object enhancement.
 	 * Can be empty or take one of the following values:
 	 * METHOD_CHAINING (data object setters will return 'this' instead of 'void'),
-	 * BUILDER (data objects will use builder pattern).
+	 * BUILDER (data objects will use builder pattern),
+	 * VALUE (data objects will use value pattern).
 	 */
 	@Parameter(property = "gql.dataObjectEnhancement")
 	private GqlConfiguration.DataObjectEnhancementType dataObjectEnhancement;
@@ -172,7 +179,7 @@ public class GeneratorMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException {
 		GqlConfiguration configuration = GqlConfiguration.builder()
-			.accept(new SourceParameterApplier(project, source, sourceDirectoryAlternative, sourceIncludesAlternative, sourceExcludesAlternative))
+			.accept(new SourceParameterApplier(sources, source, sourceDirectoryAlternative, sourceIncludesAlternative, sourceExcludesAlternative))
 			.accept(new OutputDirectoryParameterApplier(project, outputDirectory, packageName))
 			.accept(new ScalarMapParameterApplier(scalarMap, scalarMapAlternative))
 			.accept(new AliasMapParameterApplier(aliasMap, aliasMapAlternative))
