@@ -36,11 +36,9 @@ public class SourceParameterApplier implements ParameterApplier {
 		if (this.sources.isEmpty()) {
 			this.sources.add(getAlternative(sourceDirectoryAlternative, sourceIncludesAlternative, sourceExcludesAlternative));
 		}
-		this.sources.forEach(fileSet -> {
-			if (fileSet.getDirectory() == null) {
-				fileSet.setDirectory("");
-			}
-		});
+		this.sources.stream()
+			.filter(fileSet -> fileSet.getDirectory() == null)
+			.forEach(fileSet -> fileSet.setDirectory(""));
 	}
 
 	private static FileSet getAlternative(String directory, Collection<String> includes, Collection<String> excludes) {
