@@ -53,7 +53,7 @@ public class SourceParameterApplier implements ParameterApplier {
 	@Override
 	public void apply(GqlConfigurationBuilder builder) throws MojoExecutionException {
 		Set<Path> sourceFiles = sources.stream()
-			.map(SourceParameterApplier::streamFileNames)
+			.map(SourceParameterApplier::getFileNames)
 			.flatMap(Collection::stream)
 			.map(Paths::get)
 			.collect(Collectors.toSet());
@@ -63,7 +63,7 @@ public class SourceParameterApplier implements ParameterApplier {
 		builder.sourceFiles(sourceFiles);
 	}
 
-	private static List<String> streamFileNames(FileSet source) {
+	private static List<String> getFileNames(FileSet source) {
 		try {
 			return FileUtils.getFileNames(
 				new File(source.getDirectory()).getAbsoluteFile(),
