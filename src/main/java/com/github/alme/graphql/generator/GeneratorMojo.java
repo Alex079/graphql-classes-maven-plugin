@@ -179,7 +179,8 @@ public class GeneratorMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException {
 		GqlConfiguration configuration = GqlConfiguration.builder()
-			.accept(new SourceParameterApplier(sources, source, sourceDirectoryAlternative, sourceIncludesAlternative, sourceExcludesAlternative))
+			.accept(new SourceParameterApplier(project, sources, source,
+				sourceDirectoryAlternative, sourceIncludesAlternative, sourceExcludesAlternative))
 			.accept(new OutputDirectoryParameterApplier(project, outputDirectory, packageName))
 			.accept(new ScalarMapParameterApplier(scalarMap, scalarMapAlternative))
 			.accept(new AliasMapParameterApplier(aliasMap, aliasMapAlternative))

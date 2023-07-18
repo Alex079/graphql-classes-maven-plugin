@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,15 +16,17 @@ import com.github.alme.graphql.generator.dto.GqlConfiguration.GqlConfigurationBu
 
 import org.apache.maven.model.FileSet;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 
 public class SourceParameterApplier implements ParameterApplier {
 
 	private final Set<FileSet> sources;
+	private final File baseDirectory;
 	private static final String LIST_SEPARATOR = ",";
 
 	public SourceParameterApplier(
-		Collection<FileSet> sources, FileSet source,
+		MavenProject project, Collection<FileSet> sources, FileSet source,
 		String sourceDirectoryAlternative, Collection<String> sourceIncludesAlternative, Collection<String> sourceExcludesAlternative
 	) {
 		this.sources = new HashSet<>();
@@ -36,9 +39,7 @@ public class SourceParameterApplier implements ParameterApplier {
 		if (this.sources.isEmpty()) {
 			this.sources.add(getAlternative(sourceDirectoryAlternative, sourceIncludesAlternative, sourceExcludesAlternative));
 		}
-		this.sources.stream()
-			.filter(fileSet -> fileSet.getDirectory() == null)
-			.forEach(fileSet -> fileSet.setDirectory(""));
+		this.baseDirectory = Optional.ofNullable(project.getBasedir()).orElseGet(() -> new File("").getAbsoluteFile());
 	}
 
 	private static FileSet getAlternative(String directory, Collection<String> includes, Collection<String> excludes) {
@@ -53,7 +54,7 @@ public class SourceParameterApplier implements ParameterApplier {
 	@Override
 	public void apply(GqlConfigurationBuilder builder) throws MojoExecutionException {
 		Set<Path> sourceFiles = sources.stream()
-			.map(SourceParameterApplier::getFileNames)
+			.map(this::getFileNames)
 			.flatMap(Collection::stream)
 			.map(Paths::get)
 			.collect(Collectors.toSet());
@@ -63,10 +64,10 @@ public class SourceParameterApplier implements ParameterApplier {
 		builder.sourceFiles(sourceFiles);
 	}
 
-	private static List<String> getFileNames(FileSet source) {
+	private List<String> getFileNames(FileSet source) {
 		try {
 			return FileUtils.getFileNames(
-				new File(source.getDirectory()).getAbsoluteFile(),
+				Optional.ofNullable(source.getDirectory()).map(File::new).map(File::getAbsoluteFile).orElse(baseDirectory),
 				String.join(LIST_SEPARATOR, source.getIncludes()),
 				String.join(LIST_SEPARATOR, source.getExcludes()),
 				true);
