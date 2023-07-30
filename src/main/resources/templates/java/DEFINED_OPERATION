@@ -4,7 +4,7 @@ package ${currentPackage};
 
 ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
-public class ${className} implements ${operationsPackage}.${interfaceName}
+public class ${className} implements ${operationsPackage}.${operation?cap_first}
 {
 	private static final String OPERATION_NAME = <#if name?has_content>"${name}"<#else>null</#if>;
 	private static final String DOCUMENT = <#if text?has_content>"${text?j_string}"<#else>null</#if>;
@@ -38,8 +38,8 @@ public class ${className} implements ${operationsPackage}.${interfaceName}
 	}
 
 	@Override
-	public Class<${className}Result> getResultClass() {
-		return ${className}Result.class;
+	public Class<${currentPackage}.results.${typeName}> getResultClass() {
+		return ${currentPackage}.results.${typeName}.class;
 	}
 
 	<@classMembers.addToString fields=[{'name':'operationName'},{'name':'document'},{'name':'variables'}] indent='\t'/>

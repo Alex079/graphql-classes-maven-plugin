@@ -21,9 +21,11 @@ public class ${className}
 	<#list selections as typeName, fields>
 		<#if typeName?has_content>
 			<#lt/>	public ${className} on${typeName}(java.util.function.Consumer<${typeName}Selector> selector) {
-			<#lt/>		documentBuilder.append(" ...on ${typeName} {");
-			<#lt/>		selector.accept(new ${typeName}Selector());
-			<#lt/>		documentBuilder.append(" }");
+			<#lt/>		if (selector != null) {
+			<#lt/>			documentBuilder.append(" ...on ${typeName} {");
+			<#lt/>			selector.accept(new ${typeName}Selector());
+			<#lt/>			documentBuilder.append(" }");
+			<#lt/>		}
 			<#lt/>		return this;
 			<#lt/>	}
 			<#lt/>	public class ${typeName}Selector {

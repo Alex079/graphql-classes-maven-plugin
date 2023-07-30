@@ -1,4 +1,4 @@
-package com.github.alme.graphql.generator.translator;
+package com.github.alme.graphql.generator.io.translator;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.github.alme.graphql.generator.dto.GqlContext;
+import com.github.alme.graphql.generator.io.translator.EnumTypeTranslator;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;

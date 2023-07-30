@@ -1,4 +1,4 @@
-package com.github.alme.graphql.generator.translator;
+package com.github.alme.graphql.generator.io.translator;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -23,6 +23,7 @@ import com.github.alme.graphql.generator.dto.GqlArgument;
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlType;
+import com.github.alme.graphql.generator.io.translator.ObjectTypeTranslator;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;

@@ -7,15 +7,15 @@ import java.io.Reader;
 
 import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
-import com.github.alme.graphql.generator.translator.DynamicOperationTranslator;
-import com.github.alme.graphql.generator.translator.EnumTypeTranslator;
-import com.github.alme.graphql.generator.translator.InputObjectTypeTranslator;
-import com.github.alme.graphql.generator.translator.InterfaceTypeTranslator;
-import com.github.alme.graphql.generator.translator.ObjectTypeTranslator;
-import com.github.alme.graphql.generator.translator.OperationTranslator;
-import com.github.alme.graphql.generator.translator.RelayConnectionTranslator;
-import com.github.alme.graphql.generator.translator.SchemaTranslator;
-import com.github.alme.graphql.generator.translator.UnionTypeTranslator;
+import com.github.alme.graphql.generator.io.translator.DynamicOperationTranslator;
+import com.github.alme.graphql.generator.io.translator.EnumTypeTranslator;
+import com.github.alme.graphql.generator.io.translator.InputObjectTypeTranslator;
+import com.github.alme.graphql.generator.io.translator.InterfaceTypeTranslator;
+import com.github.alme.graphql.generator.io.translator.ObjectTypeTranslator;
+import com.github.alme.graphql.generator.io.translator.OperationTranslator;
+import com.github.alme.graphql.generator.io.translator.RelayConnectionTranslator;
+import com.github.alme.graphql.generator.io.translator.SchemaTranslator;
+import com.github.alme.graphql.generator.io.translator.UnionTypeTranslator;
 
 import org.apache.maven.plugin.logging.Log;
 

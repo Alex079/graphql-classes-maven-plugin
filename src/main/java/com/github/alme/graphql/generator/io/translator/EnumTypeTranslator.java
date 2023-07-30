@@ -1,4 +1,4 @@
-package com.github.alme.graphql.generator.translator;
+package com.github.alme.graphql.generator.io.translator;
 
 import static java.util.stream.Collectors.toSet;
 

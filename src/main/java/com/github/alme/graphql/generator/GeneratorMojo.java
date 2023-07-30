@@ -196,7 +196,7 @@ public class GeneratorMojo extends AbstractMojo {
 
 		GqlContext context = new GqlContext(getLog(), configuration.getScalars(), configuration.getAliases());
 		ReaderFactory readerFactory = new ReaderFactory(configuration.getSourceFiles(), getLog());
-		WriterFactory writerFactory = new WriterFactory();
+		WriterFactory writerFactory = new WriterFactory(configuration.getOutputRoot());
 
 		new GqlReader(readerFactory).read(context, configuration);
 		getLog().debug(format("Current context: %s.", context));

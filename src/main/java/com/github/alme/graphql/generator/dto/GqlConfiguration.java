@@ -36,13 +36,9 @@ public class GqlConfiguration {
 	String generatedAnnotation;
 	String schemaTypesPackageName;
 	String operationsPackageName;
-	String resultsPackageName;
-	String selectorsPackageName;
+	String definedOperationsPackageName;
+	String dynamicOperationsPackageName;
 	Path outputRoot;
-	Path schemaTypesPackagePath;
-	Path operationsPackagePath;
-	Path resultsPackagePath;
-	Path selectorsPackagePath;
 	ParserOptions parserOptions;
 
 	public static class GqlConfigurationBuilder {

@@ -1,4 +1,4 @@
-package com.github.alme.graphql.generator.translator;
+package com.github.alme.graphql.generator.io.translator;
 
 import com.github.alme.graphql.generator.dto.GqlContext;
 
