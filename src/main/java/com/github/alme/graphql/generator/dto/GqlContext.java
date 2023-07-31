@@ -3,7 +3,6 @@ package com.github.alme.graphql.generator.dto;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.maven.plugin.logging.Log;
@@ -19,7 +18,8 @@ public class GqlContext {
 	Map<String, String> schema = new HashMap<>();
 	Map<Structure, Map<String, GqlStructure>> structures = new EnumMap<>(Structure.class);
 	Map<String, GqlOperation> definedOperations = new HashMap<>();
-	Collection<GqlOperation> dynamicOperations = new HashSet<>();
+	Map<String, Map<String, Collection<GqlSelection>>> definedSelections = new HashMap<>();
+	Map<String, GqlOperation> dynamicOperations = new HashMap<>();
 	Map<String, Collection<GqlSelection>> dynamicSelections = new HashMap<>();
 
 	private Map<String, GqlStructure> getStructures(Structure category) {

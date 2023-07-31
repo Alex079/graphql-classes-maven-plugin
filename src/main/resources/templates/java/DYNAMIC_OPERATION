@@ -4,7 +4,7 @@ package ${currentPackage};
 
 ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
-public class ${className} implements ${operationsPackage}.${interfaceName}
+public class ${className} implements ${operationsPackage}.${operation?cap_first}
 {
 	private final String document;
 
@@ -24,13 +24,13 @@ public class ${className} implements ${operationsPackage}.${interfaceName}
 	}
 
 	@Override
-	public Class<${resultsPackage}.${typeName}Result> getResultClass() {
-		return ${resultsPackage}.${typeName}Result.class;
+	public Class<${currentPackage}.results.${typeName}Result> getResultClass() {
+		return ${currentPackage}.results.${typeName}Result.class;
 	}
 
-	public ${className}(java.util.function.Consumer<${selectorsPackage}.${typeName}Selector> selector) {
+	public ${className}(java.util.function.Consumer<${currentPackage}.selectors.${typeName}ResultSelector> selector) {
 		StringBuilder documentBuilder = new StringBuilder("${operation} {");
-		selector.accept(new ${selectorsPackage}.${typeName}Selector(documentBuilder));
+		selector.accept(new ${currentPackage}.selectors.${typeName}ResultSelector(documentBuilder));
 		this.document = documentBuilder.append(" }").toString();
 	}
 

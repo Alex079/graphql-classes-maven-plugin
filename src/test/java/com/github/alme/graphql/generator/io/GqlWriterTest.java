@@ -16,11 +16,10 @@ import static graphql.language.TypeName.newTypeName;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.file.Paths;
 
 import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
-import com.github.alme.graphql.generator.translator.ObjectTypeTranslator;
+import com.github.alme.graphql.generator.io.translator.ObjectTypeTranslator;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -110,13 +109,12 @@ class GqlWriterTest {
 	private void given_the_minimum_set_of_configurations() {
 		gqlConfiguration = GqlConfiguration.builder()
 				.schemaTypesPackageName("com.company.test")
-				.schemaTypesPackagePath(Paths.get("target/generated"))
 				.generateSchemaOtherTypes(true)
 				.build();
 	}
 
 	private void when_the_write_is_invoked() throws IOException, MojoExecutionException {
-		doReturn(testWriter).when(writerFactory).getWriter(any());
+		doReturn(testWriter).when(writerFactory).getWriter(any(), any());
 		GqlWriter gqlWriter = new GqlWriter(writerFactory);
 		gqlWriter.write(ctx, gqlConfiguration);
 	}

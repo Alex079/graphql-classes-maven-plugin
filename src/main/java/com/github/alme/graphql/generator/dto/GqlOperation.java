@@ -8,8 +8,8 @@ import lombok.ToString;
 import lombok.Value;
 
 @Value
-@EqualsAndHashCode(exclude = {"selections", "variables"})
-@ToString(exclude = {"selections", "variables"})
+@EqualsAndHashCode(exclude = "variables")
+@ToString(exclude = "variables")
 public class GqlOperation {
 
 	String name;
@@ -17,18 +17,10 @@ public class GqlOperation {
 	String typeName;
 	String text;
 	Collection<GqlField> variables = new HashSet<>();
-	Collection<GqlSelection> selections = new HashSet<>();
 
 	public GqlOperation addVariables(Collection<GqlField> variables) {
 		if (variables != null) {
 			this.variables.addAll(variables);
-		}
-		return this;
-	}
-
-	public GqlOperation addSelections(Collection<GqlSelection> selections) {
-		if (selections != null) {
-			this.selections.addAll(selections);
 		}
 		return this;
 	}

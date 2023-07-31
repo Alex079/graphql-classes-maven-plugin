@@ -51,23 +51,23 @@ class ITest {
 				"\tt3Value: value\n" +
 				"}"};
 
-		it.builder.g.updateField2Mutation.UpdateField2Mutation gMutation =
-			new it.builder.g.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
+		it.builder.g.defined.updateField2Mutation.UpdateField2Mutation gMutation =
+			new it.builder.g.defined.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(gMutation.getDocument()).contains(expected);
 
-		it.chaining.updateField2Mutation.UpdateField2Mutation cMutation =
-			new it.chaining.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
+		it.chaining.defined.updateField2Mutation.UpdateField2Mutation cMutation =
+			new it.chaining.defined.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(cMutation.getDocument()).contains(expected);
 
-		it.plain.updateField2Mutation.UpdateField2Mutation pMutation =
-			new it.plain.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
+		it.plain.defined.updateField2Mutation.UpdateField2Mutation pMutation =
+			new it.plain.defined.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(pMutation.getDocument()).contains(expected);
 
-		it.value.updateField2Mutation.UpdateField2Mutation vMutation =
-			new it.value.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
+		it.value.defined.updateField2Mutation.UpdateField2Mutation vMutation =
+			new it.value.defined.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(vMutation.getDocument()).contains(expected);
 	}
@@ -85,16 +85,16 @@ class ITest {
 			"  }]\n" +
 			"}";
 
-		it.builder.g.updateField2Mutation.UpdateField2MutationResult gResult =
-			gsonConvert(resultExample, it.builder.g.updateField2Mutation.UpdateField2MutationResult.class);
-		it.builder.j.updateField2Mutation.UpdateField2MutationResult jResult =
-			jacksonConvert(resultExample, it.builder.j.updateField2Mutation.UpdateField2MutationResult.class);
-		it.chaining.updateField2Mutation.UpdateField2MutationResult cResult =
-			jacksonConvert(resultExample, it.chaining.updateField2Mutation.UpdateField2MutationResult.class);
-		it.plain.updateField2Mutation.UpdateField2MutationResult pResult =
-			jacksonConvert(resultExample, it.plain.updateField2Mutation.UpdateField2MutationResult.class);
-		it.value.updateField2Mutation.UpdateField2MutationResult vResult =
-			jacksonConvert(resultExample, it.value.updateField2Mutation.UpdateField2MutationResult.class);
+		it.builder.g.defined.updateField2Mutation.results.Mutation1Result1 gResult =
+			gsonConvert(resultExample, it.builder.g.defined.updateField2Mutation.results.Mutation1Result1.class);
+		it.builder.j.defined.updateField2Mutation.results.Mutation1Result1 jResult =
+			jacksonConvert(resultExample, it.builder.j.defined.updateField2Mutation.results.Mutation1Result1.class);
+		it.chaining.defined.updateField2Mutation.results.Mutation1Result1 cResult =
+			jacksonConvert(resultExample, it.chaining.defined.updateField2Mutation.results.Mutation1Result1.class);
+		it.plain.defined.updateField2Mutation.results.Mutation1Result1 pResult =
+			jacksonConvert(resultExample, it.plain.defined.updateField2Mutation.results.Mutation1Result1.class);
+		it.value.defined.updateField2Mutation.results.Mutation1Result1 vResult =
+			jacksonConvert(resultExample, it.value.defined.updateField2Mutation.results.Mutation1Result1.class);
 
 		assertThat(gResult.toString())
 			.isEqualTo(jResult.toString())
@@ -123,11 +123,11 @@ class ITest {
 			"  ]" +
 			"}";
 
-		it.builder.g.results.Mutation1Result gResult = gsonConvert(resultExample, it.builder.g.results.Mutation1Result.class);
-		it.builder.j.results.Mutation1Result jResult = jacksonConvert(resultExample, it.builder.j.results.Mutation1Result.class);
-		it.chaining.results.Mutation1Result cResult = jacksonConvert(resultExample, it.chaining.results.Mutation1Result.class);
-		it.plain.results.Mutation1Result pResult = jacksonConvert(resultExample, it.plain.results.Mutation1Result.class);
-		it.value.results.Mutation1Result vResult = jacksonConvert(resultExample, it.value.results.Mutation1Result.class);
+		it.builder.g.dynamic.results.Mutation1Result gResult = gsonConvert(resultExample, it.builder.g.dynamic.results.Mutation1Result.class);
+		it.builder.j.dynamic.results.Mutation1Result jResult = jacksonConvert(resultExample, it.builder.j.dynamic.results.Mutation1Result.class);
+		it.chaining.dynamic.results.Mutation1Result cResult = jacksonConvert(resultExample, it.chaining.dynamic.results.Mutation1Result.class);
+		it.plain.dynamic.results.Mutation1Result pResult = jacksonConvert(resultExample, it.plain.dynamic.results.Mutation1Result.class);
+		it.value.dynamic.results.Mutation1Result vResult = jacksonConvert(resultExample, it.value.dynamic.results.Mutation1Result.class);
 
 		assertThat(gResult.toString())
 			.isEqualTo(jResult.toString())
@@ -143,7 +143,7 @@ class ITest {
 
 	@Test
 	void testDynamicUnion() {
-		it.builder.g.mutation.DynamicMutation gMutation = new it.builder.g.mutation.DynamicMutation(selection -> selection
+		it.builder.g.dynamic.DynamicMutation gMutation = new it.builder.g.dynamic.DynamicMutation(selection -> selection
 			.getField3(
 				field3Arguments -> field3Arguments.setArg1("1"),
 				union1MutationField3Selector -> union1MutationField3Selector
@@ -153,11 +153,11 @@ class ITest {
 					)
 					.onType2MutationField2(type2MutationField2Selector -> type2MutationField2Selector
 						.getId()
-						.getValue(it.builder.g.selectors.Type3MutationField2Selector::getValue)
+						.getValue(it.builder.g.dynamic.selectors.Type3MutationField2ResultSelector::getValue)
 					)
 			)
 		);
-		it.builder.j.mutation.DynamicMutation jMutation = new it.builder.j.mutation.DynamicMutation(selection -> selection
+		it.builder.j.dynamic.DynamicMutation jMutation = new it.builder.j.dynamic.DynamicMutation(selection -> selection
 			.getField3(
 				field3Arguments -> field3Arguments.setArg1("1"),
 				union1MutationField3Selector -> union1MutationField3Selector
@@ -167,11 +167,11 @@ class ITest {
 					)
 					.onType2MutationField2(type2MutationField2Selector -> type2MutationField2Selector
 						.getId()
-						.getValue(it.builder.j.selectors.Type3MutationField2Selector::getValue)
+						.getValue(it.builder.j.dynamic.selectors.Type3MutationField2ResultSelector::getValue)
 					)
 			)
 		);
-		it.chaining.mutation.DynamicMutation cMutation = new it.chaining.mutation.DynamicMutation(selection -> selection
+		it.chaining.dynamic.DynamicMutation cMutation = new it.chaining.dynamic.DynamicMutation(selection -> selection
 			.getField3(
 				field3Arguments -> field3Arguments.setArg1("1"),
 				union1MutationField3Selector -> union1MutationField3Selector
@@ -181,7 +181,7 @@ class ITest {
 					)
 					.onType2MutationField2(type2MutationField2Selector -> type2MutationField2Selector
 						.getId()
-						.getValue(it.chaining.selectors.Type3MutationField2Selector::getValue)
+						.getValue(it.chaining.dynamic.selectors.Type3MutationField2ResultSelector::getValue)
 					)
 			)
 		);
@@ -194,23 +194,23 @@ class ITest {
 
 	@Test
 	void testDynamicInterface() {
-		it.builder.g.mutation.DynamicMutation gMutation = new it.builder.g.mutation.DynamicMutation(selection -> selection
+		it.builder.g.dynamic.DynamicMutation gMutation = new it.builder.g.dynamic.DynamicMutation(selection -> selection
 			.getField2(null, interface1MutationField2Selector -> interface1MutationField2Selector
-				.onType1MutationField2(it.builder.g.selectors.Interface1MutationField2Selector.Type1MutationField2Selector::getName)
+				.onType1MutationField2(it.builder.g.dynamic.selectors.Interface1MutationField2ResultSelector.Type1MutationField2Selector::getName)
 				.getId()
 				.getName()
 			)
 		);
-		it.builder.j.mutation.DynamicMutation jMutation = new it.builder.j.mutation.DynamicMutation(selection -> selection
+		it.builder.j.dynamic.DynamicMutation jMutation = new it.builder.j.dynamic.DynamicMutation(selection -> selection
 			.getField2(null, interface1MutationField2Selector -> interface1MutationField2Selector
-				.onType1MutationField2(it.builder.j.selectors.Interface1MutationField2Selector.Type1MutationField2Selector::getName)
+				.onType1MutationField2(it.builder.j.dynamic.selectors.Interface1MutationField2ResultSelector.Type1MutationField2Selector::getName)
 				.getId()
 				.getName()
 			)
 		);
-		it.chaining.mutation.DynamicMutation cMutation = new it.chaining.mutation.DynamicMutation(selection -> selection
+		it.chaining.dynamic.DynamicMutation cMutation = new it.chaining.dynamic.DynamicMutation(selection -> selection
 			.getField2(null, interface1MutationField2Selector -> interface1MutationField2Selector
-				.onType1MutationField2(it.chaining.selectors.Interface1MutationField2Selector.Type1MutationField2Selector::getName)
+				.onType1MutationField2(it.chaining.dynamic.selectors.Interface1MutationField2ResultSelector.Type1MutationField2Selector::getName)
 				.getId()
 				.getName()
 			)

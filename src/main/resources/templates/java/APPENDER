@@ -1,5 +1,5 @@
 //CHECKSTYLE:OFF
-package ${operationsPackage};
+package ${currentPackage};
 
 import java.io.Serializable;
 import java.util.List;
@@ -9,9 +9,9 @@ import java.util.stream.Stream;
 
 ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
-public final class GraphQlAppender
+public final class ${className}
 {
-	private GraphQlAppender() {}
+	private ${className}() {}
 
 	public static Function<List<?>, Stream<?>> arrayAppender(StringBuilder documentBuilder) {
 		return value -> {

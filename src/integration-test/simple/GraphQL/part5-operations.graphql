@@ -9,7 +9,35 @@
         id
     }
     field2(arg2: []) {
-        edges { node { ...on TreeNode { cl:synchronized { value } } } }
+        edges { node { ...on Type1UnionField2 { cl:switch { ...TreeNodeLeftFragment ...TreeNodeRightFragment value } } } }
+    }
+}
+
+fragment TreeNodeFragment on TreeNode {
+    ...TreeNodeLeftFragment ...TreeNodeRightFragment
+}
+
+fragment TreeNodeLeftFragment on TreeNode {
+    left {
+        ...TreeNodeFragment
+    }
+    left {
+        value
+        ...EmptyLoop1
+    }
+}
+
+fragment EmptyLoop1 on TreeNode {
+    ...EmptyLoop2
+}
+
+fragment EmptyLoop2 on TreeNode {
+    ...EmptyLoop1
+}
+
+fragment TreeNodeRightFragment on TreeNode {
+    right {
+        ...TreeNodeFragment
     }
 }
 

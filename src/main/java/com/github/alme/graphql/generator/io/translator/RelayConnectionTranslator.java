@@ -1,8 +1,8 @@
-package com.github.alme.graphql.generator.translator;
+package com.github.alme.graphql.generator.io.translator;
 
 import static java.util.stream.Collectors.toSet;
 
-import static com.github.alme.graphql.generator.translator.Util.fromFieldDef;
+import static com.github.alme.graphql.generator.io.Util.fromFieldDef;
 
 import java.util.Collection;
 import java.util.List;

@@ -18,31 +18,17 @@ public class OutputDirectoryParameterApplier implements ParameterApplier {
 	private final String packageName;
 
 	private static final String TYPES_SUBPACKAGE = ".types";
-	private static final String RESULTS_SUBPACKAGE = ".results";
-	private static final String SELECTORS_SUBPACKAGE = ".selectors";
-	private static final String SUBPACKAGE_SEPARATOR = ".";
+	private static final String DEFINED_SUBPACKAGE = ".defined";
+	private static final String DYNAMIC_SUBPACKAGE = ".dynamic";
 
 	@Override
 	public void apply(GqlConfigurationBuilder builder) {
-		String schemaTypesPackageName = packageName + TYPES_SUBPACKAGE;
-		String operationsPackageName = packageName;
-		String resultsPackageName = packageName + RESULTS_SUBPACKAGE;
-		String selectorsPackageName = packageName + SELECTORS_SUBPACKAGE;
-		Path outputRoot = getOutputDirectory(outputDirectory);
-		Path schemaTypesPackagePath = outputRoot.resolve(schemaTypesPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
-		Path operationsPackagePath = outputRoot.resolve(operationsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
-		Path resultsPackagePath = outputRoot.resolve(resultsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
-		Path selectorsPackagePath = outputRoot.resolve(selectorsPackageName.replace(SUBPACKAGE_SEPARATOR, File.separator));
 		builder
-			.outputRoot(outputRoot)
-			.schemaTypesPackageName(schemaTypesPackageName)
-			.operationsPackageName(operationsPackageName)
-			.resultsPackageName(resultsPackageName)
-			.selectorsPackageName(selectorsPackageName)
-			.schemaTypesPackagePath(schemaTypesPackagePath)
-			.operationsPackagePath(operationsPackagePath)
-			.resultsPackagePath(resultsPackagePath)
-			.selectorsPackagePath(selectorsPackagePath);
+			.outputRoot(getOutputDirectory(outputDirectory))
+			.operationsPackageName(packageName)
+			.schemaTypesPackageName(packageName + TYPES_SUBPACKAGE)
+			.definedOperationsPackageName(packageName + DEFINED_SUBPACKAGE)
+			.dynamicOperationsPackageName(packageName + DYNAMIC_SUBPACKAGE);
 	}
 
 	private Path getOutputDirectory(File outputDirectory) {

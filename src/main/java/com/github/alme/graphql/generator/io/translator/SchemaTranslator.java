@@ -1,10 +1,11 @@
-package com.github.alme.graphql.generator.translator;
+package com.github.alme.graphql.generator.io.translator;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
 import com.github.alme.graphql.generator.dto.GqlContext;
+import com.github.alme.graphql.generator.io.Util;
 
 import graphql.language.Document;
 import graphql.language.SchemaDefinition;

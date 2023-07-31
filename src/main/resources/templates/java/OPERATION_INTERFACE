@@ -1,9 +1,9 @@
 //CHECKSTYLE:OFF
-package ${operationsPackage};
+package ${currentPackage};
 
 ${generatedAnnotation!}
 @SuppressWarnings({"all", "PMD"})
-public interface ${interfaceName}
+public interface ${className}
 {
 	String getOperationName();
 	String getDocument();

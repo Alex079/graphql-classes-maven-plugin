@@ -1,4 +1,4 @@
-package com.github.alme.graphql.generator.translator;
+package com.github.alme.graphql.generator.io.translator;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -24,14 +24,20 @@ import static graphql.language.VariableDefinition.newVariableDefinition;
 import static graphql.language.VariableReference.newVariableReference;
 
 import java.math.BigInteger;
+import java.nio.file.Paths;
+import java.util.Map;
 
+import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlSelection;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 import com.github.alme.graphql.generator.dto.GqlType;
+import com.github.alme.graphql.generator.io.GqlReader;
+import com.github.alme.graphql.generator.io.ReaderFactory;
 
 import org.apache.maven.plugin.logging.Log;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -92,15 +98,14 @@ class OperationTranslatorTest {
 
 		assertThat(ctx.getDefinedOperations())
 			.hasSize(1)
-			.extracting(m -> m.get(null))
+			.extracting(m -> m.get("UnnamedQuery"))
 			.isNotNull()
 			.satisfies(operation -> {
 				assertThat(operation.getName()).isNull();
 				assertThat(operation.getOperation()).isEqualTo("query");
 				assertThat(operation.getText()).contains("query");
-				assertThat(operation.getTypeName()).isEqualTo("Query");
+				assertThat(operation.getTypeName()).isEqualTo("QueryResult1");
 				assertThat(operation.getVariables()).isEmpty();
-				assertThat(operation.getSelections()).isEmpty();
 			});
 	}
 
@@ -121,17 +126,14 @@ class OperationTranslatorTest {
 
 		assertThat(ctx.getDefinedOperations())
 			.hasSize(1)
-			.extractingByKey("getValues")
+			.extractingByKey("GetValuesQuery")
 			.isNotNull()
 			.satisfies(operation -> {
 				assertThat(operation.getText()).containsIgnoringWhitespaces("query getValues {f}");
 				assertThat(operation.getName()).isEqualTo("getValues");
 				assertThat(operation.getOperation()).isEqualTo("query");
-				assertThat(operation.getTypeName()).isEqualTo("Query");
+				assertThat(operation.getTypeName()).isEqualTo("QueryResult1");
 				assertThat(operation.getVariables()).isEmpty();
-				assertThat(operation.getSelections())
-					.hasSize(1)
-					.first().isEqualTo(new GqlSelection(new GqlField("f", GqlType.named("String")), "", ""));
 			});
 	}
 
@@ -187,7 +189,7 @@ class OperationTranslatorTest {
 
 		assertThat(ctx.getDefinedOperations())
 			.hasSize(1)
-			.extractingByKey("getValues")
+			.extractingByKey("GetValuesQuery")
 			.isNotNull()
 			.satisfies(operation -> {
 				assertThat(operation.getText())
@@ -196,18 +198,8 @@ class OperationTranslatorTest {
 						"fragment part on Type1 @CustomDirective(arg: true) {field1: f1}");
 				assertThat(operation.getName()).isEqualTo("getValues");
 				assertThat(operation.getOperation()).isEqualTo("query");
-				assertThat(operation.getTypeName()).isEqualTo("Query");
+				assertThat(operation.getTypeName()).isEqualTo("QueryResult1");
 				assertThat(operation.getVariables()).isEmpty();
-				assertThat(operation.getSelections())
-					.hasSize(2)
-					.containsExactlyInAnyOrder(
-						new GqlSelection(new GqlField("a", GqlType.named("Type1")), "", "")
-							.addSelections(singletonList(
-								new GqlSelection(new GqlField("field1", GqlType.mandatory(GqlType.named("CustomType1"))), "", ""))),
-						new GqlSelection(new GqlField("b", GqlType.named("Type2")), "", "")
-							.addSelections(singletonList(
-								new GqlSelection(new GqlField("f2", GqlType.mandatory(GqlType.named("CustomType2"))), "", "")))
-					);
 			});
 	}
 
@@ -236,20 +228,33 @@ class OperationTranslatorTest {
 
 		assertThat(ctx.getDefinedOperations())
 			.hasSize(1)
-			.extractingByKey("setValues")
+			.extractingByKey("SetValuesMutation")
 			.isNotNull()
 			.satisfies(operation -> {
 				assertThat(operation.getText()).containsIgnoringWhitespaces("mutation setValues($v: InputType = 1) {a(v: $v)}");
 				assertThat(operation.getName()).isEqualTo("setValues");
 				assertThat(operation.getOperation()).isEqualTo("mutation");
-				assertThat(operation.getTypeName()).isEqualTo("Mutation");
+				assertThat(operation.getTypeName()).isEqualTo("MutationResult1");
 				assertThat(operation.getVariables())
 					.hasSize(1)
 					.first().isEqualTo(new GqlField("v", GqlType.named("InputType")));
-				assertThat(operation.getSelections())
-					.hasSize(1)
-					.first().isEqualTo(new GqlSelection(new GqlField("a", GqlType.named("Type1")), "", ""));
 			});
+	}
+
+	@Test
+	void translateDefinedOperationsFromMultiplePaths() {
+		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
+		new GqlReader(new ReaderFactory(asList(
+			Paths.get("./src/integration-test/simple/GraphQL/part1-query.graphqls"),
+			Paths.get("./src/integration-test/simple/GraphQL/part2-.graphqls"),
+			Paths.get("./src/integration-test/simple/GraphQL/part3-subscription.graphqls"),
+			Paths.get("./src/integration-test/simple/GraphQL/part4-shared.graphqls"),
+			Paths.get("./src/integration-test/simple/GraphQL/part5-operations.graphql")
+		), log)).read(ctx, GqlConfiguration.builder().generateDefinedOperations(true).build());
+		assertThat(ctx.getDefinedSelections())
+			.extractingByKey("UnnamedQuery", InstanceOfAssertFactories.map(String.class, Map.class))
+			.extractingByKey("QueryResult1", InstanceOfAssertFactories.collection(GqlSelection.class))
+			.hasSize(2);
 	}
 
 }

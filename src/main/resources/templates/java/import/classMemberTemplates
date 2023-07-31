@@ -15,9 +15,9 @@
 	</#switch>
 </#macro>
 
-<#function getFieldType field nested>
-	<#if field.selections?has_content>
-		<#return field.type.getCustom(nested?then(currentPackage+'.'+field.title+'.','')+field.type.inner+'Result') />
+<#function getFieldType field>
+	<#if field.targetTypeName?has_content>
+		<#return field.type.getCustom(field.targetTypeName) />
 	<#else>
 		<#return field.type.full />
 	</#if>
@@ -31,21 +31,21 @@
 	</#if>
 </#function>
 
-<#macro addField field indent nested>
+<#macro addField field indent>
 	<#if jsonProperty?has_content>
 		<#lt/>${indent}@${jsonProperty}("${getFieldName(field)}")
 	</#if>
-	<#lt/>${indent}private ${getFieldType(field,nested)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = null;
+	<#lt/>${indent}private ${getFieldType(field)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = null;
 </#macro>
 
-<#macro addGetter field indent nested>
-	<#lt/>${indent}public ${getFieldType(field,nested)} get${getFieldName(field)?cap_first}() {
+<#macro addGetter field indent>
+	<#lt/>${indent}public ${getFieldType(field)} get${getFieldName(field)?cap_first}() {
 	<#lt/>${indent}	return this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!};
 	<#lt/>${indent}}
 </#macro>
 
-<#macro addSetter className field indent nested>
-	<#lt/>${indent}public ${dtoMethodChaining?then(className,"void")} set${getFieldName(field)?cap_first}(${getFieldType(field,nested)} v) {
+<#macro addSetter className field indent>
+	<#lt/>${indent}public ${dtoMethodChaining?then(className,"void")} set${getFieldName(field)?cap_first}(${getFieldType(field)} v) {
 	<#lt/>${indent}	java.util.stream.Stream.of(v)
 	<@addNullCheck fieldType=field.type indent=indent+'\t\t'/>
 	<#lt/>${indent}	this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = v;
@@ -55,20 +55,20 @@
 	<#lt/>${indent}}
 </#macro>
 
-<#macro addFields className fields indent nested=false>
+<#macro addFields className fields indent>
 	<#list fields as field>
-		<@addField field=field indent=indent nested=nested/>
-		<@addGetter field=field indent=indent nested=nested/>
+		<@addField field indent/>
+		<@addGetter field indent/>
 		<#if dtoSetters>
-			<@addSetter className=className field=field indent=indent nested=nested/>
+			<@addSetter className field indent/>
 		</#if>
 	</#list>
 </#macro>
 
-<#macro addBuilderFields className fields indent nested=false>
+<#macro addBuilderFields className fields indent>
 	<#list fields as field>
-		<@addField field=field indent=indent nested=nested/>
-		<@addSetter className=className field=field indent=indent nested=nested/>
+		<@addField field indent/>
+		<@addSetter className field indent/>
 	</#list>
 </#macro>
 
@@ -88,26 +88,30 @@
 	</#switch>
 </#macro>
 
-<#macro addSelectionFieldBody field hasArguments hasSelections indent>
+<#macro addSelectionField className field indent>
+	<#lt/>${indent}public ${className} get${field.name?cap_first}(<#if field.arguments?has_content
+	>java.util.function.Consumer<${field.title?cap_first}Arguments> arguments<#if field.targetTypeName?has_content>, </#if></#if><#if field.targetTypeName?has_content
+	>java.util.function.Consumer<${field.targetTypeName}Selector> selector</#if>) {
 	<#if field.alias?has_content>
-		<#lt/>${indent}documentBuilder.append(" ${field.alias}:");
+		<#lt/>${indent}	documentBuilder.append(" ${field.alias}:");
 	</#if>
-	<#lt/>${indent}documentBuilder.append(" ${field.name}");
-	<#if hasArguments>
-		<#lt/>${indent}if (arguments != null) {
-		<#lt/>${indent}	documentBuilder.append(" (");
-		<#lt/>${indent}	arguments.accept(new ${field.title?cap_first}Arguments());
-		<#lt/>${indent}	documentBuilder.append(" )");
-		<#lt/>${indent}}
+	<#lt/>${indent}	documentBuilder.append(" ${field.name}");
+	<#if field.arguments?has_content>
+		<#lt/>${indent}	if (arguments != null) {
+		<#lt/>${indent}		documentBuilder.append(" (");
+		<#lt/>${indent}		arguments.accept(new ${field.title?cap_first}Arguments());
+		<#lt/>${indent}		documentBuilder.append(" )");
+		<#lt/>${indent}	}
 	</#if>
-	<#if hasSelections>
-		<#lt/>${indent}if (selector != null) {
-		<#lt/>${indent}	documentBuilder.append(" {");
-		<#lt/>${indent}	selector.accept(new ${field.type.inner}Selector(documentBuilder));
-		<#lt/>${indent}	documentBuilder.append(" }");
-		<#lt/>${indent}}
+	<#if field.targetTypeName?has_content>
+		<#lt/>${indent}	if (selector != null) {
+		<#lt/>${indent}		documentBuilder.append(" {");
+		<#lt/>${indent}		selector.accept(new ${field.targetTypeName}Selector(documentBuilder));
+		<#lt/>${indent}		documentBuilder.append(" }");
+		<#lt/>${indent}	}
 	</#if>
-	<#lt/>${indent}return this;
+	<#lt/>${indent}	return this;
+	<#lt/>${indent}}
 </#macro>
 
 <#macro addSelectionFields className fields indent>
@@ -124,27 +128,7 @@
 			</#list>
 			<#lt/>${indent}}
 		</#if>
-		<#if field.selections?has_content>
-			<#if field.arguments?has_content>
-				<#lt/>${indent}public ${className} get${field.name?cap_first}(java.util.function.Consumer<${field.title?cap_first}Arguments> arguments, java.util.function.Consumer<${field.type.inner}Selector> selector) {
-				<@addSelectionFieldBody field=field hasArguments=true hasSelections=true indent=indent+'\t' />
-				<#lt/>${indent}}
-			<#else>
-				<#lt/>${indent}public ${className} get${field.name?cap_first}(java.util.function.Consumer<${field.type.inner}Selector> selector) {
-				<@addSelectionFieldBody field=field hasArguments=false hasSelections=true indent=indent+'\t' />
-				<#lt/>${indent}}
-			</#if>
-		<#else>
-			<#if field.arguments?has_content>
-				<#lt/>${indent}public ${className} get${field.name?cap_first}(java.util.function.Consumer<${field.title?cap_first}Arguments> arguments) {
-				<@addSelectionFieldBody field=field hasArguments=true hasSelections=false indent=indent+'\t' />
-				<#lt/>${indent}}
-			<#else>
-				<#lt/>${indent}public ${className} get${field.name?cap_first}() {
-				<@addSelectionFieldBody field=field hasArguments=false hasSelections=false indent=indent+'\t' />
-				<#lt/>${indent}}
-			</#if>
-		</#if>
+		<@addSelectionField className field indent/>
 	</#list>
 </#macro>
 
@@ -228,7 +212,7 @@
 	<#lt/>${indent}}
 </#macro>
 
-<#macro addConstructor className fields indent nested=false>
+<#macro addConstructor className fields indent>
 	<#lt/>${indent}@java.beans.ConstructorProperties({
 	<#list fields as field>
 		<#lt/>${indent}	"${getFieldName(field)}"<#sep>,</#sep>
@@ -236,7 +220,7 @@
 	<#lt/>${indent}})
 	<#lt/>${indent}${dtoBuilder?then("private","public")} ${className}(
 	<#list fields as field>
-		<#lt/>${indent}	${getFieldType(field,nested)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!}<#sep>,</#sep>
+		<#lt/>${indent}	${getFieldType(field)} ${propertyPrefix!}${getFieldName(field)}${propertySuffix!}<#sep>,</#sep>
 	</#list>
 	<#lt/>${indent}) {
 	<#list fields as field>
