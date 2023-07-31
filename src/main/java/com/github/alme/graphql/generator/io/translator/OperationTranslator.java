@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
@@ -18,7 +19,6 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.github.alme.graphql.generator.dto.GqlContext;
@@ -46,7 +46,7 @@ import lombok.val;
 public class OperationTranslator implements Translator {
 
 	private static final String FRAGMENTS_KEY = "fragments";
-	private static final String OPERATIONS_KEY = "operations";
+	private static final String OPERATION_KEY = "o";
 	private static final String OPERATION_DOCUMENT = "OPERATION_DOCUMENT";
 	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_32);
 
@@ -104,7 +104,7 @@ public class OperationTranslator implements Translator {
 			// get a set of selections by type name and their unresolved subset
 			String currentTypeName = currentSelectionSet.getType().getInner();
 			Set<GqlSelection> subSelections = new HashSet<>();
-			Set<GqlSelection> subSelectionsToResolve = new HashSet<>();
+			Set<GqlSelection> subSelectionsToResolve = new LinkedHashSet<>();
 			currentSelectionSet.getSubsets().forEach(unresolvedSet ->
 				subSelections.addAll(resolveOneLevel(unresolvedSet,
 					allFragments, requiredFragments, new HashSet<>(), ctx, currentTypeName, subSelectionsToResolve)));
@@ -116,7 +116,7 @@ public class OperationTranslator implements Translator {
 				.map(Map.Entry::getKey)
 				.findAny()
 				.orElseGet(() -> {
-					// this selection set has never been linked to this type before
+					// this selection set has not been linked to this type before
 					int key = counters.computeIfAbsent(currentTypeName, x -> new AtomicInteger()).incrementAndGet();
 					selectionsByTypeName.put(key, subSelections);
 					subSelectionsToResolve.forEach(selectionsToResolve::offer);
@@ -141,22 +141,24 @@ public class OperationTranslator implements Translator {
 	) {
 		Map<GqlSelection, GqlSelection> result = new HashMap<>();
 		// fields declared explicitly
-		selectionSet.getSelectionsOfType(Field.class).forEach(field -> {
-			GqlField gqlField = new GqlField(field.getName(), guessTypeOfField(field, ctx, typeName));
-			String alias = Optional.ofNullable(field.getAlias()).orElse("");
-			GqlSelection selection = result
-				.computeIfAbsent(new GqlSelection(gqlField, alias, ""), Function.identity())
-				.addSubset(field.getSelectionSet());
-			if (field.getSelectionSet() != null) {
-				remaining.add(selection);
-			}
-		});
+		selectionSet.getSelectionsOfType(Field.class).stream()
+			.map(field -> {
+				GqlField gqlField = new GqlField(field.getName(), guessTypeOfField(field, ctx, typeName));
+				String alias = Optional.ofNullable(field.getAlias()).orElse("");
+				return new GqlSelection(gqlField, alias, "").addSubset(field.getSelectionSet());
+			})
+			.forEach(newSelection -> {
+				GqlSelection selection = mergeSubsets(newSelection, result);
+				if (!selection.getSubsets().isEmpty()) {
+					remaining.add(selection);
+				}
+			});
 		// fields reachable via inline fragments
 		selectionSet.getSelectionsOfType(InlineFragment.class).stream()
 			.map(fragment -> resolveOneLevel(fragment.getSelectionSet(),
 				allFragments, requiredFragments, visitedFragments, ctx, fragment.getTypeCondition().getName(), remaining))
 			.flatMap(Collection::stream)
-			.forEach(selection -> result.computeIfAbsent(selection, Function.identity()).addSubsets(selection.getSubsets()));
+			.forEach(selection -> mergeSubsets(selection, result));
 		// fields reachable via named fragments
 		selectionSet.getSelectionsOfType(FragmentSpread.class).stream()
 			.map(FragmentSpread::getName)
@@ -171,8 +173,17 @@ public class OperationTranslator implements Translator {
 			.map(fragment -> resolveOneLevel(fragment.getSelectionSet(),
 				allFragments, requiredFragments, visitedFragments, ctx, fragment.getTypeCondition().getName(), remaining))
 			.flatMap(Collection::stream)
-			.forEach(selection -> result.computeIfAbsent(selection, Function.identity()).addSubsets(selection.getSubsets()));
+			.forEach(selection -> mergeSubsets(selection, result));
 		return result.keySet();
+	}
+
+	private static GqlSelection mergeSubsets(GqlSelection newSelection, Map<GqlSelection, GqlSelection> result) {
+		GqlSelection oldSelection = result.get(newSelection);
+		if (oldSelection == null) {
+			result.put(newSelection, newSelection);
+			return newSelection;
+		}
+		return oldSelection.addSubsets(newSelection.getSubsets());
 	}
 
 	private static GqlType guessTypeOfField(Field field, GqlContext ctx, String containerTypeName) {
@@ -211,15 +222,16 @@ public class OperationTranslator implements Translator {
 	}
 
 	private String getDocumentString(OperationDefinition operation, Collection<FragmentDefinition> fragments, Log log) {
-		Map<String, Collection<?>> input = new HashMap<>();
-		input.put(OPERATIONS_KEY, Collections.singletonList(operation));
-		input.put(FRAGMENTS_KEY, fragments);
 		try (StringWriter writer = new StringWriter()) {
-			CFG.getTemplate(OPERATION_DOCUMENT).process(input, writer);
+			CFG.setSharedVariable(OPERATION_KEY, operation);
+			CFG.setSharedVariable(FRAGMENTS_KEY, fragments);
+			CFG.getTemplate(OPERATION_DOCUMENT).process(null, writer);
 			return writer.toString();
 		} catch (TemplateException | IOException e) {
 			log.warn(String.format("Operation document [%s] is not created.", operation.getName()), e);
 			return null;
+		} finally {
+			CFG.clearSharedVariables();
 		}
 	}
 

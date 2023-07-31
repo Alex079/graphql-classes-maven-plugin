@@ -1,7 +1,7 @@
 package com.github.alme.graphql.generator.dto;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import graphql.language.SelectionSet;
@@ -20,7 +20,7 @@ public class GqlSelection {
 	private final String alias;
 	private final String fragmentTypeName;
 	private String targetTypeName = "";
-	private final Set<SelectionSet> subsets = new HashSet<>();
+	private final Set<SelectionSet> subsets = new LinkedHashSet<>();
 
 	public GqlSelection addSubset(SelectionSet selectionSet) {
 		if (selectionSet != null) {

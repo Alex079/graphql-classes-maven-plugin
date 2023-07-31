@@ -52,9 +52,7 @@
 	</#if>
 </#macro>
 
-<#list operations as o>
 ${o.operation?lower_case} <#if o.name??>${o.name}</#if><@var o.variableDefinitions/><@dir o.directives/><@selection_set sel=o.selectionSet indent=''/>
-</#list>
 <#list fragments as f>
 fragment ${f.name} on ${f.typeCondition.name}<@dir f.directives/><@selection_set sel=f.selectionSet indent=''/>
 </#list>
