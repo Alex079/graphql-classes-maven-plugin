@@ -8,8 +8,7 @@ import ${schemaTypesPackage}.*;
 import ${i}.*;
 </#list>
 
-${generatedAnnotation!}
-@SuppressWarnings({"all", "PMD"})
+<@classMembers.addRootClassAnnotations/>
 public class ${className}
 {
 	private final java.util.Map<String, Object> map;

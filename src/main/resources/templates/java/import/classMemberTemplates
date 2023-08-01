@@ -244,3 +244,10 @@
 	<#lt/>${indent}	);
 	<#lt/>${indent}}
 </#macro>
+
+<#macro addRootClassAnnotations>
+	<#if generatedAnnotation?has_content>
+		<#lt/>${generatedAnnotation}
+	</#if>
+	<#lt/>@SuppressWarnings({"all", "PMD"})
+</#macro>

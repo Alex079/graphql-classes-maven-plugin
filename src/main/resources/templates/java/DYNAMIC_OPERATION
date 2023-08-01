@@ -2,8 +2,7 @@
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
-${generatedAnnotation!}
-@SuppressWarnings({"all", "PMD"})
+<@classMembers.addRootClassAnnotations/>
 public class ${className} implements ${operationsPackage}.${operation?cap_first}
 {
 	private final String document;

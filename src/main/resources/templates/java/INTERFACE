@@ -1,13 +1,13 @@
+<#import "import/classMemberTemplates" as classMembers/>
 //CHECKSTYLE:OFF
-package ${schemaTypesPackage};
+package ${currentPackage};
 
 <#list importPackages as i>
 import ${i}.*;
 </#list>
 
-${generatedAnnotation!}
-@SuppressWarnings({"all", "PMD"})
-public interface ${name}
+<@classMembers.addRootClassAnnotations/>
+public interface ${className}
 <#if members?has_content>
 extends ${members?join(", ")}
 </#if>

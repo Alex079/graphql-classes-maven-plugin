@@ -1,3 +1,4 @@
+<#import "import/classMemberTemplates" as classMembers/>
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
@@ -7,11 +8,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-${generatedAnnotation!}
-@SuppressWarnings({"all", "PMD"})
+<@classMembers.addRootClassAnnotations/>
 public final class ${className}
 {
-	private ${className}() {}
+	private ${className}() { }
 
 	public static Function<List<?>, Stream<?>> arrayAppender(StringBuilder documentBuilder) {
 		return value -> {

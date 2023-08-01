@@ -1,8 +1,8 @@
+<#import "import/classMemberTemplates" as classMembers/>
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
-${generatedAnnotation!}
-@SuppressWarnings({"all", "PMD"})
+<@classMembers.addRootClassAnnotations/>
 public interface ${className}
 {
 	String getOperationName();

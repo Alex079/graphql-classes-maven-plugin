@@ -2,8 +2,7 @@
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
-${generatedAnnotation!}
-@SuppressWarnings({"all", "PMD"})
+<@classMembers.addRootClassAnnotations/>
 public class ${className} implements ${operationsPackage}.${operation?cap_first}
 {
 	private static final String OPERATION_NAME = <#if name?has_content>"${name}"<#else>null</#if>;

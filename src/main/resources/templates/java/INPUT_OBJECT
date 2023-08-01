@@ -1,6 +1,6 @@
 <#import "import/classMemberTemplates" as classMembers/>
 //CHECKSTYLE:OFF
-package ${schemaTypesPackage};
+package ${currentPackage};
 
 import static ${operationsPackage}.GraphQlAppender.*;
 
@@ -8,9 +8,8 @@ import static ${operationsPackage}.GraphQlAppender.*;
 import ${i}.*;
 </#list>
 
-${generatedAnnotation!}
-@SuppressWarnings({"all", "PMD"})
-public class ${name}
+<@classMembers.addRootClassAnnotations/>
+public class ${className}
 <#if members?has_content>
 implements ${members?join(", ")}
 </#if>
