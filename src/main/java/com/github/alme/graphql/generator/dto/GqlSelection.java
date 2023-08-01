@@ -3,24 +3,33 @@ package com.github.alme.graphql.generator.dto;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import graphql.language.SelectionSet;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.experimental.Accessors;
+import lombok.Value;
+import lombok.experimental.Delegate;
 
-@Data
-@Accessors(chain = true)
+@Value
 @EqualsAndHashCode(exclude = {"targetTypeName", "subsets"})
 @ToString(exclude = {"subsets"})
 public class GqlSelection {
 
-	private final GqlField field;
-	private final String alias;
-	private final String fragmentTypeName;
-	private String targetTypeName = "";
-	private final Set<SelectionSet> subsets = new LinkedHashSet<>();
+	@Delegate GqlField field;
+	String alias;
+	String fragmentTypeName;
+	AtomicReference<String> targetTypeName = new AtomicReference<>("");
+	Set<SelectionSet> subsets = new LinkedHashSet<>();
+
+	public String getTargetTypeName() {
+		return targetTypeName.get();
+	}
+
+	public GqlSelection setTargetTypeName(String typeName) {
+		targetTypeName.set(typeName);
+		return this;
+	}
 
 	public GqlSelection addSubset(SelectionSet selectionSet) {
 		if (selectionSet != null) {
@@ -40,20 +49,8 @@ public class GqlSelection {
 		return equals(other) && subsets.equals(other.subsets);
 	}
 
-	public String getName() {
-		return field.getName();
-	}
-
-	public GqlType getType() {
-		return field.getType();
-	}
-
 	public String getTitle() {
 		return (alias == null || alias.isEmpty()) ? field.getName() : alias;
-	}
-
-	public Collection<GqlArgument> getArguments() {
-		return field.getArguments();
 	}
 
 }
