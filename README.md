@@ -91,8 +91,8 @@ fragments. The `generatedOutputTypes` property value should be set to `DEFINED_O
 classes for GraphQL operations defined in files. The following classes will be generated for each operation:
 
 - a wrapper class, which requires variables to be set and provides the operation name, document, variables and the root result class
-- a variables class, which is used by wrapper class to collect variables
-- a hierarchy of result classes, which contain the fields requested in the operation
+- a variables class, which is used by the wrapper class to collect variables
+- a set of result classes, which contain the fields requested in the operation
 
 The generated result classes will contain only the requested fields. Union (or interface) result classes will contain
 all the requested fields of all the requested union members (or interface implementors). Aliases must be set to avoid
@@ -149,7 +149,7 @@ public class UpdateField2MutationResult
 }
 ```
 ```java
-package pkg.field2;
+package pkg;
 /* imports */
 public class Interface1MutationField2Result
 {
@@ -195,7 +195,7 @@ public class Interface1MutationField2Result
 }
 ```
 ```java
-package pkg.field2.t2Value;
+package pkg;
 /* imports */
 public class Type3MutationField2Result
 {
@@ -237,27 +237,27 @@ The following code in Java
 ```java
 public class Class {
 	public Query getQuery() {
-		return new DynamicQuery(querySelector -> querySelector
+		return new DynamicQuery(query -> query
 			.getField2(
 				field2Arguments -> field2Arguments
 					.setArg2(List.of(new InputQueryArg2()))
 					.setAfter("123"),
-				unionQueryField2ConnectionSelector -> unionQueryField2ConnectionSelector
-					.getPageInfo(pageInfoSelector -> pageInfoSelector
+				unionQueryField2Connection -> unionQueryField2Connection
+					.getPageInfo(pageInfo -> pageInfo
 						.getStartCursor()
 						.getEndCursor()
 						.getHasNextPage()
 						.getHasPreviousPage())
-					.getEdges(unionQueryField2ConnectionEdgeSelector -> unionQueryField2ConnectionEdgeSelector
+					.getEdges(unionQueryField2ConnectionEdge -> unionQueryField2ConnectionEdge
 						.getCursor()
-						.getNode(unionQueryField2Selector -> unionQueryField2Selector
-							.onType1UnionField2(type1UnionField2Selector -> type1UnionField2Selector
+						.getNode(unionQueryField2 -> unionQueryField2
+							.onType1UnionField2(type1UnionField2 -> type1UnionField2
 								.getFieldA()
-								.getSwitch(TreeNodeSelector::getValue))
-							.onType2UnionField2(type2UnionField2Selector -> type2UnionField2Selector
+								.getSwitch(TreeNodeResultSelector::getValue))
+							.onType2UnionField2(type2UnionField2 -> type2UnionField2
 								.getName()
 								.getInt())
-							.onType3UnionField2(type3UnionField2Selector -> type3UnionField2Selector
+							.onType3UnionField2(type3UnionField2 -> type3UnionField2
 								.getName()
 								.getFieldC())))));
 	}
