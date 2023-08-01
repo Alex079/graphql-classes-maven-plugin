@@ -18,7 +18,6 @@ public class OutputDirectoryParameterApplier implements ParameterApplier {
 	private final String packageName;
 
 	private static final String TYPES_SUBPACKAGE = ".types";
-	private static final String DEFINED_SUBPACKAGE = ".defined";
 	private static final String DYNAMIC_SUBPACKAGE = ".dynamic";
 
 	@Override
@@ -27,7 +26,7 @@ public class OutputDirectoryParameterApplier implements ParameterApplier {
 			.outputRoot(getOutputDirectory(outputDirectory))
 			.operationsPackageName(packageName)
 			.schemaTypesPackageName(packageName + TYPES_SUBPACKAGE)
-			.definedOperationsPackageName(packageName + DEFINED_SUBPACKAGE)
+			.definedOperationsPackageName(packageName)
 			.dynamicOperationsPackageName(packageName + DYNAMIC_SUBPACKAGE);
 	}
 

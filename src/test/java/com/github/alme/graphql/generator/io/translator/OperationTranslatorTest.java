@@ -104,7 +104,7 @@ class OperationTranslatorTest {
 				assertThat(operation.getName()).isNull();
 				assertThat(operation.getOperation()).isEqualTo("query");
 				assertThat(operation.getText()).contains("query");
-				assertThat(operation.getTypeName()).isEqualTo("QueryResult1");
+				assertThat(operation.getTypeName()).isEqualTo("QueryResult");
 				assertThat(operation.getVariables()).isEmpty();
 			});
 	}
@@ -132,7 +132,7 @@ class OperationTranslatorTest {
 				assertThat(operation.getText()).containsIgnoringWhitespaces("query getValues {f}");
 				assertThat(operation.getName()).isEqualTo("getValues");
 				assertThat(operation.getOperation()).isEqualTo("query");
-				assertThat(operation.getTypeName()).isEqualTo("QueryResult1");
+				assertThat(operation.getTypeName()).isEqualTo("QueryResult");
 				assertThat(operation.getVariables()).isEmpty();
 			});
 	}
@@ -198,7 +198,7 @@ class OperationTranslatorTest {
 						"fragment part on Type1 @CustomDirective(arg: true) {field1: f1}");
 				assertThat(operation.getName()).isEqualTo("getValues");
 				assertThat(operation.getOperation()).isEqualTo("query");
-				assertThat(operation.getTypeName()).isEqualTo("QueryResult1");
+				assertThat(operation.getTypeName()).isEqualTo("QueryResult");
 				assertThat(operation.getVariables()).isEmpty();
 			});
 	}
@@ -234,7 +234,7 @@ class OperationTranslatorTest {
 				assertThat(operation.getText()).containsIgnoringWhitespaces("mutation setValues($v: InputType = 1) {a(v: $v)}");
 				assertThat(operation.getName()).isEqualTo("setValues");
 				assertThat(operation.getOperation()).isEqualTo("mutation");
-				assertThat(operation.getTypeName()).isEqualTo("MutationResult1");
+				assertThat(operation.getTypeName()).isEqualTo("MutationResult");
 				assertThat(operation.getVariables())
 					.hasSize(1)
 					.first().isEqualTo(new GqlField("v", GqlType.named("InputType")));
@@ -253,7 +253,7 @@ class OperationTranslatorTest {
 		), log)).read(ctx, GqlConfiguration.builder().generateDefinedOperations(true).build());
 		assertThat(ctx.getDefinedSelections())
 			.extractingByKey("UnnamedQuery", InstanceOfAssertFactories.map(String.class, Map.class))
-			.extractingByKey("QueryResult1", InstanceOfAssertFactories.collection(GqlSelection.class))
+			.extractingByKey("QueryResult", InstanceOfAssertFactories.collection(GqlSelection.class))
 			.hasSize(2);
 	}
 

@@ -51,23 +51,23 @@ class ITest {
 				"\tt3Value: value\n" +
 				"}"};
 
-		it.builder.g.defined.updateField2Mutation.UpdateField2Mutation gMutation =
-			new it.builder.g.defined.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
+		it.builder.g.updateField2Mutation.UpdateField2Mutation gMutation =
+			new it.builder.g.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(gMutation.getDocument()).contains(expected);
 
-		it.chaining.defined.updateField2Mutation.UpdateField2Mutation cMutation =
-			new it.chaining.defined.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
+		it.chaining.updateField2Mutation.UpdateField2Mutation cMutation =
+			new it.chaining.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(cMutation.getDocument()).contains(expected);
 
-		it.plain.defined.updateField2Mutation.UpdateField2Mutation pMutation =
-			new it.plain.defined.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
+		it.plain.updateField2Mutation.UpdateField2Mutation pMutation =
+			new it.plain.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(pMutation.getDocument()).contains(expected);
 
-		it.value.defined.updateField2Mutation.UpdateField2Mutation vMutation =
-			new it.value.defined.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
+		it.value.updateField2Mutation.UpdateField2Mutation vMutation =
+			new it.value.updateField2Mutation.UpdateField2Mutation(var -> var.setId(Collections.singletonList("2")));
 
 		assertThat(vMutation.getDocument()).contains(expected);
 	}
@@ -85,16 +85,16 @@ class ITest {
 			"  }]\n" +
 			"}";
 
-		it.builder.g.defined.updateField2Mutation.results.Mutation1Result1 gResult =
-			gsonConvert(resultExample, it.builder.g.defined.updateField2Mutation.results.Mutation1Result1.class);
-		it.builder.j.defined.updateField2Mutation.results.Mutation1Result1 jResult =
-			jacksonConvert(resultExample, it.builder.j.defined.updateField2Mutation.results.Mutation1Result1.class);
-		it.chaining.defined.updateField2Mutation.results.Mutation1Result1 cResult =
-			jacksonConvert(resultExample, it.chaining.defined.updateField2Mutation.results.Mutation1Result1.class);
-		it.plain.defined.updateField2Mutation.results.Mutation1Result1 pResult =
-			jacksonConvert(resultExample, it.plain.defined.updateField2Mutation.results.Mutation1Result1.class);
-		it.value.defined.updateField2Mutation.results.Mutation1Result1 vResult =
-			jacksonConvert(resultExample, it.value.defined.updateField2Mutation.results.Mutation1Result1.class);
+		it.builder.g.updateField2Mutation.results.Mutation1Result gResult =
+			gsonConvert(resultExample, it.builder.g.updateField2Mutation.results.Mutation1Result.class);
+		it.builder.j.updateField2Mutation.results.Mutation1Result jResult =
+			jacksonConvert(resultExample, it.builder.j.updateField2Mutation.results.Mutation1Result.class);
+		it.chaining.updateField2Mutation.results.Mutation1Result cResult =
+			jacksonConvert(resultExample, it.chaining.updateField2Mutation.results.Mutation1Result.class);
+		it.plain.updateField2Mutation.results.Mutation1Result pResult =
+			jacksonConvert(resultExample, it.plain.updateField2Mutation.results.Mutation1Result.class);
+		it.value.updateField2Mutation.results.Mutation1Result vResult =
+			jacksonConvert(resultExample, it.value.updateField2Mutation.results.Mutation1Result.class);
 
 		assertThat(gResult.toString())
 			.isEqualTo(jResult.toString())

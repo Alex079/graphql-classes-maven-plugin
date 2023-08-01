@@ -30,6 +30,7 @@ import com.github.alme.graphql.generator.dto.GqlType;
 import com.github.alme.graphql.generator.io.Util;
 
 import org.apache.maven.plugin.logging.Log;
+import org.jetbrains.annotations.NotNull;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -77,7 +78,7 @@ public class OperationTranslator implements Translator {
 				ctx.getDefinedSelections()
 					.computeIfAbsent(baseName, x -> traverseSelections(definition.getSelectionSet(), allFragments, requiredFragments, ctx, typeName));
 				ctx.getDefinedOperations()
-					.computeIfAbsent(baseName, x -> new GqlOperation(definitionName, operationName, typeName + "Result1",
+					.computeIfAbsent(baseName, x -> new GqlOperation(definitionName, operationName, typeName + "Result",
 						getDocumentString(definition, requiredFragments, ctx.getLog())))
 					.addVariables(definition.getVariableDefinitions().stream().map(fromVariableDef(ctx)).collect(toSet()));
 			}
@@ -123,11 +124,17 @@ public class OperationTranslator implements Translator {
 					return key;
 				});
 			// link previous selection to the type name
-			currentSelectionSet.setTargetTypeName(currentTypeName + "Result" + ordinalNumber);
+			currentSelectionSet.setTargetTypeName(currentTypeName + getTypeSuffix(ordinalNumber));
 		}
 		Map<String, Collection<GqlSelection>> result = new HashMap<>();
-		typeMap.forEach((type, variants) -> variants.forEach((variantNumber, selections) -> result.put(type + "Result" + variantNumber, selections)));
+		typeMap.forEach((type, variants) -> variants.forEach((variantNumber, selections) ->
+			result.put(type + getTypeSuffix(variantNumber), selections)));
 		return result;
+	}
+
+	@NotNull
+	private static String getTypeSuffix(int ordinalNumber) {
+		return "Result" + (ordinalNumber < 2 ? "" : ordinalNumber);
 	}
 
 	private Set<GqlSelection> resolveOneLevel(
@@ -143,7 +150,7 @@ public class OperationTranslator implements Translator {
 		// fields declared explicitly
 		selectionSet.getSelectionsOfType(Field.class).stream()
 			.map(field -> {
-				GqlField gqlField = new GqlField(field.getName(), guessTypeOfField(field, ctx, typeName));
+				GqlField gqlField = new GqlField(field.getName(), getTypeOfField(field, ctx, typeName));
 				String alias = Optional.ofNullable(field.getAlias()).orElse("");
 				return new GqlSelection(gqlField, alias, "").addSubset(field.getSelectionSet());
 			})
@@ -186,7 +193,7 @@ public class OperationTranslator implements Translator {
 		return oldSelection.addSubsets(newSelection.getSubsets());
 	}
 
-	private static GqlType guessTypeOfField(Field field, GqlContext ctx, String containerTypeName) {
+	private static GqlType getTypeOfField(Field field, GqlContext ctx, String containerTypeName) {
 		return Stream.concat(
 				Optional.ofNullable(ctx.getObjectTypes().get(containerTypeName))
 					.map(GqlStructure::getFields)
