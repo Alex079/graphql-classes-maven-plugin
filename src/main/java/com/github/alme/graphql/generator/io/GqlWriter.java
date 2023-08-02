@@ -117,24 +117,24 @@ public class GqlWriter {
 			context.getEnumTypes()
 				.forEach((className, gqlStructure) -> enumFileCreator
 					.createFile(packageName, className, gqlStructure));
-			count += context.getInputObjectTypes().size();
+			count += context.getEnumTypes().size();
 		}
 		if (configuration.isGenerateSchemaOtherTypes()) {
 			val interfaceFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.INTERFACE);
 			context.getInterfaceTypes()
 				.forEach((className, gqlStructure) -> interfaceFileCreator
 					.createFile(packageName, className, gqlStructure));
-			count += context.getInputObjectTypes().size();
+			count += context.getInterfaceTypes().size();
 			val unionFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.UNION);
 			context.getUnionTypes()
 				.forEach((className, gqlStructure) -> unionFileCreator
 					.createFile(packageName, className, gqlStructure));
-			count += context.getInputObjectTypes().size();
+			count += context.getUnionTypes().size();
 			val objectFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.OBJECT);
 			context.getObjectTypes()
 				.forEach((className, gqlStructure) -> objectFileCreator
 					.createFile(packageName, className, gqlStructure));
-			count += context.getInputObjectTypes().size();
+			count += context.getObjectTypes().size();
 		}
 		if (count > 0) {
 			context.getLog().info(format("Finished creating %d schema type class(es).", count));
