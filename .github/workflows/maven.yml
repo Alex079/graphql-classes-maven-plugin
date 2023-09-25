@@ -16,7 +16,7 @@ jobs:
           - 17
           - 21
         distribution:
-          - temurin
+          #- temurin
           - zulu
           - corretto
         os:
