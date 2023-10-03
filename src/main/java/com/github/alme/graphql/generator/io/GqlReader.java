@@ -50,14 +50,12 @@ public class GqlReader {
 			log.info(format(LOG_TRANSLATOR, context.getEnumTypes().size(), "Enum type"));
 
 			new InterfaceTypeTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getInterfaceTypes().size(), "Interface type"));
+			new UnionTypeTranslator().translate(doc, context);
+			log.info(format(LOG_TRANSLATOR, context.getInterfaceTypes().size(), "Interface and union type"));
 
 			new ObjectTypeTranslator().translate(doc, context);
 			new RelayConnectionTranslator().translate(doc, context);
 			log.info(format(LOG_TRANSLATOR, context.getObjectTypes().size(), "Object type"));
-
-			new UnionTypeTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getUnionTypes().size(), "Union type"));
 
 			boolean generateDefinedOperations = configuration.isGenerateDefinedOperations();
 			boolean generateDynamicOperations = configuration.isGenerateDynamicOperations();

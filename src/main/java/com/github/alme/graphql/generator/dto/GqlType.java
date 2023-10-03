@@ -1,5 +1,11 @@
 package com.github.alme.graphql.generator.dto;
 
+import java.util.function.UnaryOperator;
+
+import graphql.language.ListType;
+import graphql.language.NonNullType;
+import graphql.language.Type;
+import graphql.language.TypeName;
 import lombok.Value;
 
 @Value
@@ -14,6 +20,20 @@ public class GqlType {
 	Flag flag;
 	String name;
 	GqlType nested;
+
+	public static GqlType of(Type<?> type, UnaryOperator<String> naming) {
+		if (type instanceof NonNullType) {
+			return mandatory(of(((NonNullType) type).getType(), naming));
+		}
+		else if (type instanceof ListType) {
+			return list(of(((ListType) type).getType(), naming));
+		}
+		else if (type instanceof TypeName) {
+			String name = ((TypeName) type).getName();
+			return named(naming.apply(name));
+		}
+		return null;
+	}
 
 	public static GqlType mandatory(GqlType nested) {
 		return new GqlType(Flag.MANDATORY, null, nested);

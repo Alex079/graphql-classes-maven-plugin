@@ -14,7 +14,6 @@ import static graphql.language.UnionTypeDefinition.newUnionTypeDefinition;
 import static graphql.language.UnionTypeExtensionDefinition.newUnionTypeExtensionDefinition;
 
 import com.github.alme.graphql.generator.dto.GqlContext;
-import com.github.alme.graphql.generator.io.translator.UnionTypeTranslator;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,7 @@ class UnionTypeTranslatorTest {
 
 		translator.translate(doc, ctx);
 
-		assertTrue(ctx.getUnionTypes().isEmpty());
+		assertTrue(ctx.getInterfaceTypes().isEmpty());
 	}
 
 	@Test
@@ -58,8 +57,8 @@ class UnionTypeTranslatorTest {
 
 		translator.translate(doc, ctx);
 
-		assertEquals(1, ctx.getUnionTypes().size());
-		assertTrue(ctx.getUnionTypes().containsKey("Union1"));
+		assertEquals(1, ctx.getInterfaceTypes().size());
+		assertTrue(ctx.getInterfaceTypes().containsKey("Union1"));
 		assertEquals(2, ctx.getObjectTypes().size());
 		assertTrue(ctx.getObjectTypes().keySet().containsAll(asList("Type2", "Type1")));
 	}
@@ -79,8 +78,8 @@ class UnionTypeTranslatorTest {
 
 		translator.translate(doc, ctx);
 
-		assertEquals(1, ctx.getUnionTypes().size());
-		assertTrue(ctx.getUnionTypes().containsKey("Union1"));
+		assertEquals(1, ctx.getInterfaceTypes().size());
+		assertTrue(ctx.getInterfaceTypes().containsKey("Union1"));
 		assertEquals(2, ctx.getObjectTypes().size());
 		assertTrue(ctx.getObjectTypes().keySet().containsAll(asList("Type2", "Type1")));
 	}

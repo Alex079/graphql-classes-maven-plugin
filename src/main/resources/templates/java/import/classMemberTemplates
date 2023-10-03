@@ -39,12 +39,14 @@
 </#macro>
 
 <#macro addGetter field indent>
+	<@addJavadoc javadoc=field.javadoc indent=indent/>
 	<#lt/>${indent}public ${getFieldType(field)} get${getFieldName(field)?cap_first}() {
 	<#lt/>${indent}	return this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!};
 	<#lt/>${indent}}
 </#macro>
 
 <#macro addSetter className field indent>
+	<@addJavadoc javadoc=field.javadoc indent=indent/>
 	<#lt/>${indent}public ${dtoMethodChaining?then(className,"void")} set${getFieldName(field)?cap_first}(${getFieldType(field)} v) {
 	<#lt/>${indent}	java.util.stream.Stream.of(v)
 	<@addNullCheck fieldType=field.type indent=indent+'\t\t'/>
@@ -79,16 +81,17 @@
 			<@asLiteralArgument fieldType=fieldType.nested indent=indent/>
 		<#break/>
 		<#case 'LIST'>
-			<#lt/>${indent}.flatMap(arrayAppender(documentBuilder))
+			<#lt/>${indent}.flatMap(${operationsPackage}.GraphQlAppender.arrayAppender(documentBuilder))
 			<@asLiteralArgument fieldType=fieldType.nested indent=indent/>
 		<#break/>
 		<#default>
-			<#lt/>${indent}.forEach(valueAppender(documentBuilder));
+			<#lt/>${indent}.forEach(${operationsPackage}.GraphQlAppender.valueAppender(documentBuilder));
 		<#break/>
 	</#switch>
 </#macro>
 
 <#macro addSelectionField className field indent>
+	<@addJavadoc javadoc=field.javadoc indent=indent/>
 	<#lt/>${indent}public ${className} get${field.name?cap_first}(<#if field.arguments?has_content
 	>java.util.function.Consumer<${field.title?cap_first}Arguments> arguments<#if field.targetTypeName?has_content>, </#if></#if><#if field.targetTypeName?has_content
 	>java.util.function.Consumer<${field.targetTypeName}Selector> selector</#if>) {
@@ -119,6 +122,7 @@
 		<#if field.arguments?has_content>
 			<#lt/>${indent}public class ${field.title?cap_first}Arguments {
 			<#list field.arguments as argument>
+				<@addJavadoc javadoc=argument.javadoc indent=indent+'\t'/>
 				<#lt/>${indent}	public ${field.title?cap_first}Arguments set${argument.name?cap_first}(${argument.type.full} value) {
 				<#lt/>${indent}		documentBuilder.append(" ${argument.name}:");
 				<#lt/>${indent}		java.util.stream.Stream.of(value)
@@ -190,11 +194,11 @@
 			<@asLiteral fieldType=fieldType.nested indent=indent/>
 		<#break/>
 		<#case 'LIST'>
-			<#lt/>${indent}.flatMap(arrayAppender(documentBuilder))
+			<#lt/>${indent}.flatMap(${operationsPackage}.GraphQlAppender.arrayAppender(documentBuilder))
 			<@asLiteral fieldType=fieldType.nested indent=indent/>
 		<#break/>
 		<#default>
-			<#lt/>${indent}.forEach(valueAppender(documentBuilder));
+			<#lt/>${indent}.forEach(${operationsPackage}.GraphQlAppender.valueAppender(documentBuilder));
 		<#break/>
 	</#switch>
 </#macro>
@@ -250,4 +254,14 @@
 		<#lt/>${generatedAnnotation}
 	</#if>
 	<#lt/>@SuppressWarnings({"all", "PMD"})
+</#macro>
+
+<#macro addJavadoc javadoc indent>
+	<#if javadoc?has_content>
+		<#lt/>${indent}/**
+		<#list javadoc as line>
+			<#lt/>${indent} * ${line}
+		</#list>
+		<#lt/>${indent} */
+	</#if>
 </#macro>

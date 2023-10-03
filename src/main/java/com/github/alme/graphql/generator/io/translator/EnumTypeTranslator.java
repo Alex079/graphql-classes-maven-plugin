@@ -1,7 +1,5 @@
 package com.github.alme.graphql.generator.io.translator;
 
-import static java.util.stream.Collectors.toSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -11,7 +9,6 @@ import com.github.alme.graphql.generator.dto.GqlStructure;
 import graphql.language.Document;
 import graphql.language.EnumTypeDefinition;
 import graphql.language.EnumTypeExtensionDefinition;
-import graphql.language.EnumValueDefinition;
 
 public class EnumTypeTranslator implements Translator {
 
@@ -33,10 +30,11 @@ public class EnumTypeTranslator implements Translator {
 	}
 
 	private void populate(GqlContext ctx, Collection<? extends EnumTypeDefinition> definitions) {
-		definitions.forEach((definition) ->
-			ctx.getEnumTypes()
-				.computeIfAbsent(definition.getName(), GqlStructure::new)
-				.addMembers(definition.getEnumValueDefinitions().stream().map(EnumValueDefinition::getName).collect(toSet())));
+		definitions.forEach(definition ->
+			ctx.getEnumTypes().merge(
+				definition.getName(),
+				GqlStructure.of(definition),
+				GqlStructure::merge));
 	}
 
 }

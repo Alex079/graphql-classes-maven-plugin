@@ -23,7 +23,6 @@ import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 import com.github.alme.graphql.generator.dto.GqlType;
-import com.github.alme.graphql.generator.io.translator.InterfaceTypeTranslator;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
@@ -174,9 +173,9 @@ class InterfaceTypeTranslatorTest {
 		GqlStructure interface1 = ctx.getInterfaceTypes().get("Interface1");
 		GqlStructure interface2 = ctx.getInterfaceTypes().get("Interface2");
 		assertEquals(1, interface1.getFields().size());
-		assertEquals(0, interface1.getMembers().size());
+		assertEquals(0, interface1.getParents().size());
 		assertEquals(2, interface2.getFields().size());
-		assertEquals(1, interface2.getMembers().size());
+		assertEquals(1, interface2.getParents().size());
 		interface1.getFields().forEach(field -> {
 			assertEquals("field1", field.getName());
 			GqlType type = field.getType();

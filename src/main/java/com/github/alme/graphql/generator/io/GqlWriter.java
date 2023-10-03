@@ -125,11 +125,6 @@ public class GqlWriter {
 				.forEach((className, gqlStructure) -> interfaceFileCreator
 					.createFile(packageName, className, gqlStructure));
 			count += context.getInterfaceTypes().size();
-			val unionFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.UNION);
-			context.getUnionTypes()
-				.forEach((className, gqlStructure) -> unionFileCreator
-					.createFile(packageName, className, gqlStructure));
-			count += context.getUnionTypes().size();
 			val objectFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.OBJECT);
 			context.getObjectTypes()
 				.forEach((className, gqlStructure) -> objectFileCreator

@@ -23,13 +23,13 @@ public class ${className} implements ${operationsPackage}.${operation?cap_first}
 	}
 
 	@Override
-	public Class<${currentPackage}.results.${typeName}Result> getResultClass() {
-		return ${currentPackage}.results.${typeName}Result.class;
+	public Class<${currentPackage}.results.${typeName}> getResultClass() {
+		return ${currentPackage}.results.${typeName}.class;
 	}
 
-	public ${className}(java.util.function.Consumer<${currentPackage}.selectors.${typeName}ResultSelector> selector) {
+	public ${className}(java.util.function.Consumer<${currentPackage}.selectors.${typeName}Selector> selector) {
 		StringBuilder documentBuilder = new StringBuilder("${operation} {");
-		selector.accept(new ${currentPackage}.selectors.${typeName}ResultSelector(documentBuilder));
+		selector.accept(new ${currentPackage}.selectors.${typeName}Selector(documentBuilder));
 		this.document = documentBuilder.append(" }").toString();
 	}
 

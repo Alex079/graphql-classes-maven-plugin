@@ -42,8 +42,12 @@ public class GqlContext {
 		return getStructures(Structure.INPUT_OBJECT);
 	}
 
-	public Map<String, GqlStructure> getUnionTypes() {
-		return getStructures(Structure.UNION);
+	public String applyNaming(String name) {
+		return scalars.getOrDefault(name, name);
+	}
+
+	public String getAlias(String name) {
+		return aliases.get(name);
 	}
 
 }

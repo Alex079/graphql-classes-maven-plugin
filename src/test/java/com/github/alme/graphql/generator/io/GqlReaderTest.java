@@ -64,7 +64,7 @@ class GqlReaderTest {
 
 		assertThat(context.getObjectTypes())
 			.hasSize(1)
-			.containsEntry("Query", new GqlStructure("Query"));
+			.containsEntry("Query", GqlStructure.of("Query", null));
 	}
 
 }

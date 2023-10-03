@@ -1,9 +1,5 @@
 package com.github.alme.graphql.generator.io.translator;
 
-import static java.util.stream.Collectors.toSet;
-
-import static com.github.alme.graphql.generator.io.Util.fromFieldDef;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -13,7 +9,6 @@ import com.github.alme.graphql.generator.dto.GqlStructure;
 import graphql.kickstart.tools.relay.RelayConnectionFactory;
 import graphql.language.Document;
 import graphql.language.ObjectTypeDefinition;
-import graphql.language.TypeName;
 
 public class RelayConnectionTranslator implements Translator {
 
@@ -28,11 +23,10 @@ public class RelayConnectionTranslator implements Translator {
 
 	private void populate(GqlContext ctx, Collection<ObjectTypeDefinition> definitions) {
 		definitions.forEach(definition ->
-			ctx.getObjectTypes()
-				.computeIfAbsent(definition.getName(), GqlStructure::new)
-				.addMembers(definition.getImplements().stream().map(TypeName.class::cast).map(TypeName::getName).collect(toSet()))
-				.addFields(definition.getFieldDefinitions().stream().map(fromFieldDef(ctx)).collect(toSet()))
-		);
+			ctx.getObjectTypes().merge(
+				definition.getName(),
+				GqlStructure.of(definition, ctx::applyNaming),
+				GqlStructure::merge));
 	}
 
 }

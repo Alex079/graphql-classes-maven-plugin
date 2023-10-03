@@ -1,28 +1,38 @@
 package com.github.alme.graphql.generator.dto;
 
-import java.util.Collection;
-import java.util.HashSet;
+import static java.util.Collections.emptySet;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collection;
+import java.util.Set;
+
 import lombok.Value;
 
 @Value
-@EqualsAndHashCode(exclude = "variables")
-@ToString(exclude = "variables")
 public class GqlOperation {
 
 	String name;
 	String operation;
 	String typeName;
 	String text;
-	Collection<GqlField> variables = new HashSet<>();
+	Collection<GqlField> variables;
 
-	public GqlOperation addVariables(Collection<GqlField> variables) {
-		if (variables != null) {
-			this.variables.addAll(variables);
-		}
-		return this;
+	public static GqlOperation of(String name, String operation, String typeName, String text, Set<GqlField> variables) {
+		return new GqlOperation(
+			name,
+			operation,
+			typeName,
+			text,
+			variables
+		);
 	}
 
+	public static GqlOperation of(String operation, String typeName) {
+		return new GqlOperation(
+			null,
+			operation,
+			typeName,
+			null,
+			emptySet()
+		);
+	}
 }

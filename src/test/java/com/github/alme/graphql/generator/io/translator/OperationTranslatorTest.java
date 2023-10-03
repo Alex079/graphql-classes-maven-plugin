@@ -3,6 +3,8 @@ package com.github.alme.graphql.generator.io.translator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +40,7 @@ import com.github.alme.graphql.generator.io.ReaderFactory;
 
 import org.apache.maven.plugin.logging.Log;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.assertj.core.util.Sets;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -142,18 +145,18 @@ class OperationTranslatorTest {
 		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 		ctx.getSchema().put("query", "Query");
 		ctx.getObjectTypes().put("Type1",
-			new GqlStructure("Type1").addFields(singletonList(
-				new GqlField("f1", GqlType.mandatory(GqlType.named("CustomType1")))
-			)));
+			new GqlStructure("Type1", emptySet(), singleton(
+				GqlField.of("f1", GqlType.mandatory(GqlType.named("CustomType1")))
+			), emptySet(), emptyList()));
 		ctx.getObjectTypes().put("Type2",
-			new GqlStructure("Type2").addFields(singletonList(
-				new GqlField("f2", GqlType.mandatory(GqlType.named("CustomType2")))
-			)));
+			new GqlStructure("Type2", emptySet(), singleton(
+				GqlField.of("f2", GqlType.mandatory(GqlType.named("CustomType2")))
+			), emptySet(), emptyList()));
 		ctx.getObjectTypes().put("Query",
-			new GqlStructure("Query").addFields(asList(
-				new GqlField("a", GqlType.named("Type1")),
-				new GqlField("b", GqlType.named("Type2"))
-			)));
+			new GqlStructure("Query", emptySet(), Sets.set(
+				GqlField.of("a", GqlType.named("Type1")),
+				GqlField.of("b", GqlType.named("Type2"))
+			), emptySet(), emptyList()));
 		when(doc.getDefinitionsOfType(OperationDefinition.class)).thenReturn(singletonList(
 			newOperationDefinition()
 				.name("getValues")
@@ -208,10 +211,10 @@ class OperationTranslatorTest {
 		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
 		ctx.getSchema().put("mutation", "Mutation");
 		ctx.getObjectTypes().put("Mutation",
-			new GqlStructure("Mutation").addFields(asList(
-				new GqlField("a", GqlType.named("Type1")),
-				new GqlField("b", GqlType.named("Type2"))
-			)));
+			new GqlStructure("Mutation", emptySet(), Sets.set(
+				GqlField.of("a", GqlType.named("Type1")),
+				GqlField.of("b", GqlType.named("Type2"))
+			), emptySet(), emptyList()));
 		when(doc.getDefinitionsOfType(OperationDefinition.class)).thenReturn(singletonList(
 			newOperationDefinition()
 				.name("setValues")
@@ -237,7 +240,7 @@ class OperationTranslatorTest {
 				assertThat(operation.getTypeName()).isEqualTo("MutationResult");
 				assertThat(operation.getVariables())
 					.hasSize(1)
-					.first().isEqualTo(new GqlField("v", GqlType.named("InputType")));
+					.first().isEqualTo(GqlField.of("v", GqlType.named("InputType")));
 			});
 	}
 
