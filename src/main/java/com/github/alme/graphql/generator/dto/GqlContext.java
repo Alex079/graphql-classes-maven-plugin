@@ -3,6 +3,8 @@ package com.github.alme.graphql.generator.dto;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.plugin.logging.Log;
@@ -15,7 +17,8 @@ public class GqlContext {
 	Log log;
 	Map<String, String> scalars;
 	Map<String, String> aliases;
-	Map<String, String> schema = new HashMap<>();
+	Map<String, String> operations = new HashMap<>();
+	List<String> schemaJavadoc = new LinkedList<>();
 	Map<Structure, Map<String, GqlStructure>> structures = new EnumMap<>(Structure.class);
 	Map<String, GqlOperation> definedOperations = new HashMap<>();
 	Map<String, Map<String, Collection<GqlSelection>>> definedSelections = new HashMap<>();

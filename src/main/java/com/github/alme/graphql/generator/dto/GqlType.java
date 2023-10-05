@@ -55,6 +55,9 @@ public class GqlType {
 		return res.getName();
 	}
 
+	/**
+	 * Used in templates
+	 */
 	public String getFull() {
 		switch (flag) {
 			case MANDATORY:
@@ -66,6 +69,9 @@ public class GqlType {
 		}
 	}
 
+	/**
+	 * Used in templates
+	 */
 	public String getCustom(String customType) {
 		switch (flag) {
 			case MANDATORY:

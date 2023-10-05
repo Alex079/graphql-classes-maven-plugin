@@ -17,7 +17,7 @@ public class EnumTypeTranslator implements Translator {
 
 		Collection<EnumTypeDefinition> main = new ArrayList<>();
 		Collection<EnumTypeExtensionDefinition> ext = new ArrayList<>();
-		doc.getDefinitionsOfType(EnumTypeDefinition.class).forEach((i) -> {
+		doc.getDefinitionsOfType(EnumTypeDefinition.class).forEach(i -> {
 			if (i.getClass() == EnumTypeDefinition.class) {
 				main.add(i);
 			}

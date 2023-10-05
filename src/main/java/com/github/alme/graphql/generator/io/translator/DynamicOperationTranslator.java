@@ -22,7 +22,7 @@ public class DynamicOperationTranslator implements Translator {
 	@Override
 	public void translate(Document doc, GqlContext ctx) {
 		ctx.getDynamicSelections().putAll(createCompleteSelections(ctx));
-		ctx.getSchema().forEach((operation, typeName) ->
+		ctx.getOperations().forEach((operation, typeName) ->
 			ctx.getDynamicOperations().put(PREFIX + Util.firstUpper(operation), GqlOperation.of(operation, typeName + SUFFIX))
 		);
 	}

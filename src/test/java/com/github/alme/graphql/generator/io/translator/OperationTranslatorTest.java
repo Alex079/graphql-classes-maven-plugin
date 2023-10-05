@@ -88,7 +88,7 @@ class OperationTranslatorTest {
 	@Test
 	void translateOneEmptyUnnamedOperationWithoutFragments() {
 		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
-		ctx.getSchema().put("query", "Query");
+		ctx.getOperations().put("query", "Query");
 		when(doc.getDefinitionsOfType(OperationDefinition.class)).thenReturn(singletonList(
 			newOperationDefinition()
 				.operation(OperationDefinition.Operation.QUERY)
@@ -115,7 +115,7 @@ class OperationTranslatorTest {
 	@Test
 	void translateOneOperationWithoutFragments() {
 		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
-		ctx.getSchema().put("query", "Query");
+		ctx.getOperations().put("query", "Query");
 		when(doc.getDefinitionsOfType(OperationDefinition.class)).thenReturn(singletonList(
 			newOperationDefinition()
 				.name("getValues")
@@ -143,7 +143,7 @@ class OperationTranslatorTest {
 	@Test
 	void translateOneOperationWithFragmentsAndAnnotations() {
 		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
-		ctx.getSchema().put("query", "Query");
+		ctx.getOperations().put("query", "Query");
 		ctx.getObjectTypes().put("Type1",
 			new GqlStructure("Type1", emptySet(), singleton(
 				GqlField.of("f1", GqlType.mandatory(GqlType.named("CustomType1")))
@@ -209,7 +209,7 @@ class OperationTranslatorTest {
 	@Test
 	void translateOneOperationWithVariables() {
 		GqlContext ctx = new GqlContext(log, emptyMap(), emptyMap());
-		ctx.getSchema().put("mutation", "Mutation");
+		ctx.getOperations().put("mutation", "Mutation");
 		ctx.getObjectTypes().put("Mutation",
 			new GqlStructure("Mutation", emptySet(), Sets.set(
 				GqlField.of("a", GqlType.named("Type1")),

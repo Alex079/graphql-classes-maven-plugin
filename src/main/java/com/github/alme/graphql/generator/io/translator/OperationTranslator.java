@@ -72,7 +72,7 @@ public class OperationTranslator implements Translator {
 	private void populate(GqlContext ctx, Collection<OperationDefinition> definitions, Collection<FragmentDefinition> allFragments) {
 		definitions.forEach(definition -> {
 			String operationName = definition.getOperation().name().toLowerCase();
-			String typeName = ctx.getSchema().get(operationName);
+			String typeName = ctx.getOperations().get(operationName);
 			if (typeName != null) {
 				String definitionName = definition.getName();
 				String baseName = getOperationBaseName(definitionName, operationName);
@@ -107,8 +107,8 @@ public class OperationTranslator implements Translator {
 		selectionsToResolve.offer(rootSelection);
 		while (!selectionsToResolve.isEmpty()) {
 			val currentSelection = selectionsToResolve.poll();
-			// get a set of selections by type name and their unresolved subset
 			String currentTypeName = currentSelection.getType().getInner();
+			// get a set of selections by type name and their unresolved subset
 			Set<GqlSelection> subSelections = new HashSet<>();
 			Set<GqlSelection> unresolved = new LinkedHashSet<>();
 			currentSelection.getSubsets().forEach(unresolvedSet ->
@@ -158,7 +158,7 @@ public class OperationTranslator implements Translator {
 		Map<String, GqlSelection> result = new HashMap<>();
 		// fields declared explicitly
 		selectionSet.getSelectionsOfType(Field.class).stream()
-			.map(field -> GqlSelection.of(field, getTypeOfField(field.getName(), ctx, typeName)))
+			.map(field -> GqlSelection.of(findField(field.getName(), ctx, typeName), field.getAlias(), field.getSelectionSet()))
 			.forEach(selection -> result.merge(selection.getKey(), selection, GqlSelection::merge));
 		// fields reachable via inline fragments
 		selectionSet.getSelectionsOfType(InlineFragment.class).stream()
@@ -184,7 +184,7 @@ public class OperationTranslator implements Translator {
 		return result.values();
 	}
 
-	private static GqlType getTypeOfField(String fieldName, GqlContext ctx, String containerTypeName) {
+	private static GqlField findField(String fieldName, GqlContext ctx, String containerTypeName) {
 		return Stream.concat(
 				Optional.ofNullable(ctx.getObjectTypes().get(containerTypeName))
 					.map(GqlStructure::getFields)
@@ -195,9 +195,8 @@ public class OperationTranslator implements Translator {
 					.map(Collection::stream)
 					.orElseGet(Stream::empty))
 			.filter(candidate -> Objects.equals(fieldName, candidate.getName()))
-			.map(GqlField::getType)
 			.findAny()
-			.orElseGet(() -> GqlType.named("String"));
+			.orElseGet(() -> GqlField.of(fieldName, GqlType.named("String")));
 	}
 
 	private static boolean fragmentMatchesByType(String candidateType, String selectionType, GqlContext ctx) {

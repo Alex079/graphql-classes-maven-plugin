@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 
-import graphql.language.Field;
 import graphql.language.SelectionSet;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -37,16 +36,16 @@ public class GqlSelection {
 		return new GqlSelection(field, alias, fragmentTypeName, emptySet());
 	}
 
+	public static GqlSelection of(GqlField field, String alias, SelectionSet subset) {
+		return new GqlSelection(field, alias, "", getSubsets(subset));
+	}
+
 	public static GqlSelection of(GqlField field, String alias) {
 		return new GqlSelection(field, alias, "", emptySet());
 	}
 
 	public static GqlSelection of(String typeName, SelectionSet subset) {
 		return new GqlSelection(GqlField.of(null, GqlType.named(typeName)), null, "", getSubsets(subset));
-	}
-
-	public static GqlSelection of(Field field, GqlType type) {
-		return new GqlSelection(GqlField.of(field.getName(), type), field.getAlias(), "", getSubsets(field.getSelectionSet()));
 	}
 
 	@NotNull

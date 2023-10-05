@@ -10,6 +10,7 @@ import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlSelection;
 import com.github.alme.graphql.generator.dto.Structure;
+import com.github.alme.graphql.generator.io.creator.AppenderFileCreator;
 import com.github.alme.graphql.generator.io.creator.DefinedOperationFileCreator;
 import com.github.alme.graphql.generator.io.creator.DefinedOperationResultFileCreator;
 import com.github.alme.graphql.generator.io.creator.DefinedOperationVariablesFileCreator;
@@ -17,7 +18,7 @@ import com.github.alme.graphql.generator.io.creator.DynamicOperationFileCreator;
 import com.github.alme.graphql.generator.io.creator.DynamicOperationResultFileCreator;
 import com.github.alme.graphql.generator.io.creator.DynamicOperationSelectorFileCreator;
 import com.github.alme.graphql.generator.io.creator.OperationInterfaceFileCreator;
-import com.github.alme.graphql.generator.io.creator.SharedClassesFileCreator;
+import com.github.alme.graphql.generator.io.creator.SchemaFileCreator;
 import com.github.alme.graphql.generator.io.creator.StructureFileCreator;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -30,6 +31,7 @@ import lombok.val;
 public class GqlWriter {
 
 	private static final String APPENDER_CLASS_NAME = "GraphQlAppender";
+	private static final String SCHEMA_CLASS_NAME = "package-info";
 	private static final String JSON_PROPERTY_KEY = "jsonProperty";
 	private static final String PROPERTY_PREFIX_KEY = "propertyPrefix";
 	private static final String PROPERTY_SUFFIX_KEY = "propertySuffix";
@@ -97,8 +99,14 @@ public class GqlWriter {
 		if ((configuration.isGenerateSchemaInputTypes() && !context.getInputObjectTypes().isEmpty()) ||
 			(configuration.isGenerateDynamicOperations() && !context.getDynamicOperations().isEmpty())
 		) {
-			new SharedClassesFileCreator(writerFactory, freemarker)
+			new AppenderFileCreator(writerFactory, freemarker)
 				.createFile(configuration.getOperationsPackageName(), APPENDER_CLASS_NAME, null);
+		}
+		if ((configuration.isGenerateDefinedOperations() && !context.getDefinedOperations().isEmpty()) ||
+			(configuration.isGenerateDynamicOperations() && !context.getDynamicOperations().isEmpty())
+		) {
+			new SchemaFileCreator(writerFactory, freemarker)
+				.createFile(configuration.getOperationsPackageName(), SCHEMA_CLASS_NAME, singletonMap("javadoc", context.getSchemaJavadoc()));
 		}
 	}
 
@@ -141,7 +149,7 @@ public class GqlWriter {
 			(configuration.isGenerateDynamicOperations() && !context.getDynamicOperations().isEmpty())
 		) {
 			val operationInterfaceFileCreator = new OperationInterfaceFileCreator(writerFactory, freemarker);
-			context.getSchema().keySet().stream()
+			context.getOperations().keySet().stream()
 				.map(Util::firstUpper)
 				.forEach(interfaceName -> operationInterfaceFileCreator
 					.createFile(configuration.getOperationsPackageName(), interfaceName, null));

@@ -2,7 +2,6 @@ package com.github.alme.graphql.generator.dto;
 
 import static java.util.Collections.emptySet;
 
-import java.util.Collection;
 import java.util.Set;
 
 import lombok.Value;
@@ -14,7 +13,7 @@ public class GqlOperation {
 	String operation;
 	String typeName;
 	String text;
-	Collection<GqlField> variables;
+	Set<GqlField> variables;
 
 	public static GqlOperation of(String name, String operation, String typeName, String text, Set<GqlField> variables) {
 		return new GqlOperation(

@@ -4,9 +4,9 @@ import com.github.alme.graphql.generator.io.WriterFactory;
 
 import freemarker.template.Configuration;
 
-public class SharedClassesFileCreator extends FileCreator {
+public class AppenderFileCreator extends FileCreator {
 
-	public SharedClassesFileCreator(WriterFactory writerFactory, Configuration freemarker) {
+	public AppenderFileCreator(WriterFactory writerFactory, Configuration freemarker) {
 		super(writerFactory, freemarker);
 	}
 

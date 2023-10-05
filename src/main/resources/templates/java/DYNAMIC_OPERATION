@@ -7,6 +7,12 @@ public class ${className} implements ${operationsPackage}.${operation?cap_first}
 {
 	private final String document;
 
+	public ${className}(java.util.function.Consumer<${currentPackage}.selectors.${typeName}Selector> selector) {
+		StringBuilder documentBuilder = new StringBuilder("${operation} {");
+		selector.accept(new ${currentPackage}.selectors.${typeName}Selector(documentBuilder));
+		this.document = documentBuilder.append(" }").toString();
+	}
+
 	@Override
 	public String getOperationName() {
 		return null;
@@ -25,12 +31,6 @@ public class ${className} implements ${operationsPackage}.${operation?cap_first}
 	@Override
 	public Class<${currentPackage}.results.${typeName}> getResultClass() {
 		return ${currentPackage}.results.${typeName}.class;
-	}
-
-	public ${className}(java.util.function.Consumer<${currentPackage}.selectors.${typeName}Selector> selector) {
-		StringBuilder documentBuilder = new StringBuilder("${operation} {");
-		selector.accept(new ${currentPackage}.selectors.${typeName}Selector(documentBuilder));
-		this.document = documentBuilder.append(" }").toString();
 	}
 
 	<@classMembers.addToString fields=[{'name':'document'}] indent='\t'/>

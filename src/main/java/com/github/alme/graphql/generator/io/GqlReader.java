@@ -62,7 +62,7 @@ public class GqlReader {
 
 			if (generateDefinedOperations || generateDynamicOperations) {
 				new SchemaTranslator().translate(doc, context);
-				log.info(format(LOG_TRANSLATOR, context.getSchema().size(), "Schema"));
+				log.info(format(LOG_TRANSLATOR, context.getOperations().size(), "Schema"));
 			}
 			if (generateDefinedOperations) {
 				new OperationTranslator().translate(doc, context);
