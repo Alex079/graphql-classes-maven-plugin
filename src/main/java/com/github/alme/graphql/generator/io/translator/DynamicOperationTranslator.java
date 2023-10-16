@@ -39,10 +39,10 @@ public class DynamicOperationTranslator implements Translator {
 			result.put(interfaceTypeName + SUFFIX, Stream.concat(
 				interfaceType.getFields().stream()
 					.map(field -> GqlSelection.of(field, ctx.getAlias(field.getName()))),
-				ctx.getObjectTypes().values().stream()
-					.filter(objectType -> objectType.getParents().contains(interfaceTypeName))
-					.flatMap(objectType -> objectType.getFields().stream()
-						.map(field -> GqlSelection.of(field, field.getName() + '_' + objectType.getName(), objectType.getName())))
+				Stream.concat(ctx.getInterfaceTypes().values().stream(), ctx.getObjectTypes().values().stream())
+					.filter(childType -> childType.getParents().contains(interfaceTypeName))
+					.flatMap(childType -> childType.getFields().stream()
+						.map(field -> GqlSelection.of(field, field.getName() + '_' + childType.getName(), childType.getName())))
 				)
 				.collect(toSet())));
 		// link selections by inner type
