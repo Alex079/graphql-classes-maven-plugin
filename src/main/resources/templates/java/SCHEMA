@@ -1,3 +1,0 @@
-<#import "import/classMemberTemplates" as classMembers/>
-<@classMembers.addJavadoc javadoc=javadoc indent=''/>
-package ${currentPackage};

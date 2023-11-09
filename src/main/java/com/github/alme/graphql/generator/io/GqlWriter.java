@@ -18,7 +18,6 @@ import com.github.alme.graphql.generator.io.creator.DynamicOperationFileCreator;
 import com.github.alme.graphql.generator.io.creator.DynamicOperationResultFileCreator;
 import com.github.alme.graphql.generator.io.creator.DynamicOperationSelectorFileCreator;
 import com.github.alme.graphql.generator.io.creator.OperationInterfaceFileCreator;
-import com.github.alme.graphql.generator.io.creator.SchemaFileCreator;
 import com.github.alme.graphql.generator.io.creator.StructureFileCreator;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -31,7 +30,6 @@ import lombok.val;
 public class GqlWriter {
 
 	private static final String APPENDER_CLASS_NAME = "GraphQlAppender";
-	private static final String SCHEMA_CLASS_NAME = "package-info";
 	private static final String JSON_PROPERTY_KEY = "jsonProperty";
 	private static final String PROPERTY_PREFIX_KEY = "propertyPrefix";
 	private static final String PROPERTY_SUFFIX_KEY = "propertySuffix";
@@ -102,12 +100,6 @@ public class GqlWriter {
 			new AppenderFileCreator(writerFactory, freemarker)
 				.createFile(configuration.getOperationsPackageName(), APPENDER_CLASS_NAME, null);
 		}
-		if ((configuration.isGenerateDefinedOperations() && !context.getDefinedOperations().isEmpty()) ||
-			(configuration.isGenerateDynamicOperations() && !context.getDynamicOperations().isEmpty())
-		) {
-			new SchemaFileCreator(writerFactory, freemarker)
-				.createFile(configuration.getOperationsPackageName(), SCHEMA_CLASS_NAME, singletonMap("javadoc", context.getSchemaJavadoc()));
-		}
 	}
 
 	private void createSchemaTypes(GqlContext context, GqlConfiguration configuration) {
@@ -152,7 +144,7 @@ public class GqlWriter {
 			context.getOperations().keySet().stream()
 				.map(Util::firstUpper)
 				.forEach(interfaceName -> operationInterfaceFileCreator
-					.createFile(configuration.getOperationsPackageName(), interfaceName, null));
+					.createFile(configuration.getOperationsPackageName(), interfaceName, singletonMap("javadoc", context.getSchemaJavadoc())));
 		}
 	}
 

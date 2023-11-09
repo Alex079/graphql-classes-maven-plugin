@@ -2,6 +2,7 @@
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
+<@classMembers.addJavadoc javadoc=javadoc indent=''/>
 <@classMembers.addRootClassAnnotations/>
 public interface ${className}
 {

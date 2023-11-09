@@ -185,15 +185,10 @@ public class OperationTranslator implements Translator {
 	}
 
 	private static GqlField findField(String fieldName, GqlContext ctx, String containerTypeName) {
-		return Stream.concat(
-				Optional.ofNullable(ctx.getObjectTypes().get(containerTypeName))
-					.map(GqlStructure::getFields)
-					.map(Collection::stream)
-					.orElseGet(Stream::empty),
-				Optional.ofNullable(ctx.getInterfaceTypes().get(containerTypeName))
-					.map(GqlStructure::getFields)
-					.map(Collection::stream)
-					.orElseGet(Stream::empty))
+		return Stream.of(ctx.getObjectTypes().get(containerTypeName), ctx.getInterfaceTypes().get(containerTypeName))
+			.filter(Objects::nonNull)
+			.map(GqlStructure::getFields)
+			.flatMap(Collection::stream)
 			.filter(candidate -> Objects.equals(fieldName, candidate.getName()))
 			.findAny()
 			.orElseGet(() -> GqlField.of(fieldName, GqlType.named("String")));
