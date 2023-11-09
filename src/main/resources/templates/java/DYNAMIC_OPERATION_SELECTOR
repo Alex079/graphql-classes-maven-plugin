@@ -2,8 +2,6 @@
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
-import static ${operationsPackage}.GraphQlAppender.*;
-
 import ${schemaTypesPackage}.*;
 
 <#list importPackages as i>

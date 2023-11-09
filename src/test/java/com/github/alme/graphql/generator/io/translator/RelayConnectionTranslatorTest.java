@@ -22,7 +22,6 @@ import static graphql.language.TypeName.newTypeName;
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlField;
 import com.github.alme.graphql.generator.dto.GqlType;
-import com.github.alme.graphql.generator.io.translator.RelayConnectionTranslator;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
@@ -126,18 +125,18 @@ class RelayConnectionTranslatorTest {
 
 		assertThat(ctx.getObjectTypes()).containsOnlyKeys("Type8Connection", "Type8ConnectionEdge", "PageInfo");
 		assertThat(ctx.getObjectTypes().get("Type8Connection").getFields()).containsOnly(
-			new GqlField("edges", GqlType.list(GqlType.named("Type8ConnectionEdge"))),
-			new GqlField("pageInfo", GqlType.named("PageInfo"))
+			GqlField.of("edges", GqlType.list(GqlType.named("Type8ConnectionEdge"))),
+			GqlField.of("pageInfo", GqlType.named("PageInfo"))
 		);
 		assertThat(ctx.getObjectTypes().get("Type8ConnectionEdge").getFields()).containsOnly(
-			new GqlField("node", GqlType.named("Type8")),
-			new GqlField("cursor", GqlType.named("String"))
+			GqlField.of("node", GqlType.named("Type8")),
+			GqlField.of("cursor", GqlType.named("String"))
 		);
 		assertThat(ctx.getObjectTypes().get("PageInfo").getFields()).containsOnly(
-			new GqlField("startCursor", GqlType.named("String")),
-			new GqlField("endCursor", GqlType.named("String")),
-			new GqlField("hasNextPage", GqlType.mandatory(GqlType.named("Boolean"))),
-			new GqlField("hasPreviousPage", GqlType.mandatory(GqlType.named("Boolean")))
+			GqlField.of("startCursor", GqlType.named("String")),
+			GqlField.of("endCursor", GqlType.named("String")),
+			GqlField.of("hasNextPage", GqlType.mandatory(GqlType.named("Boolean"))),
+			GqlField.of("hasPreviousPage", GqlType.mandatory(GqlType.named("Boolean")))
 		);
 	}
 
@@ -173,18 +172,18 @@ class RelayConnectionTranslatorTest {
 
 		assertThat(ctx.getObjectTypes()).containsOnlyKeys("Type8Connection", "Type8ConnectionEdge", "PageInfo");
 		assertThat(ctx.getObjectTypes().get("Type8Connection").getFields()).containsOnly(
-			new GqlField("edges", GqlType.list(GqlType.named("Type8ConnectionEdge"))),
-			new GqlField("pageInfo", GqlType.named("PageInfo"))
+			GqlField.of("edges", GqlType.list(GqlType.named("Type8ConnectionEdge"))),
+			GqlField.of("pageInfo", GqlType.named("PageInfo"))
 		);
 		assertThat(ctx.getObjectTypes().get("Type8ConnectionEdge").getFields()).containsOnly(
-			new GqlField("node", GqlType.named("Type8")),
-			new GqlField("cursor", GqlType.named("String"))
+			GqlField.of("node", GqlType.named("Type8")),
+			GqlField.of("cursor", GqlType.named("String"))
 		);
 		assertThat(ctx.getObjectTypes().get("PageInfo").getFields()).containsOnly(
-			new GqlField("startCursor", GqlType.named("String")),
-			new GqlField("endCursor", GqlType.named("String")),
-			new GqlField("hasNextPage", GqlType.mandatory(GqlType.named("Boolean"))),
-			new GqlField("hasPreviousPage", GqlType.mandatory(GqlType.named("Boolean")))
+			GqlField.of("startCursor", GqlType.named("String")),
+			GqlField.of("endCursor", GqlType.named("String")),
+			GqlField.of("hasNextPage", GqlType.mandatory(GqlType.named("Boolean"))),
+			GqlField.of("hasPreviousPage", GqlType.mandatory(GqlType.named("Boolean")))
 		);
 	}
 }

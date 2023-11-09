@@ -5,12 +5,13 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.github.alme.graphql.generator.dto.GqlContext;
-import com.github.alme.graphql.generator.io.translator.EnumTypeTranslator;
+import com.github.alme.graphql.generator.dto.GqlValue;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class EnumTypeTranslatorTest {
 
 		translator.translate(doc, ctx);
 
-		assertTrue(ctx.getUnionTypes().isEmpty());
+		assertTrue(ctx.getEnumTypes().isEmpty());
 	}
 
 	@Test
@@ -58,8 +59,8 @@ class EnumTypeTranslatorTest {
 
 		assertEquals(1, ctx.getEnumTypes().size());
 		assertTrue(ctx.getEnumTypes().containsKey("Enum1"));
-		assertEquals(2, ctx.getEnumTypes().get("Enum1").getMembers().size());
-		assertTrue(ctx.getEnumTypes().get("Enum1").getMembers().containsAll(asList("V2", "V1")));
+		assertEquals(2, ctx.getEnumTypes().get("Enum1").getValues().size());
+		assertThat(ctx.getEnumTypes().get("Enum1").getValues()).extracting(GqlValue::getName).containsExactlyInAnyOrder("V1", "V2");
 	}
 
 	@Test
@@ -79,7 +80,7 @@ class EnumTypeTranslatorTest {
 
 		assertEquals(1, ctx.getEnumTypes().size());
 		assertTrue(ctx.getEnumTypes().containsKey("Enum1"));
-		assertEquals(2, ctx.getEnumTypes().get("Enum1").getMembers().size());
-		assertTrue(ctx.getEnumTypes().get("Enum1").getMembers().containsAll(asList("V2", "V1")));
+		assertEquals(2, ctx.getEnumTypes().get("Enum1").getValues().size());
+		assertThat(ctx.getEnumTypes().get("Enum1").getValues()).extracting(GqlValue::getName).containsExactlyInAnyOrder("V1", "V2");
 	}
 }

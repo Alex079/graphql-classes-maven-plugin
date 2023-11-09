@@ -2,11 +2,14 @@
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
+
+<@classMembers.addJavadoc javadoc=javadoc indent=''/>
 <@classMembers.addRootClassAnnotations/>
 public enum ${className}
 {
-	<#list members as m>
-	${m}<#sep>,</#sep>
+	<#list values as v>
+	<@classMembers.addJavadoc javadoc=v.javadoc indent='\t'/>
+	${v.name}<#sep>,</#sep>
 	</#list>
 }
 //CHECKSTYLE:ON

@@ -41,14 +41,15 @@ public class SchemaTranslator implements Translator {
 	private void setImplicit(GqlContext ctx) {
 		ctx.getObjectTypes().keySet().stream()
 			.filter(IMPLICIT_SCHEMA::contains)
-			.forEach(name -> ctx.getSchema().put(name.toLowerCase(), name));
+			.forEach(name -> ctx.getOperations().put(name.toLowerCase(), name));
 	}
 
 	private void populate(GqlContext ctx, Collection<? extends SchemaDefinition> definitions) {
-		definitions.stream()
-			.map(SchemaDefinition::getOperationTypeDefinitions)
-			.flatMap(Collection::stream)
-			.forEach(definition -> ctx.getSchema().put(definition.getName(), definition.getTypeName().getName()));
+		definitions.forEach(definition -> {
+			ctx.getSchemaJavadoc().addAll(Util.extractJavadoc(definition));
+			definition.getOperationTypeDefinitions().forEach(operation ->
+				ctx.getOperations().put(operation.getName(), operation.getTypeName().getName()));
+		});
 	}
 
 }

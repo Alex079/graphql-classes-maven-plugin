@@ -6,10 +6,11 @@ package ${currentPackage};
 import ${i}.*;
 </#list>
 
+<@classMembers.addJavadoc javadoc=javadoc indent=''/>
 <@classMembers.addRootClassAnnotations/>
 public class ${className}
-<#if members?has_content>
-implements ${members?join(", ")}
+<#if parents?has_content>
+implements ${parents?join(", ")}
 </#if>
 {
 	<@classMembers.addFields className=name fields=fields indent='\t'/>

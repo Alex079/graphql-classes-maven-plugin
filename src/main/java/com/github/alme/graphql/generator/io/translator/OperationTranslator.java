@@ -2,8 +2,6 @@ package com.github.alme.graphql.generator.io.translator;
 
 import static java.util.stream.Collectors.toSet;
 
-import static com.github.alme.graphql.generator.io.Util.fromVariableDef;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -46,18 +44,22 @@ import lombok.val;
 
 public class OperationTranslator implements Translator {
 
+	private static final String SUFFIX = "Result";
+	private static final String UNNAMED = "Unnamed";
 	private static final String FRAGMENTS_KEY = "fragments";
 	private static final String OPERATION_KEY = "o";
 	private static final String OPERATION_DOCUMENT = "OPERATION_DOCUMENT";
-	private static final Configuration CFG = new Configuration(Configuration.VERSION_2_3_32);
 
-	static {
-		CFG.setClassLoaderForTemplateLoading(OperationTranslator.class.getClassLoader(), "/templates/text");
-		CFG.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
-		CFG.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-		CFG.setLogTemplateExceptions(false);
-		CFG.setWrapUncheckedExceptions(true);
-		CFG.setFallbackOnNullLoopVariable(false);
+	private final Configuration freemarker;
+
+	public OperationTranslator() {
+		freemarker = new Configuration(Configuration.VERSION_2_3_32);
+		freemarker.setClassLoaderForTemplateLoading(OperationTranslator.class.getClassLoader(), "/templates/text");
+		freemarker.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
+		freemarker.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+		freemarker.setLogTemplateExceptions(false);
+		freemarker.setWrapUncheckedExceptions(true);
+		freemarker.setFallbackOnNullLoopVariable(false);
 	}
 
 	@Override
@@ -70,102 +72,100 @@ public class OperationTranslator implements Translator {
 	private void populate(GqlContext ctx, Collection<OperationDefinition> definitions, Collection<FragmentDefinition> allFragments) {
 		definitions.forEach(definition -> {
 			String operationName = definition.getOperation().name().toLowerCase();
-			String typeName = ctx.getSchema().get(operationName);
+			String typeName = ctx.getOperations().get(operationName);
 			if (typeName != null) {
 				String definitionName = definition.getName();
 				String baseName = getOperationBaseName(definitionName, operationName);
 				Collection<FragmentDefinition> requiredFragments = new HashSet<>();
 				ctx.getDefinedSelections()
-					.computeIfAbsent(baseName, x -> traverseSelections(definition.getSelectionSet(), allFragments, requiredFragments, ctx, typeName));
+					.computeIfAbsent(baseName, x -> traverseSelections(
+						GqlSelection.of(typeName, definition.getSelectionSet()), allFragments, requiredFragments, ctx));
 				ctx.getDefinedOperations()
-					.computeIfAbsent(baseName, x -> new GqlOperation(definitionName, operationName, typeName + "Result",
-						getDocumentString(definition, requiredFragments, ctx.getLog())))
-					.addVariables(definition.getVariableDefinitions().stream().map(fromVariableDef(ctx)).collect(toSet()));
+					.computeIfAbsent(baseName, x -> GqlOperation.of(
+						definitionName,
+						operationName,
+						typeName + SUFFIX,
+						getDocumentString(definition, requiredFragments, ctx.getLog()),
+						definition.getVariableDefinitions().stream().map(v -> GqlField.of(v, ctx::applyNaming)).collect(toSet())));
 			}
 		});
 	}
 
 	private String getOperationBaseName(String definitionName, String operationName) {
-		return (definitionName == null ? "Unnamed" : Util.firstUpper(definitionName)) + Util.firstUpper(operationName);
+		return (definitionName == null ? UNNAMED : Util.firstUpper(definitionName)) + Util.firstUpper(operationName);
 	}
 
 	private Map<String, Collection<GqlSelection>> traverseSelections(
-		SelectionSet selectionSet,
+		GqlSelection rootSelection,
 		Collection<FragmentDefinition> allFragments,
 		Collection<FragmentDefinition> requiredFragments,
-		GqlContext ctx,
-		String typeName
+		GqlContext ctx
 	) {
 		Map<String, Map<Integer, Set<GqlSelection>>> typeMap = new HashMap<>();
 		Map<String, AtomicInteger> counters = new HashMap<>();
 		Queue<GqlSelection> selectionsToResolve = new LinkedList<>();
-		selectionsToResolve.offer(new GqlSelection(new GqlField(null, GqlType.named(typeName)), "", "").addSubset(selectionSet));
+		selectionsToResolve.offer(rootSelection);
 		while (!selectionsToResolve.isEmpty()) {
-			val currentSelectionSet = selectionsToResolve.poll();
+			val currentSelection = selectionsToResolve.poll();
+			String currentTypeName = currentSelection.getType().getInner();
 			// get a set of selections by type name and their unresolved subset
-			String currentTypeName = currentSelectionSet.getType().getInner();
 			Set<GqlSelection> subSelections = new HashSet<>();
-			Set<GqlSelection> subSelectionsToResolve = new LinkedHashSet<>();
-			currentSelectionSet.getSubsets().forEach(unresolvedSet ->
-				subSelections.addAll(resolveOneLevel(unresolvedSet,
-					allFragments, requiredFragments, new HashSet<>(), ctx, currentTypeName, subSelectionsToResolve)));
+			Set<GqlSelection> unresolved = new LinkedHashSet<>();
+			currentSelection.getSubsets().forEach(unresolvedSet ->
+				resolveOneLevel(unresolvedSet, allFragments, requiredFragments, new HashSet<>(), ctx, currentTypeName)
+					.forEach(selection -> {
+						if (!selection.getSubsets().isEmpty()) {
+							unresolved.add(selection);
+						}
+						subSelections.add(selection);
+					}));
 			// find exactly the same selection set already linked to this type
-			val selectionsByTypeName = typeMap.computeIfAbsent(currentTypeName, x -> new HashMap<>());
-			int ordinalNumber = selectionsByTypeName.entrySet().stream()
-				.filter(entry -> entry.getValue().size() == subSelections.size()
-					&& entry.getValue().stream().allMatch(selection -> subSelections.stream().anyMatch(selection::equalsWithSubsets)))
+			val variants = typeMap.computeIfAbsent(currentTypeName, x -> new HashMap<>());
+			int variantNumber = variants.entrySet().stream()
+				.filter(entry -> entry.getValue().equals(subSelections))
 				.map(Map.Entry::getKey)
 				.findAny()
 				.orElseGet(() -> {
 					// this selection set has not been linked to this type before
 					int key = counters.computeIfAbsent(currentTypeName, x -> new AtomicInteger()).incrementAndGet();
-					selectionsByTypeName.put(key, subSelections);
-					subSelectionsToResolve.forEach(selectionsToResolve::offer);
+					variants.put(key, subSelections);
+					unresolved.forEach(selectionsToResolve::offer);
 					return key;
 				});
 			// link previous selection to the type name
-			currentSelectionSet.setTargetTypeName(currentTypeName + getTypeSuffix(ordinalNumber));
+			currentSelection.replaceTargetType(currentTypeName + getTypeSuffix(variantNumber));
 		}
 		Map<String, Collection<GqlSelection>> result = new HashMap<>();
 		typeMap.forEach((type, variants) -> variants.forEach((variantNumber, selections) ->
-			result.put(type + getTypeSuffix(variantNumber), selections)));
+			result.put(type + getTypeSuffix(variantNumber), selections)
+		));
 		return result;
 	}
 
 	@NotNull
 	private static String getTypeSuffix(int ordinalNumber) {
-		return "Result" + (ordinalNumber < 2 ? "" : ordinalNumber);
+		return SUFFIX + (ordinalNumber < 2 ? "" : ordinalNumber);
 	}
 
-	private Set<GqlSelection> resolveOneLevel(
+	private static Collection<GqlSelection> resolveOneLevel(
 		SelectionSet selectionSet,
 		Collection<FragmentDefinition> allFragments,
 		Collection<FragmentDefinition> requiredFragments,
 		Collection<FragmentDefinition> visitedFragments,
 		GqlContext ctx,
-		String typeName,
-		Set<GqlSelection> remaining
+		String typeName
 	) {
-		Map<GqlSelection, GqlSelection> result = new HashMap<>();
+		Map<String, GqlSelection> result = new HashMap<>();
 		// fields declared explicitly
 		selectionSet.getSelectionsOfType(Field.class).stream()
-			.map(field -> {
-				GqlField gqlField = new GqlField(field.getName(), getTypeOfField(field, ctx, typeName));
-				String alias = Optional.ofNullable(field.getAlias()).orElse("");
-				return new GqlSelection(gqlField, alias, "").addSubset(field.getSelectionSet());
-			})
-			.forEach(newSelection -> {
-				GqlSelection selection = mergeSubsets(newSelection, result);
-				if (!selection.getSubsets().isEmpty()) {
-					remaining.add(selection);
-				}
-			});
+			.map(field -> GqlSelection.of(findField(field.getName(), ctx, typeName), field.getAlias(), field.getSelectionSet()))
+			.forEach(selection -> result.merge(selection.getKey(), selection, GqlSelection::merge));
 		// fields reachable via inline fragments
 		selectionSet.getSelectionsOfType(InlineFragment.class).stream()
 			.map(fragment -> resolveOneLevel(fragment.getSelectionSet(),
-				allFragments, requiredFragments, visitedFragments, ctx, fragment.getTypeCondition().getName(), remaining))
+				allFragments, requiredFragments, visitedFragments, ctx, fragment.getTypeCondition().getName()))
 			.flatMap(Collection::stream)
-			.forEach(selection -> mergeSubsets(selection, result));
+			.forEach(selection -> result.merge(selection.getKey(), selection, GqlSelection::merge));
 		// fields reachable via named fragments
 		selectionSet.getSelectionsOfType(FragmentSpread.class).stream()
 			.map(FragmentSpread::getName)
@@ -178,35 +178,20 @@ public class OperationTranslator implements Translator {
 			.filter(visitedFragments::add)
 			.peek(requiredFragments::add)
 			.map(fragment -> resolveOneLevel(fragment.getSelectionSet(),
-				allFragments, requiredFragments, visitedFragments, ctx, fragment.getTypeCondition().getName(), remaining))
+				allFragments, requiredFragments, visitedFragments, ctx, fragment.getTypeCondition().getName()))
 			.flatMap(Collection::stream)
-			.forEach(selection -> mergeSubsets(selection, result));
-		return result.keySet();
+			.forEach(selection -> result.merge(selection.getKey(), selection, GqlSelection::merge));
+		return result.values();
 	}
 
-	private static GqlSelection mergeSubsets(GqlSelection newSelection, Map<GqlSelection, GqlSelection> result) {
-		GqlSelection oldSelection = result.get(newSelection);
-		if (oldSelection == null) {
-			result.put(newSelection, newSelection);
-			return newSelection;
-		}
-		return oldSelection.addSubsets(newSelection.getSubsets());
-	}
-
-	private static GqlType getTypeOfField(Field field, GqlContext ctx, String containerTypeName) {
-		return Stream.concat(
-				Optional.ofNullable(ctx.getObjectTypes().get(containerTypeName))
-					.map(GqlStructure::getFields)
-					.map(Collection::stream)
-					.orElseGet(Stream::empty),
-				Optional.ofNullable(ctx.getInterfaceTypes().get(containerTypeName))
-					.map(GqlStructure::getFields)
-					.map(Collection::stream)
-					.orElseGet(Stream::empty))
-			.filter(candidate -> Objects.equals(field.getName(), candidate.getName()))
-			.map(GqlField::getType)
+	private static GqlField findField(String fieldName, GqlContext ctx, String containerTypeName) {
+		return Stream.of(ctx.getObjectTypes().get(containerTypeName), ctx.getInterfaceTypes().get(containerTypeName))
+			.filter(Objects::nonNull)
+			.map(GqlStructure::getFields)
+			.flatMap(Collection::stream)
+			.filter(candidate -> Objects.equals(fieldName, candidate.getName()))
 			.findAny()
-			.orElseGet(() -> GqlType.named("String"));
+			.orElseGet(() -> GqlField.of(fieldName, GqlType.named("String")));
 	}
 
 	private static boolean fragmentMatchesByType(String candidateType, String selectionType, GqlContext ctx) {
@@ -218,10 +203,10 @@ public class OperationTranslator implements Translator {
 		Set<String> selectionTypes = new HashSet<>();
 		selectionTypes.add(selectionType);
 		ctx.getObjectTypes().values().forEach(typeStructure -> {
-			if (typeStructure.getMembers().contains(candidateType)) {
+			if (typeStructure.getParents().contains(candidateType)) {
 				candidateTypes.add(typeStructure.getName());
 			}
-			if (typeStructure.getMembers().contains(selectionType)) {
+			if (typeStructure.getParents().contains(selectionType)) {
 				selectionTypes.add(typeStructure.getName());
 			}
 		});
@@ -230,15 +215,15 @@ public class OperationTranslator implements Translator {
 
 	private String getDocumentString(OperationDefinition operation, Collection<FragmentDefinition> fragments, Log log) {
 		try (StringWriter writer = new StringWriter()) {
-			CFG.setSharedVariable(OPERATION_KEY, operation);
-			CFG.setSharedVariable(FRAGMENTS_KEY, fragments);
-			CFG.getTemplate(OPERATION_DOCUMENT).process(null, writer);
+			freemarker.setSharedVariable(OPERATION_KEY, operation);
+			freemarker.setSharedVariable(FRAGMENTS_KEY, fragments);
+			freemarker.getTemplate(OPERATION_DOCUMENT).process(null, writer);
 			return writer.toString();
 		} catch (TemplateException | IOException e) {
 			log.warn(String.format("Operation document [%s] is not created.", operation.getName()), e);
 			return null;
 		} finally {
-			CFG.clearSharedVariables();
+			freemarker.clearSharedVariables();
 		}
 	}
 

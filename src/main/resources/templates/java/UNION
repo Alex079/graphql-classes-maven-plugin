@@ -1,7 +1,0 @@
-<#import "import/classMemberTemplates" as classMembers/>
-//CHECKSTYLE:OFF
-package ${currentPackage};
-
-<@classMembers.addRootClassAnnotations/>
-public interface ${className} { }
-//CHECKSTYLE:ON
