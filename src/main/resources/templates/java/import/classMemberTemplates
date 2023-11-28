@@ -208,11 +208,11 @@
 	<#lt/>${indent}public String toString() {
 	<#lt/>${indent}	StringBuilder documentBuilder = new StringBuilder().append(" {");
 	<#list fields as field>
-		<#lt/>${indent}		documentBuilder.append(" ${getFieldName(field)}:");
-		<#lt/>${indent}		java.util.stream.Stream.of(get${getFieldName(field)?cap_first}())
-		<@asLiteral fieldType=field.type indent=indent+'\t\t\t'/>
+		<#lt/>${indent}	documentBuilder.append(" ${getFieldName(field)}:");
+		<#lt/>${indent}	java.util.stream.Stream.of(get${getFieldName(field)?cap_first}())
+		<@asLiteral fieldType=field.type indent=indent+'\t\t'/>
 	</#list>
-	<#lt/>${indent}		return documentBuilder.append(" }").toString();
+	<#lt/>${indent}	return documentBuilder.append(" }").toString();
 	<#lt/>${indent}}
 </#macro>
 
