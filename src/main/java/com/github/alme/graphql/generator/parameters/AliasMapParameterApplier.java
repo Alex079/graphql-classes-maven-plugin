@@ -1,7 +1,6 @@
 package com.github.alme.graphql.generator.parameters;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -16,77 +15,76 @@ public class AliasMapParameterApplier implements ParameterApplier {
 	private final Collection<String> aliasMapAlternative;
 
 	private static final String KEY_VALUE_SEPARATOR = "=";
-	
-	private static final Map<String, String> FORCED_ALIASES = new HashMap<>();
 
-	static {
-		FORCED_ALIASES.put("abstract", "abstractValue");
-		FORCED_ALIASES.put("assert", "assertValue");
-		FORCED_ALIASES.put("boolean", "booleanValue");
-		FORCED_ALIASES.put("break", "breakValue");
-		FORCED_ALIASES.put("byte", "byteValue");
-		FORCED_ALIASES.put("case", "caseValue");
-		FORCED_ALIASES.put("catch", "catchValue");
-		FORCED_ALIASES.put("char", "charValue");
-		FORCED_ALIASES.put("class", "classValue");
-		FORCED_ALIASES.put("const", "constValue");
-		FORCED_ALIASES.put("continue", "continueValue");
-		FORCED_ALIASES.put("default", "defaultValue");
-		FORCED_ALIASES.put("do", "doValue");
-		FORCED_ALIASES.put("double", "doubleValue");
-		FORCED_ALIASES.put("else", "elseValue");
-		FORCED_ALIASES.put("enum", "enumValue");
-		FORCED_ALIASES.put("extends", "extendsValue");
-		FORCED_ALIASES.put("final", "finalValue");
-		FORCED_ALIASES.put("finally", "finallyValue");
-		FORCED_ALIASES.put("float", "floatValue");
-		FORCED_ALIASES.put("for", "forValue");
-		FORCED_ALIASES.put("goto", "gotoValue");
-		FORCED_ALIASES.put("if", "ifValue");
-		FORCED_ALIASES.put("implements", "implementsValue");
-		FORCED_ALIASES.put("import", "importValue");
-		FORCED_ALIASES.put("instanceof", "instanceofValue");
-		FORCED_ALIASES.put("int", "intValue");
-		FORCED_ALIASES.put("interface", "interfaceValue");
-		FORCED_ALIASES.put("long", "longValue");
-		FORCED_ALIASES.put("native", "nativeValue");
-		FORCED_ALIASES.put("new", "newValue");
-		FORCED_ALIASES.put("package", "packageValue");
-		FORCED_ALIASES.put("private", "privateValue");
-		FORCED_ALIASES.put("protected", "protectedValue");
-		FORCED_ALIASES.put("public", "publicValue");
-		FORCED_ALIASES.put("return", "returnValue");
-		FORCED_ALIASES.put("short", "shortValue");
-		FORCED_ALIASES.put("static", "staticValue");
-		FORCED_ALIASES.put("strictfp", "strictfpValue");
-		FORCED_ALIASES.put("super", "superValue");
-		FORCED_ALIASES.put("switch", "switchValue");
-		FORCED_ALIASES.put("synchronized", "synchronizedValue");
-		FORCED_ALIASES.put("this", "thisValue");
-		FORCED_ALIASES.put("throw", "throwValue");
-		FORCED_ALIASES.put("throws", "throwsValue");
-		FORCED_ALIASES.put("transient", "transientValue");
-		FORCED_ALIASES.put("try", "tryValue");
-		FORCED_ALIASES.put("void", "voidValue");
-		FORCED_ALIASES.put("volatile", "volatileValue");
-		FORCED_ALIASES.put("while", "whileValue");
-	}
+	private static final Map<String, String> DEFAULT_ALIASES = Map.ofEntries(
+		Map.entry("abstract", "abstractValue"),
+		Map.entry("assert", "assertValue"),
+		Map.entry("boolean", "booleanValue"),
+		Map.entry("break", "breakValue"),
+		Map.entry("byte", "byteValue"),
+		Map.entry("case", "caseValue"),
+		Map.entry("catch", "catchValue"),
+		Map.entry("char", "charValue"),
+		Map.entry("class", "classValue"),
+		Map.entry("const", "constValue"),
+		Map.entry("continue", "continueValue"),
+		Map.entry("default", "defaultValue"),
+		Map.entry("do", "doValue"),
+		Map.entry("double", "doubleValue"),
+		Map.entry("else", "elseValue"),
+		Map.entry("enum", "enumValue"),
+		Map.entry("extends", "extendsValue"),
+		Map.entry("final", "finalValue"),
+		Map.entry("finally", "finallyValue"),
+		Map.entry("float", "floatValue"),
+		Map.entry("for", "forValue"),
+		Map.entry("goto", "gotoValue"),
+		Map.entry("if", "ifValue"),
+		Map.entry("implements", "implementsValue"),
+		Map.entry("import", "importValue"),
+		Map.entry("instanceof", "instanceofValue"),
+		Map.entry("int", "intValue"),
+		Map.entry("interface", "interfaceValue"),
+		Map.entry("long", "longValue"),
+		Map.entry("native", "nativeValue"),
+		Map.entry("new", "newValue"),
+		Map.entry("package", "packageValue"),
+		Map.entry("private", "privateValue"),
+		Map.entry("protected", "protectedValue"),
+		Map.entry("public", "publicValue"),
+		Map.entry("return", "returnValue"),
+		Map.entry("short", "shortValue"),
+		Map.entry("static", "staticValue"),
+		Map.entry("strictfp", "strictfpValue"),
+		Map.entry("super", "superValue"),
+		Map.entry("switch", "switchValue"),
+		Map.entry("synchronized", "synchronizedValue"),
+		Map.entry("this", "thisValue"),
+		Map.entry("throw", "throwValue"),
+		Map.entry("throws", "throwsValue"),
+		Map.entry("transient", "transientValue"),
+		Map.entry("try", "tryValue"),
+		Map.entry("void", "voidValue"),
+		Map.entry("volatile", "volatileValue"),
+		Map.entry("while", "whileValue"),
+		Map.entry("yield", "yieldValue")
+	);
 
 	@Override
 	public void apply(GqlConfigurationBuilder builder) {
-		builder.aliases(FORCED_ALIASES);
+		builder.aliases(DEFAULT_ALIASES);
 		if (aliasMap != null) {
 			aliasMap.entrySet().stream()
 				.filter(item ->
 					item.getKey() != null && item.getValue() != null &&
-					item.getKey().trim().length() > 0 && item.getValue().trim().length() > 0)
+					!item.getKey().isBlank() && !item.getValue().isBlank())
 				.forEach(item -> builder.alias(item.getKey().trim(), item.getValue().trim()));
 		}
 		else if (aliasMapAlternative != null) {
 			aliasMapAlternative.stream()
 				.filter(Objects::nonNull)
 				.map(item -> item.split(KEY_VALUE_SEPARATOR, 2))
-				.filter(item -> (item.length == 2) && item[0].trim().length() > 0 && item[1].trim().length() > 0)
+				.filter(item -> (item.length == 2) && !item[0].isBlank() && !item[1].isBlank())
 				.forEach(item -> builder.alias(item[0].trim(), item[1].trim()));
 		}
 	}

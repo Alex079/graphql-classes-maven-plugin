@@ -1,6 +1,5 @@
 package com.github.alme.graphql.generator.io;
 
-import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -25,7 +24,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModelException;
-import lombok.val;
 
 public class GqlWriter {
 
@@ -106,33 +104,33 @@ public class GqlWriter {
 		String packageName = configuration.getSchemaTypesPackageName();
 		int count = 0;
 		if (configuration.isGenerateSchemaInputTypes()) {
-			val inputObjectFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.INPUT_OBJECT);
+			var inputObjectFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.INPUT_OBJECT);
 			context.getInputObjectTypes()
 				.forEach((className, gqlStructure) -> inputObjectFileCreator
 					.createFile(packageName, className, gqlStructure));
 			count += context.getInputObjectTypes().size();
 		}
 		if (configuration.isGenerateSchemaInputTypes() || configuration.isGenerateSchemaOtherTypes()) {
-			val enumFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.ENUM);
+			var enumFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.ENUM);
 			context.getEnumTypes()
 				.forEach((className, gqlStructure) -> enumFileCreator
 					.createFile(packageName, className, gqlStructure));
 			count += context.getEnumTypes().size();
 		}
 		if (configuration.isGenerateSchemaOtherTypes()) {
-			val interfaceFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.INTERFACE);
+			var interfaceFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.INTERFACE);
 			context.getInterfaceTypes()
 				.forEach((className, gqlStructure) -> interfaceFileCreator
 					.createFile(packageName, className, gqlStructure));
 			count += context.getInterfaceTypes().size();
-			val objectFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.OBJECT);
+			var objectFileCreator = new StructureFileCreator(writerFactory, freemarker, Structure.OBJECT);
 			context.getObjectTypes()
 				.forEach((className, gqlStructure) -> objectFileCreator
 					.createFile(packageName, className, gqlStructure));
 			count += context.getObjectTypes().size();
 		}
 		if (count > 0) {
-			context.getLog().info(format("Finished creating %d schema type class(es).", count));
+			context.getLog().info("Finished creating %d schema type class(es).".formatted(count));
 		}
 	}
 
@@ -140,7 +138,7 @@ public class GqlWriter {
 		if ((configuration.isGenerateDefinedOperations() && !context.getDefinedOperations().isEmpty()) ||
 			(configuration.isGenerateDynamicOperations() && !context.getDynamicOperations().isEmpty())
 		) {
-			val operationInterfaceFileCreator = new OperationInterfaceFileCreator(writerFactory, freemarker);
+			var operationInterfaceFileCreator = new OperationInterfaceFileCreator(writerFactory, freemarker);
 			context.getOperations().keySet().stream()
 				.map(Util::firstUpper)
 				.forEach(interfaceName -> operationInterfaceFileCreator
@@ -150,8 +148,8 @@ public class GqlWriter {
 
 	private void createDefinedOperations(GqlContext context, GqlConfiguration configuration) {
 		if (configuration.isGenerateDefinedOperations() && !context.getDefinedOperations().isEmpty()) {
-			val definedOperationFileCreator = new DefinedOperationFileCreator(writerFactory, freemarker);
-			val definedOperationVariablesFileCreator = new DefinedOperationVariablesFileCreator(writerFactory, freemarker);
+			var definedOperationFileCreator = new DefinedOperationFileCreator(writerFactory, freemarker);
+			var definedOperationVariablesFileCreator = new DefinedOperationVariablesFileCreator(writerFactory, freemarker);
 			context.getDefinedOperations().forEach((operationName, operation) -> {
 				String packageName = configuration.getDefinedOperationsPackageName() + "." + Util.firstLower(operationName);
 				definedOperationFileCreator.createFile(packageName, operationName, operation);
@@ -159,33 +157,34 @@ public class GqlWriter {
 					definedOperationVariablesFileCreator.createFile(packageName, operationName + "Variables", operation);
 				}
 			});
-			val definedOperationResultFileCreator = new DefinedOperationResultFileCreator(writerFactory, freemarker);
+			var definedOperationResultFileCreator = new DefinedOperationResultFileCreator(writerFactory, freemarker);
 			context.getDefinedSelections().forEach((operationName, typeMap) -> {
 				String packageName = configuration.getDefinedOperationsPackageName() + "." + Util.firstLower(operationName) + ".results";
 				typeMap.forEach((typeName, selections) -> definedOperationResultFileCreator
 					.createFile(packageName, typeName, singletonMap("selections", selections)));
 			});
-			context.getDefinedOperations().forEach((operationName, operation) -> context.getLog().info(format("Finished creating %d class(es) for %s operation.",
-				(operation.getVariables().isEmpty() ? 1 : 2) + context.getDefinedSelections().get(operationName).size(),
-				operationName)));
+			context.getDefinedOperations().forEach((operationName, operation) ->
+				context.getLog().info("Finished creating %d class(es) for %s operation.".formatted(
+					(operation.getVariables().isEmpty() ? 1 : 2) + context.getDefinedSelections().get(operationName).size(),
+					operationName)));
 		}
 	}
 
 	private void createDynamicOperations(GqlContext context, GqlConfiguration configuration) {
 		if (configuration.isGenerateDynamicOperations() && !context.getDynamicOperations().isEmpty()) {
 			String packageName = configuration.getDynamicOperationsPackageName();
-			val dynamicOperationFileCreator = new DynamicOperationFileCreator(writerFactory, freemarker);
+			var dynamicOperationFileCreator = new DynamicOperationFileCreator(writerFactory, freemarker);
 			context.getDynamicOperations()
 				.forEach((className, operation) -> dynamicOperationFileCreator.createFile(packageName, className, operation));
-			val dynamicOperationResultFileCreator = new DynamicOperationResultFileCreator(writerFactory, freemarker);
-			val dynamicOperationSelectorFileCreator = new DynamicOperationSelectorFileCreator(writerFactory, freemarker);
+			var dynamicOperationResultFileCreator = new DynamicOperationResultFileCreator(writerFactory, freemarker);
+			var dynamicOperationSelectorFileCreator = new DynamicOperationSelectorFileCreator(writerFactory, freemarker);
 			context.getDynamicSelections()
 				.forEach((className, selections) -> {
 					dynamicOperationResultFileCreator.createFile(packageName + ".results", className, singletonMap("selections", selections));
 					dynamicOperationSelectorFileCreator.createFile(packageName + ".selectors", className + "Selector",
 						singletonMap("selections", selections.stream().collect(groupingBy(GqlSelection::getFragmentTypeName))));
 				});
-			context.getLog().info(format("Finished creating %d dynamic operation(s) with %d common class(es).",
+			context.getLog().info("Finished creating %d dynamic operation(s) with %d common class(es).".formatted(
 				context.getDynamicOperations().size(),
 				context.getDynamicSelections().size() * 2));
 		}

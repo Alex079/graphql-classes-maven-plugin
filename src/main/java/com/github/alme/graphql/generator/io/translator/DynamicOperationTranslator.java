@@ -48,8 +48,8 @@ public class DynamicOperationTranslator implements Translator {
 		// link selections by inner type
 		result.values().stream()
 			.flatMap(Collection::stream)
-			.filter(selection -> result.containsKey(selection.getType().getInner() + SUFFIX))
-			.forEach(selection -> selection.replaceTargetType(selection.getType().getInner() + SUFFIX));
+			.filter(selection -> result.containsKey(selection.getType().getName() + SUFFIX))
+			.forEach(selection -> selection.setTargetTypeName(selection.getType().getName() + SUFFIX));
 		return result;
 	}
 

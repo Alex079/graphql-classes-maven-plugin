@@ -1,7 +1,5 @@
 package com.github.alme.graphql.generator.parameters;
 
-import static java.lang.String.format;
-
 import java.time.Instant;
 
 import com.github.alme.graphql.generator.GeneratorMojo;
@@ -21,7 +19,7 @@ public class GeneratedAnnotationParameterApplier implements ParameterApplier {
 	@Override
 	public void apply(GqlConfiguration.GqlConfigurationBuilder builder) {
 		if (generatedAnnotationVersion != null) {
-			builder.generatedAnnotation(format(TEMPLATE,
+			builder.generatedAnnotation(TEMPLATE.formatted(
 				JAVA8.equals(generatedAnnotationVersion) ? "" : PROCESSING,
 				GeneratorMojo.class.getName(),
 				Instant.now()

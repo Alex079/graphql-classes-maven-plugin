@@ -1,7 +1,5 @@
 package com.github.alme.graphql.generator;
 
-import static java.lang.String.format;
-
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
@@ -192,14 +190,14 @@ public class GeneratorMojo extends AbstractMojo {
 			.importPackages(importPackages)
 			.build();
 
-		getLog().info(format("Current configuration: %s.", configuration));
+		getLog().info("Current configuration: %s.".formatted(configuration));
 
 		GqlContext context = new GqlContext(getLog(), configuration.getScalars(), configuration.getAliases());
 		ReaderFactory readerFactory = new ReaderFactory(configuration.getSourceFiles(), getLog());
 		WriterFactory writerFactory = new WriterFactory(configuration.getOutputRoot());
 
 		new GqlReader(readerFactory).read(context, configuration);
-		getLog().debug(format("Current context: %s.", context));
+		getLog().debug("Current context: %s.".formatted(context));
 
 		new GqlWriter(writerFactory).write(context, configuration);
 		getLog().info("Generation is done.");
