@@ -2,6 +2,7 @@ package com.github.alme.graphql.generator.parameters;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -35,9 +36,7 @@ class ScalarMapParameterApplierTest {
 		assertThat(configuration.getScalars()).containsOnlyKeys("ID", "Int", "Float");
 		verify(builder).accept(any());
 		verify(builder).build();
-		verify(builder).scalar("Int", "Integer");
-		verify(builder).scalar("Float", "Double");
-		verify(builder).scalar("ID", "String");
+		verify(builder).scalars(anyMap());
 		verifyNoMoreInteractions(builder);
 	}
 
@@ -51,9 +50,7 @@ class ScalarMapParameterApplierTest {
 		assertThat(configuration.getScalars()).containsOnlyKeys("ID", "Int", "Float", "A").containsEntry("A", "B");
 		verify(builder).accept(any());
 		verify(builder).build();
-		verify(builder).scalar("Int", "Integer");
-		verify(builder).scalar("Float", "Double");
-		verify(builder).scalar("ID", "String");
+		verify(builder).scalars(anyMap());
 		verify(builder).scalar("A", "B");
 		verifyNoMoreInteractions(builder);
 	}
@@ -68,9 +65,7 @@ class ScalarMapParameterApplierTest {
 		assertThat(configuration.getScalars()).containsOnlyKeys("ID", "Int", "Float");
 		verify(builder).accept(any());
 		verify(builder).build();
-		verify(builder).scalar("Int", "Integer");
-		verify(builder).scalar("Float", "Double");
-		verify(builder).scalar("ID", "String");
+		verify(builder).scalars(anyMap());
 		verifyNoMoreInteractions(builder);
 	}
 
@@ -88,9 +83,7 @@ class ScalarMapParameterApplierTest {
 		assertThat(configuration.getScalars()).containsOnlyKeys("ID", "Int", "Float", "A").containsEntry("A", "B");
 		verify(builder).accept(any());
 		verify(builder).build();
-		verify(builder).scalar("Int", "Integer");
-		verify(builder).scalar("Float", "Double");
-		verify(builder).scalar("ID", "String");
+		verify(builder).scalars(anyMap());
 		verify(builder).scalar("A", "B");
 		verifyNoMoreInteractions(builder);
 	}
@@ -108,9 +101,7 @@ class ScalarMapParameterApplierTest {
 			.containsEntry("Float", "Double");
 		verify(builder).accept(any());
 		verify(builder).build();
-		verify(builder).scalar("Int", "Integer");
-		verify(builder).scalar("Float", "Double");
-		verify(builder).scalar("ID", "String");
+		verify(builder).scalars(anyMap());
 		verifyNoMoreInteractions(builder);
 	}
 

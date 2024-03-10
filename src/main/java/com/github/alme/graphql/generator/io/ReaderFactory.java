@@ -1,7 +1,5 @@
 package com.github.alme.graphql.generator.io;
 
-import static java.lang.String.format;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -13,7 +11,6 @@ import org.apache.maven.plugin.logging.Log;
 
 import graphql.parser.MultiSourceReader;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 
 @RequiredArgsConstructor
 public class ReaderFactory {
@@ -27,7 +24,7 @@ public class ReaderFactory {
 				try {
 					return new FileInfo(Files.newBufferedReader(path), path.toString());
 				} catch (IOException e) {
-					log.error(format("Skipping [%s].", path), e);
+					log.error("Skipping [%s].".formatted(path), e);
 					return null;
 				}
 			})
@@ -39,10 +36,6 @@ public class ReaderFactory {
 			.build();
 	}
 
-	@Value
-	private static class FileInfo {
-		Reader reader;
-		String path;
-	}
+	private record FileInfo(Reader reader, String path) { }
 
 }

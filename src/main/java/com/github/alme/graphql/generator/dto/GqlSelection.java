@@ -1,39 +1,36 @@
 package com.github.alme.graphql.generator.dto;
 
-import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
-
-import org.jetbrains.annotations.NotNull;
 
 import graphql.language.SelectionSet;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import lombok.Value;
 import lombok.experimental.Delegate;
 
-@Value
+@Getter
+@RequiredArgsConstructor
 @EqualsAndHashCode(exclude = { "targetTypeName", "subsets" })
 @ToString(exclude = { "subsets" })
 public class GqlSelection {
 
-	@Delegate GqlField field;
-	String alias;
-	String fragmentTypeName;
-	Set<SelectionSet> subsets;
-	AtomicReference<String> targetTypeName = new AtomicReference<>("");
+	private final @Delegate GqlField field;
+	private final String alias;
+	private final String fragmentTypeName;
+	private final Set<SelectionSet> subsets;
+	private String targetTypeName;
 
 	public String getKey() {
-		return String.format("%s:%s:%s:%s", alias, getName(), getType(), fragmentTypeName);
+		return "%s:%s:%s:%s".formatted(alias, field.getName(), field.getType(), fragmentTypeName);
 	}
 
 	public static GqlSelection of(GqlField field, String alias, String fragmentTypeName) {
-		return new GqlSelection(field, alias, fragmentTypeName, emptySet());
+		return new GqlSelection(field, alias, fragmentTypeName, Set.of());
 	}
 
 	public static GqlSelection of(GqlField field, String alias, SelectionSet subset) {
@@ -41,16 +38,15 @@ public class GqlSelection {
 	}
 
 	public static GqlSelection of(GqlField field, String alias) {
-		return new GqlSelection(field, alias, "", emptySet());
+		return new GqlSelection(field, alias, "", Set.of());
 	}
 
 	public static GqlSelection of(String typeName, SelectionSet subset) {
 		return new GqlSelection(GqlField.of(null, GqlType.named(typeName)), null, "", getSubsets(subset));
 	}
 
-	@NotNull
 	private static Set<SelectionSet> getSubsets(SelectionSet subset) {
-		return Optional.ofNullable(subset).map(Collections::singleton).orElseGet(Collections::emptySet);
+		return Optional.ofNullable(subset).map(Set::of).orElseGet(Set::of);
 	}
 
 	public GqlSelection merge(GqlSelection that) {
@@ -62,22 +58,15 @@ public class GqlSelection {
 		);
 	}
 
-	public void replaceTargetType(String typeName) {
-		targetTypeName.set(typeName);
-	}
-
-	/**
-	 * Used in templates
-	 */
-	public String getTargetTypeName() {
-		return targetTypeName.get();
+	public void setTargetTypeName(String targetTypeName) {
+		this.targetTypeName = targetTypeName;
 	}
 
 	/**
 	 * Used in templates
 	 */
 	public String getTitle() {
-		return (alias == null || alias.isEmpty()) ? getName() : alias;
+		return (alias == null || alias.isEmpty()) ? field.getName() : alias;
 	}
 
 }
