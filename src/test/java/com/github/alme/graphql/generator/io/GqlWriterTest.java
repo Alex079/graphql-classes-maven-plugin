@@ -76,6 +76,17 @@ class GqlWriterTest {
 		then_the_generated_class_overrides_the_hashCode_method();
 	}
 
+	@Test
+	void translateOneObjectTypeWithTwoFieldsAndBuilderPattern() throws MojoExecutionException, IOException {
+		given_a_context_containing_an_object_with_two_fields();
+		given_the_builder_enhancement_configurations();
+		when_the_write_is_invoked();
+		then_the_generated_class_overrides_the_toString_method();
+		then_the_generated_class_overrides_the_equals_method();
+		then_the_generated_class_overrides_the_hashCode_method();
+		then_the_generated_class_has_builder_methods();
+	}
+
 	private void given_a_context_containing_an_object_with_two_fields() {
 		when(doc.getDefinitionsOfType(ObjectTypeDefinition.class)).thenReturn(singletonList(
 				newObjectTypeDefinition()
@@ -113,6 +124,14 @@ class GqlWriterTest {
 				.build();
 	}
 
+	private void given_the_builder_enhancement_configurations() {
+		gqlConfiguration = GqlConfiguration.builder()
+				.schemaTypesPackageName("com.company.test")
+				.generateSchemaOtherTypes(true)
+				.generateDtoBuilder(true)
+				.build();
+	}
+
 	private void when_the_write_is_invoked() throws IOException, MojoExecutionException {
 		doReturn(testWriter).when(writerFactory).getWriter(any(), any());
 		GqlWriter gqlWriter = new GqlWriter(writerFactory);
@@ -129,5 +148,11 @@ class GqlWriterTest {
 
 	private void then_the_generated_class_overrides_the_hashCode_method() {
 		assertTrue(testWriter.toString().contains("public int hashCode()"));
+	}
+
+	private void then_the_generated_class_has_builder_methods() {
+		assertTrue(testWriter.toString().contains("public static Builder builder()"));
+		assertTrue(testWriter.toString().contains("public Builder toBuilder()"));
+		assertTrue(testWriter.toString().contains("public Object1 build()"));
 	}
 }
