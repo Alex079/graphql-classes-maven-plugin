@@ -67,6 +67,16 @@
 	</#list>
 </#macro>
 
+<#macro addToBuilderMethod builderClassName fields indent>
+	<#lt/>${indent}public ${builderClassName} toBuilder() {
+	<#lt/>${indent}	${builderClassName} builder = new ${builderClassName}();
+	<#list fields as field>
+		<#lt/>${indent}	builder.${propertyPrefix!}${getFieldName(field)}${propertySuffix!} = this.${propertyPrefix!}${getFieldName(field)}${propertySuffix!};
+	</#list>
+	<#lt/>${indent}	return builder;
+	<#lt/>${indent}}
+</#macro>
+
 <#macro addBuilderFields className fields indent>
 	<#list fields as field>
 		<@addField field indent/>

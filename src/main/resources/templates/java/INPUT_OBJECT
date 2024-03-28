@@ -28,6 +28,7 @@ implements ${parents?join(", ")}
 		<@classMembers.addBuilderFields className='Builder' fields=fields indent='\t\t'/>
 		<@classMembers.addBuildMethod resultClassName=name fields=fields indent='\t\t'/>
 		<#lt/>	}
+		<@classMembers.addToBuilderMethod builderClassName='Builder' fields=fields indent='\t'/>
 	</#if>
 }
 //CHECKSTYLE:ON
