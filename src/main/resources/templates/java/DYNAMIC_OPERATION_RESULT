@@ -26,6 +26,7 @@ public class ${className}
 		<@classMembers.addBuilderFields className='Builder' fields=selections indent='\t\t'/>
 		<@classMembers.addBuildMethod resultClassName=className fields=selections indent='\t\t'/>
 		<#lt/>	}
+		<@classMembers.addToBuilderMethod builderClassName='Builder' fields=selections indent='\t'/>
 	</#if>
 }
 //CHECKSTYLE:ON
