@@ -19,7 +19,7 @@ public class ${className}
 		<@classMembers.addConstructor className=className fields=selections indent='\t'/>
 	</#if>
 	<#if dtoBuilder>
-		<@classMembers.addBuilderMethod indent='\t'/>
+		<@classMembers.addBuilderMethod builderClassName='Builder' indent='\t'/>
 		<#lt/>	public static class Builder
 		<#lt/>	{
 		<#lt/>		private Builder() { }
