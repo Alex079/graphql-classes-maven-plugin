@@ -165,9 +165,10 @@ public class GqlWriter {
 				typeMap.forEach((typeName, selections) -> definedOperationResultFileCreator
 					.createFile(packageName, typeName, singletonMap("selections", selections)));
 			});
-			context.getDefinedOperations().forEach((operationName, operation) -> context.getLog().info(format("Finished creating %d class(es) for %s operation.",
-				(operation.getVariables().isEmpty() ? 1 : 2) + context.getDefinedSelections().get(operationName).size(),
-				operationName)));
+			context.getDefinedOperations().forEach((operationName, operation) ->
+				context.getLog().info(format("Finished creating %d class(es) for %s operation.",
+					(operation.getVariables().isEmpty() ? 1 : 2) + context.getDefinedSelections().get(operationName).size(),
+					operationName)));
 		}
 	}
 

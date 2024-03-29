@@ -29,8 +29,7 @@ public class GqlType {
 			return list(of(((ListType) type).getType(), naming));
 		}
 		else if (type instanceof TypeName) {
-			String name = ((TypeName) type).getName();
-			return named(naming.apply(name));
+			return named(naming.apply(((TypeName) type).getName()));
 		}
 		return null;
 	}
@@ -47,12 +46,12 @@ public class GqlType {
 		return new GqlType(Flag.NAMED, name, null);
 	}
 
-	public String getInner() {
+	public String getName() {
 		GqlType res = this;
-		while (res.getNested() != null) {
-			res = res.getNested();
+		while (res.nested != null) {
+			res = res.nested;
 		}
-		return res.getName();
+		return res.name;
 	}
 
 	/**

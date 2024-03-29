@@ -79,7 +79,7 @@ public class OperationTranslator implements Translator {
 				Collection<FragmentDefinition> requiredFragments = new HashSet<>();
 				ctx.getDefinedSelections()
 					.computeIfAbsent(baseName, x -> traverseSelections(
-						GqlSelection.of(typeName, definition.getSelectionSet()), allFragments, requiredFragments, ctx));
+						typeName, definition.getSelectionSet(), allFragments, requiredFragments, ctx));
 				ctx.getDefinedOperations()
 					.computeIfAbsent(baseName, x -> GqlOperation.of(
 						definitionName,
@@ -96,7 +96,8 @@ public class OperationTranslator implements Translator {
 	}
 
 	private Map<String, Collection<GqlSelection>> traverseSelections(
-		GqlSelection rootSelection,
+		String typeName,
+		SelectionSet subset,
 		Collection<FragmentDefinition> allFragments,
 		Collection<FragmentDefinition> requiredFragments,
 		GqlContext ctx
@@ -104,21 +105,14 @@ public class OperationTranslator implements Translator {
 		Map<String, Map<Integer, Set<GqlSelection>>> typeMap = new HashMap<>();
 		Map<String, AtomicInteger> counters = new HashMap<>();
 		Queue<GqlSelection> selectionsToResolve = new LinkedList<>();
-		selectionsToResolve.offer(rootSelection);
+		selectionsToResolve.offer(GqlSelection.of(typeName, subset));
 		while (!selectionsToResolve.isEmpty()) {
 			val currentSelection = selectionsToResolve.poll();
-			String currentTypeName = currentSelection.getType().getInner();
+			String currentTypeName = currentSelection.getType().getName();
 			// get a set of selections by type name and their unresolved subset
-			Set<GqlSelection> subSelections = new HashSet<>();
-			Set<GqlSelection> unresolved = new LinkedHashSet<>();
-			currentSelection.getSubsets().forEach(unresolvedSet ->
-				resolveOneLevel(unresolvedSet, allFragments, requiredFragments, new HashSet<>(), ctx, currentTypeName)
-					.forEach(selection -> {
-						if (!selection.getSubsets().isEmpty()) {
-							unresolved.add(selection);
-						}
-						subSelections.add(selection);
-					}));
+			val subSelections = currentSelection.getSubsets().stream()
+				.flatMap(unresolved -> resolveOneLevel(unresolved, allFragments, requiredFragments, new HashSet<>(), ctx, currentTypeName).stream())
+				.collect(toSet());
 			// find exactly the same selection set already linked to this type
 			val variants = typeMap.computeIfAbsent(currentTypeName, x -> new HashMap<>());
 			int variantNumber = variants.entrySet().stream()
@@ -129,11 +123,11 @@ public class OperationTranslator implements Translator {
 					// this selection set has not been linked to this type before
 					int key = counters.computeIfAbsent(currentTypeName, x -> new AtomicInteger()).incrementAndGet();
 					variants.put(key, subSelections);
-					unresolved.forEach(selectionsToResolve::offer);
+					subSelections.stream().filter(s -> !s.getSubsets().isEmpty()).forEach(selectionsToResolve::offer);
 					return key;
 				});
 			// link previous selection to the type name
-			currentSelection.replaceTargetType(currentTypeName + getTypeSuffix(variantNumber));
+			currentSelection.setTargetTypeName(currentTypeName + getTypeSuffix(variantNumber));
 		}
 		Map<String, Collection<GqlSelection>> result = new HashMap<>();
 		typeMap.forEach((type, variants) -> variants.forEach((variantNumber, selections) ->
@@ -176,9 +170,11 @@ public class OperationTranslator implements Translator {
 			.filter(Optional::isPresent)
 			.map(Optional::get)
 			.filter(visitedFragments::add)
-			.peek(requiredFragments::add)
-			.map(fragment -> resolveOneLevel(fragment.getSelectionSet(),
-				allFragments, requiredFragments, visitedFragments, ctx, fragment.getTypeCondition().getName()))
+			.map(fragment -> {
+				requiredFragments.add(fragment);
+				return resolveOneLevel(fragment.getSelectionSet(),
+					allFragments, requiredFragments, visitedFragments, ctx, fragment.getTypeCondition().getName());
+			})
 			.flatMap(Collection::stream)
 			.forEach(selection -> result.merge(selection.getKey(), selection, GqlSelection::merge));
 		return result.values();
