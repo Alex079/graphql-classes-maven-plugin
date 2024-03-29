@@ -10,6 +10,7 @@ import graphql.language.SelectionSet;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Delegate;
 
@@ -23,7 +24,7 @@ public class GqlSelection {
 	private final String alias;
 	private final String fragmentTypeName;
 	private final Set<SelectionSet> subsets;
-	private String targetTypeName;
+	@Setter private String targetTypeName;
 
 	public String getKey() {
 		return "%s:%s:%s:%s".formatted(alias, field.getName(), field.getType(), fragmentTypeName);
@@ -56,10 +57,6 @@ public class GqlSelection {
 			this.fragmentTypeName,
 			Stream.concat(this.subsets.stream(), that.subsets.stream()).collect(toSet())
 		);
-	}
-
-	public void setTargetTypeName(String targetTypeName) {
-		this.targetTypeName = targetTypeName;
 	}
 
 	/**
