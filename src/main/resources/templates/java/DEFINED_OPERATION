@@ -41,6 +41,28 @@ public class ${className} implements ${operationsPackage}.${operation?cap_first}
 		return ${currentPackage}.results.${typeName}.class;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof ${className})) return false;
+		${className} other = (${className}) o;
+		java.util.Map<String, Object> otherVariables = other.getVariables();
+		java.util.Map<String, Object> currentVariables = getVariables();
+		if (otherVariables == currentVariables) {
+			return true;
+		}
+		if (otherVariables == null || currentVariables == null) {
+			return false;
+		}
+		return otherVariables.equals(currentVariables);
+	}
+
+	@Override
+	public int hashCode() {
+		return java.util.Objects.hashCode(getVariables());
+	}
+
+
 	<@classMembers.addToString fields=[{'name':'operationName'},{'name':'document'},{'name':'variables'}] indent='\t'/>
 }
 //CHECKSTYLE:ON

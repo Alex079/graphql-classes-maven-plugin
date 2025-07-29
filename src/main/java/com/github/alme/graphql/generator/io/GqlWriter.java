@@ -71,6 +71,7 @@ public class GqlWriter {
 
 	private void setTemplateVariables(GqlConfiguration configuration) throws MojoExecutionException {
 		try {
+			//
 			freemarker.setSharedVariable(SCHEMA_TYPES_PACKAGE_KEY, configuration.getSchemaTypesPackageName());
 			freemarker.setSharedVariable(OPERATIONS_PACKAGE_KEY, configuration.getOperationsPackageName());
 			freemarker.setSharedVariable(DEFINED_OPERATIONS_PACKAGE_KEY, configuration.getDefinedOperationsPackageName());
