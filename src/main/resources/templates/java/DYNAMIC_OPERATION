@@ -33,6 +33,8 @@ public class ${className} implements ${operationsPackage}.${operation?cap_first}
 		return ${currentPackage}.results.${typeName}.class;
 	}
 
+	<@classMembers.addEquals className=className fields=[{'name':'document'}] indent='\t'/>
+	<@classMembers.addHashCode fields=[{'name':'document'}] indent='\t'/>
 	<@classMembers.addToString fields=[{'name':'document'}] indent='\t'/>
 }
 //CHECKSTYLE:ON
