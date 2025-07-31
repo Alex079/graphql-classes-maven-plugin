@@ -41,6 +41,8 @@ public class ${className} implements ${operationsPackage}.${operation?cap_first}
 		return ${currentPackage}.results.${typeName}.class;
 	}
 
+	<@classMembers.addEquals className=className fields=[{'name':'variables'}] indent='\t'/>
+	<@classMembers.addHashCode fields=[{'name':'variables'}] indent='\t'/>
 	<@classMembers.addToString fields=[{'name':'operationName'},{'name':'document'},{'name':'variables'}] indent='\t'/>
 }
 //CHECKSTYLE:ON
