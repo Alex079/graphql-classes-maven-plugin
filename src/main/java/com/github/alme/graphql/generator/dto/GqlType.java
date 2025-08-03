@@ -22,14 +22,14 @@ public class GqlType {
 	GqlType nested;
 
 	public static GqlType of(Type<?> type, UnaryOperator<String> naming) {
-		if (type instanceof NonNullType) {
-			return mandatory(of(((NonNullType) type).getType(), naming));
+		if (type instanceof NonNullType nonnull) {
+			return mandatory(of(nonnull.getType(), naming));
 		}
-		else if (type instanceof ListType) {
-			return list(of(((ListType) type).getType(), naming));
+		else if (type instanceof ListType list) {
+			return list(of(list.getType(), naming));
 		}
-		else if (type instanceof TypeName) {
-			return named(naming.apply(((TypeName) type).getName()));
+		else if (type instanceof TypeName named) {
+			return named(naming.apply(named.getName()));
 		}
 		return null;
 	}
@@ -58,39 +58,30 @@ public class GqlType {
 	 * Used in templates
 	 */
 	public String getFull() {
-		switch (flag) {
-			case MANDATORY:
-				return nested.getFull();
-			case LIST:
-				return String.format("java.util.List<%s>", nested.getFull());
-			default:
-				return name;
-		}
+		return switch (flag) {
+			case MANDATORY -> nested.getFull();
+			case LIST -> "java.util.List<%s>".formatted(nested.getFull());
+			case NAMED -> name;
+		};
 	}
 
 	/**
 	 * Used in templates
 	 */
 	public String getCustom(String customType) {
-		switch (flag) {
-			case MANDATORY:
-				return nested.getCustom(customType);
-			case LIST:
-				return String.format("java.util.List<%s>", nested.getCustom(customType));
-			default:
-				return customType;
-		}
+		return switch (flag) {
+			case MANDATORY -> nested.getCustom(customType);
+			case LIST -> "java.util.List<%s>".formatted(nested.getCustom(customType));
+			case NAMED -> customType;
+		};
 	}
 
 	@Override
 	public String toString() {
-		switch (flag) {
-			case MANDATORY:
-				return String.format("%s!", nested);
-			case LIST:
-				return String.format("[%s]", nested);
-			default:
-				return name;
-		}
+		return switch (flag) {
+			case MANDATORY -> "%s!".formatted(nested);
+			case LIST -> "[%s]".formatted(nested);
+			case NAMED -> name;
+		};
 	}
 }
