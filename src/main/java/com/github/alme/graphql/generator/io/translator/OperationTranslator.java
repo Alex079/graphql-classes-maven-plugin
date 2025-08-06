@@ -52,7 +52,7 @@ public class OperationTranslator implements Translator {
 	private final Configuration freemarker;
 
 	public OperationTranslator() {
-		freemarker = new Configuration(Configuration.VERSION_2_3_32);
+		freemarker = new Configuration(Configuration.VERSION_2_3_34);
 		freemarker.setClassLoaderForTemplateLoading(OperationTranslator.class.getClassLoader(), "/templates/text");
 		freemarker.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
 		freemarker.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);

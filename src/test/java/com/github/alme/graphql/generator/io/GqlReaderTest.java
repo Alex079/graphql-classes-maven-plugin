@@ -12,6 +12,8 @@ import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.dto.GqlStructure;
 
+import graphql.parser.ParserOptions;
+
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +26,7 @@ class GqlReaderTest {
 
 	private static final String MINIMAL_SCHEMA = " type Query {}";
 	private static final String INVALID_SCHEMA = "type Type { a: }";
-	private static final GqlConfiguration MINIMAL_CONFIG = GqlConfiguration.builder().build();
+	private static final GqlConfiguration MINIMAL_CONFIG = GqlConfiguration.builder().parserOptions(ParserOptions.getDefaultParserOptions()).build();
 
 	@Mock
 	private ReaderFactory readerFactory;
