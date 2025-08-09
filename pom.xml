@@ -209,7 +209,6 @@
 				<extensions>true</extensions>
 				<configuration>
 					<publishingServerId>central</publishingServerId>
-					<skipPublishing>true</skipPublishing>
 				</configuration>
 			</plugin>
 		</plugins>
