@@ -113,7 +113,7 @@
 				<version>3.15.1</version>
 				<configuration>
 					<goalPrefix>graphql-classes</goalPrefix>
-					<requiredJavaVersion>8</requiredJavaVersion>
+					<requiredJavaVersion>${maven.compiler.release}</requiredJavaVersion>
 					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 				</configuration>
 				<executions>
