@@ -1,7 +1,6 @@
 package com.github.alme.graphql.generator.parameters;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
