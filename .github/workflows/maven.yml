@@ -13,6 +13,7 @@ jobs:
         version:
           - 17
           - 21
+          - 25
         distribution:
           - temurin
           - zulu
