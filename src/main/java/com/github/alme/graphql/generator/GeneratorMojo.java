@@ -135,12 +135,6 @@ public class GeneratorMojo extends AbstractMojo {
 	private String privateFieldSuffix;
 
 	/**
-	 * Version of "@Generated" annotation to use on generated classes (i.e. "1.8", "11", "15").
-	 */
-	@Parameter(property = "gql.generatedAnnotationVersion")
-	private String generatedAnnotationVersion;
-
-	/**
 	 * The type of data object enhancement.
 	 * Can be empty or take one of the following values:
 	 * METHOD_CHAINING (data object setters will return 'this' instead of 'void'),
@@ -184,7 +178,7 @@ public class GeneratorMojo extends AbstractMojo {
 			.accept(new AliasMapParameterApplier(aliasMap, aliasMapAlternative))
 			.accept(new DataObjectEnhancementTypeParameterApplier(dataObjectEnhancement))
 			.accept(new OutputTypesParameterApplier(generatedOutputTypes))
-			.accept(new GeneratedAnnotationParameterApplier(generatedAnnotationVersion))
+			.accept(new GeneratedAnnotationParameterApplier())
 			.accept(new ParserOptionsParameterApplier(parserMaxTokens))
 			.accept(new FieldTransformationApplier(jsonPropertyAnnotation, privateFieldPrefix, privateFieldSuffix))
 			.importPackages(importPackages)
