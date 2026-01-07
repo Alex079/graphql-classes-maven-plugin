@@ -1,7 +1,5 @@
 package com.github.alme.graphql.generator.io;
 
-import static java.lang.String.format;
-
 import java.io.IOException;
 import java.io.Reader;
 
@@ -41,36 +39,36 @@ public class GqlReader {
 				.parserOptions(configuration.getParserOptions())
 				.build();
 			Document doc = Parser.parse(environment);
-			log.info(format(LOG_PARSER, doc.getDefinitions().size()));
+			log.info(LOG_PARSER.formatted(doc.getDefinitions().size()));
 
 			new InputObjectTypeTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getInputObjectTypes().size(), "Input Object type"));
+			log.info(LOG_TRANSLATOR.formatted(context.getInputObjectTypes().size(), "Input Object type"));
 
 			new EnumTypeTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getEnumTypes().size(), "Enum type"));
+			log.info(LOG_TRANSLATOR.formatted(context.getEnumTypes().size(), "Enum type"));
 
 			new InterfaceTypeTranslator().translate(doc, context);
 			new UnionTypeTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getInterfaceTypes().size(), "Interface and union type"));
+			log.info(LOG_TRANSLATOR.formatted(context.getInterfaceTypes().size(), "Interface and union type"));
 
 			new ObjectTypeTranslator().translate(doc, context);
 			new RelayConnectionTranslator().translate(doc, context);
-			log.info(format(LOG_TRANSLATOR, context.getObjectTypes().size(), "Object type"));
+			log.info(LOG_TRANSLATOR.formatted(context.getObjectTypes().size(), "Object type"));
 
 			boolean generateDefinedOperations = configuration.isGenerateDefinedOperations();
 			boolean generateDynamicOperations = configuration.isGenerateDynamicOperations();
 
 			if (generateDefinedOperations || generateDynamicOperations) {
 				new SchemaTranslator().translate(doc, context);
-				log.info(format(LOG_TRANSLATOR, context.getOperations().size(), "Schema"));
+				log.info(LOG_TRANSLATOR.formatted(context.getOperations().size(), "Schema"));
 			}
 			if (generateDefinedOperations) {
 				new OperationTranslator().translate(doc, context);
-				log.info(format(LOG_TRANSLATOR, context.getDefinedOperations().size(), "Defined operation"));
+				log.info(LOG_TRANSLATOR.formatted(context.getDefinedOperations().size(), "Defined operation"));
 			}
 			if (generateDynamicOperations) {
 				new DynamicOperationTranslator().translate(doc, context);
-				log.info(format(LOG_TRANSLATOR, context.getDynamicOperations().size(), "Dynamic operation"));
+				log.info(LOG_TRANSLATOR.formatted(context.getDynamicOperations().size(), "Dynamic operation"));
 			}
 		}
 		catch (IOException e) {

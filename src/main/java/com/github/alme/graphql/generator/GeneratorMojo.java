@@ -1,7 +1,5 @@
 package com.github.alme.graphql.generator;
 
-import static java.lang.String.format;
-
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
@@ -137,12 +135,6 @@ public class GeneratorMojo extends AbstractMojo {
 	private String privateFieldSuffix;
 
 	/**
-	 * Version of "@Generated" annotation to use on generated classes (i.e. "1.8", "11", "15").
-	 */
-	@Parameter(property = "gql.generatedAnnotationVersion")
-	private String generatedAnnotationVersion;
-
-	/**
 	 * The type of data object enhancement.
 	 * Can be empty or take one of the following values:
 	 * METHOD_CHAINING (data object setters will return 'this' instead of 'void'),
@@ -186,20 +178,20 @@ public class GeneratorMojo extends AbstractMojo {
 			.accept(new AliasMapParameterApplier(aliasMap, aliasMapAlternative))
 			.accept(new DataObjectEnhancementTypeParameterApplier(dataObjectEnhancement))
 			.accept(new OutputTypesParameterApplier(generatedOutputTypes))
-			.accept(new GeneratedAnnotationParameterApplier(generatedAnnotationVersion))
+			.accept(new GeneratedAnnotationParameterApplier())
 			.accept(new ParserOptionsParameterApplier(parserMaxTokens))
 			.accept(new FieldTransformationApplier(jsonPropertyAnnotation, privateFieldPrefix, privateFieldSuffix))
 			.importPackages(importPackages)
 			.build();
 
-		getLog().info(format("Current configuration: %s.", configuration));
+		getLog().info("Current configuration: %s.".formatted(configuration));
 
 		GqlContext context = new GqlContext(getLog(), configuration.getScalars(), configuration.getAliases());
 		ReaderFactory readerFactory = new ReaderFactory(configuration.getSourceFiles(), getLog());
 		WriterFactory writerFactory = new WriterFactory(configuration.getOutputRoot());
 
 		new GqlReader(readerFactory).read(context, configuration);
-		getLog().debug(format("Current context: %s.", context));
+		getLog().debug("Current context: %s.".formatted(context));
 
 		new GqlWriter(writerFactory).write(context, configuration);
 		getLog().info("Generation is done.");

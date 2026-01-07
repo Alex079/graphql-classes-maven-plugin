@@ -1,7 +1,5 @@
 package com.github.alme.graphql.generator.parameters;
 
-import static java.lang.String.format;
-
 import java.time.Instant;
 
 import com.github.alme.graphql.generator.GeneratorMojo;
@@ -12,21 +10,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GeneratedAnnotationParameterApplier implements ParameterApplier {
 
-	private final String generatedAnnotationVersion;
-
-	private static final String TEMPLATE = "@javax.annotation%s.Generated(value = \"%s\", date = \"%s\")";
-	private static final String PROCESSING = ".processing";
-	private static final String JAVA8 = "1.8";
+	private static final String ANNOTATION = """
+		@javax.annotation.processing.Generated(value = "%s", date = "%s")
+		""".formatted(GeneratorMojo.class.getName(), Instant.now());
 
 	@Override
 	public void apply(GqlConfiguration.GqlConfigurationBuilder builder) {
-		if (generatedAnnotationVersion != null) {
-			builder.generatedAnnotation(format(TEMPLATE,
-				JAVA8.equals(generatedAnnotationVersion) ? "" : PROCESSING,
-				GeneratorMojo.class.getName(),
-				Instant.now()
-			));
-		}
+		builder.generatedAnnotation(ANNOTATION);
 	}
 
 }

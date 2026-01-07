@@ -1,9 +1,7 @@
 package com.github.alme.graphql.generator.dto;
 
-import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -29,11 +27,11 @@ public class GqlSelection {
 	@Setter private String targetTypeName;
 
 	public String getKey() {
-		return String.format("%s:%s:%s:%s", alias, field.getName(), field.getType(), fragmentTypeName);
+		return "%s:%s:%s:%s".formatted(alias, field.getName(), field.getType(), fragmentTypeName);
 	}
 
 	public static GqlSelection of(GqlField field, String alias, String fragmentTypeName) {
-		return new GqlSelection(field, alias, fragmentTypeName, emptySet());
+		return new GqlSelection(field, alias, fragmentTypeName, Set.of());
 	}
 
 	public static GqlSelection of(GqlField field, String alias, SelectionSet subset) {
@@ -41,7 +39,7 @@ public class GqlSelection {
 	}
 
 	public static GqlSelection of(GqlField field, String alias) {
-		return new GqlSelection(field, alias, "", emptySet());
+		return new GqlSelection(field, alias, "", Set.of());
 	}
 
 	public static GqlSelection of(String typeName, SelectionSet subset) {
@@ -49,7 +47,7 @@ public class GqlSelection {
 	}
 
 	private static Set<SelectionSet> getSubsets(SelectionSet subset) {
-		return Optional.ofNullable(subset).map(Collections::singleton).orElseGet(Collections::emptySet);
+		return Optional.ofNullable(subset).map(Set::of).orElseGet(Set::of);
 	}
 
 	public GqlSelection merge(GqlSelection that) {

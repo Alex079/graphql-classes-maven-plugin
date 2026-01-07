@@ -1,7 +1,6 @@
 package com.github.alme.graphql.generator.parameters;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -17,12 +16,11 @@ public class ScalarMapParameterApplier implements ParameterApplier {
 
 	private static final String KEY_VALUE_SEPARATOR = "=";
 
-	private static final Map<String, String> DEFAULT_SCALARS = new HashMap<>();
-	static {
-		DEFAULT_SCALARS.put("Int", "Integer");
-		DEFAULT_SCALARS.put("Float", "Double");
-		DEFAULT_SCALARS.put("ID", "String");
-	}
+	private static final Map<String, String> DEFAULT_SCALARS = Map.of(
+		"Int", "Integer",
+		"Float", "Double",
+		"ID", "String"
+	);
 
 	@Override
 	public void apply(GqlConfigurationBuilder builder) {
@@ -31,14 +29,14 @@ public class ScalarMapParameterApplier implements ParameterApplier {
 			scalarMap.entrySet().stream()
 				.filter(item ->
 					item.getKey() != null && item.getValue() != null &&
-					!item.getKey().trim().isEmpty() && !item.getValue().trim().isEmpty())
+					!item.getKey().isBlank() && !item.getValue().isBlank())
 				.forEach(item -> builder.scalar(item.getKey().trim(), item.getValue().trim()));
 		}
 		else if (scalarMapAlternative != null) {
 			scalarMapAlternative.stream()
 				.filter(Objects::nonNull)
 				.map(item -> item.split(KEY_VALUE_SEPARATOR, 2))
-				.filter(item -> (item.length == 2) && !item[0].trim().isEmpty() && !item[1].trim().isEmpty())
+				.filter(item -> (item.length == 2) && !item[0].isBlank() && !item[1].isBlank())
 				.forEach(item -> builder.scalar(item[0].trim(), item[1].trim()));
 		}
 	}
