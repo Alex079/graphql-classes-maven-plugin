@@ -47,7 +47,7 @@ public class GqlWriter {
 
 	public GqlWriter(WriterFactory writerFactory) {
 		this.writerFactory = writerFactory;
-		freemarker = new Configuration(Configuration.VERSION_2_3_32);
+		freemarker = new Configuration(Configuration.VERSION_2_3_34);
 		freemarker.setClassLoaderForTemplateLoading(GqlWriter.class.getClassLoader(), "/templates/java");
 		freemarker.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
 		freemarker.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);

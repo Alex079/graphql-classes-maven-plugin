@@ -12,11 +12,11 @@ public class ParserOptionsParameterApplier implements ParameterApplier {
 
 	@Override
 	public void apply(GqlConfiguration.GqlConfigurationBuilder builder) {
-		ParserOptions.Builder parserOptionsBuilder = ParserOptions.newParserOptions();
-		if (parserMaxTokens != null) {
-			parserOptionsBuilder.maxTokens(parserMaxTokens);
-		}
-		builder.parserOptions(parserOptionsBuilder.build());
+		builder.parserOptions(ParserOptions.getDefaultParserOptions().transform(options -> {
+			if (parserMaxTokens != null) {
+				options.maxTokens(parserMaxTokens);
+			}
+		}));
 	}
 
 }
