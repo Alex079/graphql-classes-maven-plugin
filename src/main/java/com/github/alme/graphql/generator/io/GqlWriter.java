@@ -40,6 +40,7 @@ public class GqlWriter {
 	private static final String IMPORT_PACKAGES_KEY = "importPackages";
 	private static final String GENERATED_ANNOTATION_KEY = "generatedAnnotation";
 	private static final String SCHEMA_TYPES_PACKAGE_KEY = "schemaTypesPackage";
+	private static final String SCHEMA_TYPES_AVAILABLE_KEY = "schemaTypesAvailable";
 	private static final String OPERATIONS_PACKAGE_KEY = "operationsPackage";
 	private static final String DEFINED_OPERATIONS_PACKAGE_KEY = "definedOperationsPackage";
 	private static final String DYNAMIC_OPERATIONS_PACKAGE_KEY = "dynamicOperationsPackage";
@@ -62,7 +63,7 @@ public class GqlWriter {
 	public void write(GqlContext context, GqlConfiguration configuration) throws MojoExecutionException {
 		setTemplateVariables(configuration);
 		createSharedClasses(context, configuration);
-		createSchemaTypes(context, configuration);
+		setSchemaTypesAvailable(createSchemaTypes(context, configuration));
 		createOperationInterfaces(context, configuration);
 		createDefinedOperations(context, configuration);
 		createDynamicOperations(context, configuration);
@@ -89,6 +90,14 @@ public class GqlWriter {
 		}
 	}
 
+	private void setSchemaTypesAvailable(boolean schemaTypesAvailable) throws MojoExecutionException {
+		try {
+			freemarker.setSharedVariable(SCHEMA_TYPES_AVAILABLE_KEY, schemaTypesAvailable);
+		} catch (TemplateModelException e) {
+			throw new MojoExecutionException("Cannot set shared variables.", e);
+		}
+	}
+
 	private void clearTemplateVariables() {
 		freemarker.clearSharedVariables();
 	}
@@ -102,7 +111,7 @@ public class GqlWriter {
 		}
 	}
 
-	private void createSchemaTypes(GqlContext context, GqlConfiguration configuration) {
+	private boolean createSchemaTypes(GqlContext context, GqlConfiguration configuration) {
 		String packageName = configuration.getSchemaTypesPackageName();
 		int count = 0;
 		if (configuration.isGenerateSchemaInputTypes()) {
@@ -133,7 +142,9 @@ public class GqlWriter {
 		}
 		if (count > 0) {
 			context.getLog().info(format("Finished creating %d schema type class(es).", count));
+			return true;
 		}
+		return false;
 	}
 
 	private void createOperationInterfaces(GqlContext context, GqlConfiguration configuration) {

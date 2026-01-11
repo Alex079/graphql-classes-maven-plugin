@@ -12,6 +12,6 @@ public class DefinedOperationVariablesFileCreator extends FileCreator {
 
 	@Override
 	protected String getTemplate() {
-		return "DEFINED_OPERATION_VARIABLES";
+		return "DEFINED_OPERATION_VARIABLES.ftl";
 	}
 }

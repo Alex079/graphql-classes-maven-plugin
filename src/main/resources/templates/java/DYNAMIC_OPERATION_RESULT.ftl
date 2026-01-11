@@ -1,8 +1,10 @@
-<#import "import/classMemberTemplates" as classMembers/>
+<#import "import/classMemberTemplates.ftl" as classMembers/>
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
+<#if schemaTypesAvailable>
 import ${schemaTypesPackage}.*;
+</#if>
 
 <#list importPackages as i>
 import ${i}.*;

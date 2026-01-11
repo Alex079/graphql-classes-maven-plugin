@@ -12,6 +12,6 @@ public class OperationInterfaceFileCreator extends FileCreator {
 
 	@Override
 	protected String getTemplate() {
-		return "OPERATION_INTERFACE";
+		return "OPERATION_INTERFACE.ftl";
 	}
 }
