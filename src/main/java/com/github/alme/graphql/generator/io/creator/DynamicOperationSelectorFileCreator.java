@@ -12,6 +12,6 @@ public class DynamicOperationSelectorFileCreator extends FileCreator {
 
 	@Override
 	protected String getTemplate() {
-		return "DYNAMIC_OPERATION_SELECTOR";
+		return "DYNAMIC_OPERATION_SELECTOR.ftl";
 	}
 }
