@@ -16,6 +16,6 @@ public class StructureFileCreator extends FileCreator {
 
 	@Override
 	protected String getTemplate() {
-		return structure.name();
+		return structure.name() + ".ftl";
 	}
 }

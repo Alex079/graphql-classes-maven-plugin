@@ -47,7 +47,7 @@ public class OperationTranslator implements Translator {
 	private static final String UNNAMED = "Unnamed";
 	private static final String FRAGMENTS_KEY = "fragments";
 	private static final String OPERATION_KEY = "o";
-	private static final String OPERATION_DOCUMENT = "OPERATION_DOCUMENT";
+	private static final String OPERATION_DOCUMENT = "OPERATION_DOCUMENT.ftl";
 
 	private final Configuration freemarker;
 

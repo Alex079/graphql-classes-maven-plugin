@@ -12,6 +12,6 @@ public class DefinedOperationResultFileCreator extends FileCreator {
 
 	@Override
 	protected String getTemplate() {
-		return "DEFINED_OPERATION_RESULT";
+		return "DEFINED_OPERATION_RESULT.ftl";
 	}
 }

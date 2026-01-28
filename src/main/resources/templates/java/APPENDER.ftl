@@ -1,4 +1,4 @@
-<#import "import/classMemberTemplates" as classMembers/>
+<#import "import/classMemberTemplates.ftl" as classMembers/>
 //CHECKSTYLE:OFF
 package ${currentPackage};
 

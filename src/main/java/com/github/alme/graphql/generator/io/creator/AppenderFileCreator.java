@@ -12,6 +12,6 @@ public class AppenderFileCreator extends FileCreator {
 
 	@Override
 	protected String getTemplate() {
-		return "APPENDER";
+		return "APPENDER.ftl";
 	}
 }
