@@ -74,11 +74,7 @@ class GqlWriterTest {
 		given_a_context_containing_query_operation_definition_with_one_field();
 		GqlConfiguration gqlConfiguration = given_generate_defined_operations_config();
 		when_the_write_is_invoked(gqlConfiguration);
-		assertThat(testWriter.toString()).containsIgnoringWhitespaces("\t@Override\n"
-			+ "\tpublic boolean equals(Object o) {\n"
-			+ "\t\tif (this == o) return true;\n"
-			+ "\t\tif (!(o instanceof GetInstrumentsQuery)) return false;\n"
-			+ "\t\tGetInstrumentsQuery other = (GetInstrumentsQuery) o;");
+		then_the_generated_query_class_overrides_the_equals_method();
 	}
 
 	@Test
@@ -104,24 +100,12 @@ class GqlWriterTest {
 
 	@Test
 	void translateOneQueryOperationWithInput() throws MojoExecutionException, IOException {
-		// enable generating defined operations and schema input types so imports are emitted
-		GqlConfiguration gqlConfiguration = GqlConfiguration.builder()
-			.schemaTypesPackageName("com.company.test.types")
-			.generateSchemaOtherTypes(true)
-			.generateSchemaInputTypes(true)
-			.generateDefinedOperations(true)
-			.operationsPackageName("com.company.test")
-			.build();
+		GqlConfiguration gqlConfiguration = given_defined_operations_with_schema_input_types_config();
 		given_a_context_containing_an_input_object_with_one_field();
 		given_a_context_containing_mutation_operation_with_one_field_and_one_argument();
 		when_the_write_is_invoked(gqlConfiguration);
-		// generated classes should import schema types package with a star-import
-		assertTrue(testWriter.toString().contains("import com.company.test.types.*;"));
-		assertThat(testWriter.toString()).containsIgnoringWhitespaces("\t@Override\n"
-			+ "\tpublic boolean equals(Object o) {\n"
-			+ "\t\tif (this == o) return true;\n"
-			+ "\t\tif (!(o instanceof UpdateMutation)) return false;\n"
-			+ "\t\tUpdateMutation other = (UpdateMutation) o;");
+		then_the_generated_class_imports_schema_types_package();
+		then_the_generated_mutation_class_overrides_the_equals_method();
 	}
 
 	private void given_a_context_containing_an_object_with_two_fields() {
@@ -215,6 +199,16 @@ class GqlWriterTest {
 				.build();
 	}
 
+	private GqlConfiguration given_defined_operations_with_schema_input_types_config() {
+		return GqlConfiguration.builder()
+				.schemaTypesPackageName("com.company.test.types")
+				.generateSchemaOtherTypes(true)
+				.generateSchemaInputTypes(true)
+				.generateDefinedOperations(true)
+				.operationsPackageName("com.company.test")
+				.build();
+	}
+
 	private void when_the_write_is_invoked(GqlConfiguration gqlConfiguration) throws IOException, MojoExecutionException {
 		doReturn(testWriter).when(writerFactory).getWriter(any(), any());
 		GqlWriter gqlWriter = new GqlWriter(writerFactory);
@@ -237,5 +231,25 @@ class GqlWriterTest {
 		assertTrue(testWriter.toString().contains("public static Builder builder()"));
 		assertTrue(testWriter.toString().contains("public Builder toBuilder()"));
 		assertTrue(testWriter.toString().contains("public Object1 build()"));
+	}
+
+	private void then_the_generated_query_class_overrides_the_equals_method() {
+		assertThat(testWriter.toString()).containsIgnoringWhitespaces("\t@Override\n"
+			+ "\tpublic boolean equals(Object o) {\n"
+			+ "\t\tif (this == o) return true;\n"
+			+ "\t\tif (!(o instanceof GetInstrumentsQuery)) return false;\n"
+			+ "\t\tGetInstrumentsQuery other = (GetInstrumentsQuery) o;");
+	}
+
+	private void then_the_generated_class_imports_schema_types_package() {
+		assertTrue(testWriter.toString().contains("import com.company.test.types.*;"));
+	}
+
+	private void then_the_generated_mutation_class_overrides_the_equals_method() {
+		assertThat(testWriter.toString()).containsIgnoringWhitespaces("\t@Override\n"
+			+ "\tpublic boolean equals(Object o) {\n"
+			+ "\t\tif (this == o) return true;\n"
+			+ "\t\tif (!(o instanceof UpdateMutation)) return false;\n"
+			+ "\t\tUpdateMutation other = (UpdateMutation) o;");
 	}
 }
