@@ -12,6 +12,6 @@ public class DynamicOperationResultFileCreator extends FileCreator {
 
 	@Override
 	protected String getTemplate() {
-		return "DYNAMIC_OPERATION_RESULT";
+		return "DYNAMIC_OPERATION_RESULT.ftl";
 	}
 }

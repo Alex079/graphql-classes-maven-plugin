@@ -1,4 +1,4 @@
-<#import "import/classMemberTemplates" as classMembers/>
+<#import "import/classMemberTemplates.ftl" as classMembers/>
 //CHECKSTYLE:OFF
 package ${currentPackage};
 
@@ -16,7 +16,7 @@ implements ${parents?join(", ")}
 	<@classMembers.addFields className=name fields=fields indent='\t'/>
 	<@classMembers.addEquals className=name fields=fields indent='\t'/>
 	<@classMembers.addHashCode fields=fields indent='\t'/>
-	<@classMembers.addToString fields=fields indent='\t'/>
+	<@classMembers.addToGraphQlString fields=fields indent='\t'/>
 	<#if dtoConstructor>
 		<@classMembers.addConstructor className=name fields=fields indent='\t'/>
 	</#if>

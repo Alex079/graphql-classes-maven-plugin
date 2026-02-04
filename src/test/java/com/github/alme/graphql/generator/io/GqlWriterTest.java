@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -27,13 +28,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.github.alme.graphql.generator.dto.GqlConfiguration;
 import com.github.alme.graphql.generator.dto.GqlContext;
 import com.github.alme.graphql.generator.io.translator.ObjectTypeTranslator;
+import com.github.alme.graphql.generator.io.translator.InputObjectTypeTranslator;
 import com.github.alme.graphql.generator.io.translator.OperationTranslator;
 
 import graphql.language.Document;
 import graphql.language.Field;
+import graphql.language.InputObjectTypeDefinition;
 import graphql.language.ObjectTypeDefinition;
 import graphql.language.OperationDefinition;
 import graphql.language.SelectionSet;
+import graphql.language.VariableDefinition;
 
 @ExtendWith(MockitoExtension.class)
 class GqlWriterTest {
@@ -47,21 +51,19 @@ class GqlWriterTest {
 	@Mock
 	private WriterFactory writerFactory;
 	private GqlContext ctx;
-	private GqlConfiguration gqlConfiguration;
 	private StringWriter testWriter;
 
 	@BeforeEach
 	void init() {
-		this.ctx = null;
-		this.gqlConfiguration = null;
+		this.ctx = new GqlContext(log, emptyMap(), emptyMap());
 		this.testWriter = new StringWriter();
 	}
 
 	@Test
 	void translateOneObjectTypeWithNoFields() throws MojoExecutionException, IOException {
 		given_a_context_containing_an_object_without_fields();
-		given_the_minimum_set_of_configurations();
-		when_the_write_is_invoked();
+		GqlConfiguration gqlConfiguration = given_the_minimum_set_of_configurations();
+		when_the_write_is_invoked(gqlConfiguration);
 		then_the_generated_class_overrides_the_toString_method();
 		then_the_generated_class_overrides_the_equals_method();
 		then_the_generated_class_overrides_the_hashCode_method();
@@ -70,20 +72,16 @@ class GqlWriterTest {
 	@Test
 	void translateOneQueryOperationTypeWithOneField() throws MojoExecutionException, IOException {
 		given_a_context_containing_query_operation_definition_with_one_field();
-		given_generate_defined_operations_config();
-		when_the_write_is_invoked();
-		assertThat(testWriter.toString()).containsIgnoringWhitespaces("\t@Override\n"
-				+ "\tpublic boolean equals(Object o) {\n"
-				+ "\t\tif (this == o) return true;\n"
-				+ "\t\tif (!(o instanceof GetInstrumentsQuery)) return false;\n"
-				+ "\t\tGetInstrumentsQuery other = (GetInstrumentsQuery) o;");
+		GqlConfiguration gqlConfiguration = given_generate_defined_operations_config();
+		when_the_write_is_invoked(gqlConfiguration);
+		then_the_generated_query_class_overrides_the_equals_method();
 	}
 
 	@Test
 	void translateOneObjectTypeWithTwoFields() throws MojoExecutionException, IOException {
 		given_a_context_containing_an_object_with_two_fields();
-		given_the_minimum_set_of_configurations();
-		when_the_write_is_invoked();
+		GqlConfiguration gqlConfiguration = given_the_minimum_set_of_configurations();
+		when_the_write_is_invoked(gqlConfiguration);
 		then_the_generated_class_overrides_the_toString_method();
 		then_the_generated_class_overrides_the_equals_method();
 		then_the_generated_class_overrides_the_hashCode_method();
@@ -92,12 +90,22 @@ class GqlWriterTest {
 	@Test
 	void translateOneObjectTypeWithTwoFieldsAndBuilderPattern() throws MojoExecutionException, IOException {
 		given_a_context_containing_an_object_with_two_fields();
-		given_the_builder_enhancement_configurations();
-		when_the_write_is_invoked();
+		GqlConfiguration gqlConfiguration = given_the_builder_enhancement_configurations();
+		when_the_write_is_invoked(gqlConfiguration);
 		then_the_generated_class_overrides_the_toString_method();
 		then_the_generated_class_overrides_the_equals_method();
 		then_the_generated_class_overrides_the_hashCode_method();
 		then_the_generated_class_has_builder_methods();
+	}
+
+	@Test
+	void translateOneQueryOperationWithInput() throws MojoExecutionException, IOException {
+		GqlConfiguration gqlConfiguration = given_defined_operations_with_schema_input_types_config();
+		given_a_context_containing_an_input_object_with_one_field();
+		given_a_context_containing_mutation_operation_with_one_field_and_one_argument();
+		when_the_write_is_invoked(gqlConfiguration);
+		then_the_generated_class_imports_schema_types_package();
+		then_the_generated_mutation_class_overrides_the_equals_method();
 	}
 
 	private void given_a_context_containing_an_object_with_two_fields() {
@@ -117,8 +125,19 @@ class GqlWriterTest {
 								.type(newListType(newTypeName("Type3").build()).build())
 								.build())
 						.build()));
-		this.ctx = new GqlContext(log, emptyMap(), emptyMap());
 		objectTypeTranslator.translate(doc, ctx);
+	}
+
+	private void given_a_context_containing_an_input_object_with_one_field() {
+		lenient().when(doc.getDefinitionsOfType(InputObjectTypeDefinition.class)).thenReturn(singletonList(
+				InputObjectTypeDefinition.newInputObjectDefinition()
+						.name("InputType")
+						.inputValueDefinition(newInputValueDefinition()
+								.name("str")
+								.type(newTypeName("String").build())
+								.build())
+						.build()));
+		new InputObjectTypeTranslator().translate(doc, ctx);
 	}
 
 	private void given_a_context_containing_an_object_without_fields() {
@@ -126,7 +145,6 @@ class GqlWriterTest {
 				newObjectTypeDefinition()
 						.name("Object1")
 						.build()));
-		this.ctx = new GqlContext(log, emptyMap(), emptyMap());
 		objectTypeTranslator.translate(doc, ctx);
 	}
 
@@ -139,20 +157,33 @@ class GqlWriterTest {
 								.selection(Field.newField("isin").build())
 								.build())
 						.build()));
-		this.ctx = new GqlContext(log, emptyMap(), emptyMap());
 		ctx.getOperations().put("query", "Query");
 		operationTranslator.translate(doc, ctx);
 	}
 
-	private void given_the_minimum_set_of_configurations() {
-		gqlConfiguration = GqlConfiguration.builder()
+	private void given_a_context_containing_mutation_operation_with_one_field_and_one_argument() {
+		lenient().when(doc.getDefinitionsOfType(OperationDefinition.class)).thenReturn(singletonList(
+				OperationDefinition.newOperationDefinition()
+						.name("Update")
+						.operation(OperationDefinition.Operation.MUTATION)
+						.variableDefinition(VariableDefinition.newVariableDefinition("input", newTypeName("InputType").build()).build())
+						.selectionSet(SelectionSet.newSelectionSet()
+								.selection(Field.newField("isin").build())
+								.build())
+						.build()));
+		ctx.getOperations().put("mutation", "Update");
+		operationTranslator.translate(doc, ctx);
+	}
+
+	private GqlConfiguration given_the_minimum_set_of_configurations() {
+		return GqlConfiguration.builder()
 				.schemaTypesPackageName("com.company.test")
 				.generateSchemaOtherTypes(true)
 				.build();
 	}
 
-	private void given_generate_defined_operations_config() {
-		gqlConfiguration = GqlConfiguration.builder()
+	private GqlConfiguration given_generate_defined_operations_config() {
+		return GqlConfiguration.builder()
 				.schemaTypesPackageName("com.company.test")
 				.generateSchemaOtherTypes(true)
 				.generateDefinedOperations(true)
@@ -160,15 +191,25 @@ class GqlWriterTest {
 				.build();
 	}
 
-	private void given_the_builder_enhancement_configurations() {
-		gqlConfiguration = GqlConfiguration.builder()
+	private GqlConfiguration given_the_builder_enhancement_configurations() {
+		return GqlConfiguration.builder()
 				.schemaTypesPackageName("com.company.test")
 				.generateSchemaOtherTypes(true)
 				.generateDtoBuilder(true)
 				.build();
 	}
 
-	private void when_the_write_is_invoked() throws IOException, MojoExecutionException {
+	private GqlConfiguration given_defined_operations_with_schema_input_types_config() {
+		return GqlConfiguration.builder()
+				.schemaTypesPackageName("com.company.test.types")
+				.generateSchemaOtherTypes(true)
+				.generateSchemaInputTypes(true)
+				.generateDefinedOperations(true)
+				.operationsPackageName("com.company.test")
+				.build();
+	}
+
+	private void when_the_write_is_invoked(GqlConfiguration gqlConfiguration) throws IOException, MojoExecutionException {
 		doReturn(testWriter).when(writerFactory).getWriter(any(), any());
 		GqlWriter gqlWriter = new GqlWriter(writerFactory);
 		gqlWriter.write(ctx, gqlConfiguration);
@@ -190,5 +231,25 @@ class GqlWriterTest {
 		assertTrue(testWriter.toString().contains("public static Builder builder()"));
 		assertTrue(testWriter.toString().contains("public Builder toBuilder()"));
 		assertTrue(testWriter.toString().contains("public Object1 build()"));
+	}
+
+	private void then_the_generated_query_class_overrides_the_equals_method() {
+		assertThat(testWriter.toString()).containsIgnoringWhitespaces("\t@Override\n"
+			+ "\tpublic boolean equals(Object o) {\n"
+			+ "\t\tif (this == o) return true;\n"
+			+ "\t\tif (!(o instanceof GetInstrumentsQuery)) return false;\n"
+			+ "\t\tGetInstrumentsQuery other = (GetInstrumentsQuery) o;");
+	}
+
+	private void then_the_generated_class_imports_schema_types_package() {
+		assertTrue(testWriter.toString().contains("import com.company.test.types.*;"));
+	}
+
+	private void then_the_generated_mutation_class_overrides_the_equals_method() {
+		assertThat(testWriter.toString()).containsIgnoringWhitespaces("\t@Override\n"
+			+ "\tpublic boolean equals(Object o) {\n"
+			+ "\t\tif (this == o) return true;\n"
+			+ "\t\tif (!(o instanceof UpdateMutation)) return false;\n"
+			+ "\t\tUpdateMutation other = (UpdateMutation) o;");
 	}
 }
