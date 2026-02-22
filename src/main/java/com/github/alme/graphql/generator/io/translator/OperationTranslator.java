@@ -27,7 +27,6 @@ import com.github.alme.graphql.generator.dto.GqlType;
 import com.github.alme.graphql.generator.io.Util;
 
 import org.apache.maven.plugin.logging.Log;
-import org.jetbrains.annotations.NotNull;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -134,7 +133,6 @@ public class OperationTranslator implements Translator {
 		return result;
 	}
 
-	@NotNull
 	private static String getTypeSuffix(int ordinalNumber) {
 		return SUFFIX + (ordinalNumber < 2 ? "" : ordinalNumber);
 	}
