@@ -29,7 +29,7 @@ abstract class FileCreator {
 			freemarker.setSharedVariable(CURRENT_PACKAGE_KEY, packageName);
 			freemarker.getTemplate(getTemplate()).process(baseObject, writer);
 		} catch (TemplateException | IOException e) {
-			throw new MojoExecutionException(String.format(LOG_CANNOT_CREATE, packageName, className), e);
+			throw new MojoExecutionException(LOG_CANNOT_CREATE.formatted(packageName, className), e);
 		}
 	}
 

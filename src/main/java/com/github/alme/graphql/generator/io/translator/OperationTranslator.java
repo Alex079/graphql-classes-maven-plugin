@@ -39,7 +39,6 @@ import graphql.language.FragmentSpread;
 import graphql.language.InlineFragment;
 import graphql.language.OperationDefinition;
 import graphql.language.SelectionSet;
-import lombok.val;
 
 public class OperationTranslator implements Translator {
 
@@ -106,14 +105,14 @@ public class OperationTranslator implements Translator {
 		Queue<GqlSelection> selectionsToResolve = new LinkedList<>();
 		selectionsToResolve.offer(GqlSelection.of(typeName, subset));
 		while (!selectionsToResolve.isEmpty()) {
-			val currentSelection = selectionsToResolve.poll();
+			var currentSelection = selectionsToResolve.poll();
 			String currentTypeName = currentSelection.getType().getName();
 			// get a set of selections by type name and their unresolved subset
-			val subSelections = currentSelection.getSubsets().stream()
+			var subSelections = currentSelection.getSubsets().stream()
 				.flatMap(unresolved -> resolveOneLevel(unresolved, allFragments, requiredFragments, new HashSet<>(), ctx, currentTypeName).stream())
 				.collect(toSet());
 			// find exactly the same selection set already linked to this type
-			val variants = typeMap.computeIfAbsent(currentTypeName, x -> new HashMap<>());
+			var variants = typeMap.computeIfAbsent(currentTypeName, x -> new HashMap<>());
 			int variantNumber = variants.entrySet().stream()
 				.filter(entry -> entry.getValue().equals(subSelections))
 				.map(Map.Entry::getKey)
@@ -215,7 +214,7 @@ public class OperationTranslator implements Translator {
 			freemarker.getTemplate(OPERATION_DOCUMENT).process(null, writer);
 			return writer.toString();
 		} catch (TemplateException | IOException e) {
-			log.warn(String.format("Operation document [%s] is not created.", operation.getName()), e);
+			log.warn("Operation document [%s] is not created.".formatted(operation.getName()), e);
 			return null;
 		} finally {
 			freemarker.clearSharedVariables();
