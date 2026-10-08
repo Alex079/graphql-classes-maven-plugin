@@ -361,7 +361,7 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:https://github.com/Alex079/graphql-classes-maven-plugin.git</connection>
+		<connection>scm:git:git@github.com:Alex079/graphql-classes-maven-plugin.git</connection>
 		<url>https://github.com/Alex079/graphql-classes-maven-plugin</url>
 		<tag>v2.4.0</tag>
 	</scm>
